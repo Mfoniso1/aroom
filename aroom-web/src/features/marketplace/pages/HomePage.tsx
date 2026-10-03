@@ -31,7 +31,7 @@ const MOCK_LISTINGS: Listing[] = [
     landmark: 'Onike roundabout',
     verificationStatus: 'verified',
     availabilityStatus: 'held',
-    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1c2c490b2d?q=80&w=800&auto=format&fit=crop'
+    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop'
   }
 ]
 

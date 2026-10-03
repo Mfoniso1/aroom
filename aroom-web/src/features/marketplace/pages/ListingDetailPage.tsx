@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { TrustBadge } from '@/components/shared/TrustBadge'
+import { MoveInCostCalculator } from '@/components/shared/MoveInCostCalculator'
 import { Calendar, MapPin, User, Star } from 'lucide-react'
 
 export function ListingDetailPage() {
@@ -46,6 +47,10 @@ export function ListingDetailPage() {
             <h2 className="text-xl font-semibold text-slate-900 mb-4">Description</h2>
             <p className="text-slate-700 leading-relaxed">{listing.description}</p>
           </div>
+
+          <div>
+            <MoveInCostCalculator rent={listing.price} mode="inline" />
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -53,6 +58,10 @@ export function ListingDetailPage() {
             <div className="text-3xl font-bold text-green-700">
               ₦{listing.price.toLocaleString()}
               <span className="text-lg font-normal text-slate-500">/{listing.period}</span>
+            </div>
+
+            <div className="mt-4">
+              <MoveInCostCalculator rent={listing.price} mode="card" />
             </div>
             
             <button className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-4 rounded-lg transition-colors">
