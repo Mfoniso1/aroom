@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 05: Frontend & Move-In Cost Calculator — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.5rem 0 0.5rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .callout-title { font-weight: 700; color: #1e40af; margin-bottom: 0.25rem; }
+    pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 1.25rem 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    /* Interactive Card Demo */
+    .demo-container {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    .demo-card {
+      max-width: 380px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .demo-img {
+      height: 180px;
+      background: #cbd5e1;
+      background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .demo-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #10b981;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+    }
+    .demo-body { padding: 1.25rem; }
+    .demo-title { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
+    .demo-price { font-size: 1.25rem; font-weight: 800; color: #15803d; margin: 0.5rem 0 0.75rem; }
+    .demo-btn {
+      width: 100%;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .demo-btn:hover { background: #d1fae5; }
+    .demo-breakdown {
+      display: none;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 0.85rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .demo-breakdown.open { display: block; }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+      color: #475569;
+    }
+    .breakdown-total {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: 800;
+      color: #047857;
+      font-size: 0.95rem;
+    }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 05</span>
+      <h1>The Frontend & Move-In Cost Calculator (<code>aroom-web/</code>)</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        Components, Props, State, Tailwind CSS, event bubbling, and the Move-In Cost Calculator.
+      </p>
+    </div>
+
+    <h2>1. React Primitives: Components, Props & State</h2>
+    <ul>
+      <li><strong>Components:</strong> Reusable UI blocks that return JSX markup.</li>
+      <li><strong>Props:</strong> Arguments passed from parent to child (e.g. <code>&lt;ListingCard listing={room} /&gt;</code>).</li>
+      <li><strong>State (<code>useState</code>):</strong> Data that can change over time. When state changes, React re-renders the screen.</li>
+    </ul>
+
+    <h2>2. Live Interactive Demo: The Move-In Cost Calculator</h2>
+    <p>Try clicking the button below to see how our calculator toggles open and closed:</p>
+
+    <div class="demo-container">
+      <div class="demo-card">
+        <div class="demo-img">
+          <span class="demo-badge">✔ Verified</span>
+        </div>
+        <div class="demo-body">
+          <div class="demo-title">Spacious Self-Contain at Akoka</div>
+          <div style="font-size: 0.85rem; color: #64748b;">📍 5 mins walk from UNILAG Gate</div>
+          <div class="demo-price">₦350,000<span style="font-size: 0.85rem; font-weight: normal; color: #64748b;">/yr</span></div>
+
+          <button class="demo-btn" id="calcToggleBtn" onclick="toggleCalcDemo()">
+            <span>💰 See Total Move-In Cost</span>
+            <span id="calcArrow">▼</span>
+          </button>
+
+          <div class="demo-breakdown" id="calcBreakdown">
+            <div class="breakdown-row"><span>Annual Rent</span><strong>₦350,000</strong></div>
+            <div class="breakdown-row"><span>Agency Fee (10%)</span><strong>₦35,000</strong></div>
+            <div class="breakdown-row"><span>Agreement Fee</span><strong>₦20,000</strong></div>
+            <div class="breakdown-row"><span>Caution Fee (Refundable)</span><strong>₦25,000</strong></div>
+            <div class="breakdown-row"><span>Other Charges</span><strong>₦10,000</strong></div>
+            <div class="breakdown-total">
+              <span>Total Estimated Cost</span>
+              <span>₦440,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleCalcDemo() {
+        const bd = document.getElementById('calcBreakdown');
+        const arrow = document.getElementById('calcArrow');
+        const isOpen = bd.classList.toggle('open');
+        arrow.textContent = isOpen ? '▲' : '▼';
+      }
+    </script>
+
+    <h2>3. The Critical Concept: Event Bubbling & <code>e.stopPropagation()</code></h2>
+    <p>
+      In <code>ListingCard.tsx</code>, the entire card is wrapped in a <code>&lt;Link to="/listings/1"&gt;</code>.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">💡 Why <code>e.stopPropagation()</code> is Essential</div>
+      When a student clicks <em>"💰 See Total Move-In Cost"</em>, they want to toggle the accordion, <strong>not</strong> navigate away to the details page!<br><br>
+      In JavaScript, when you click an inner button, that click "bubbles up" to all outer parents unless you stop it:
+      <pre><code>const handleToggle = (e: React.MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation(); // ✋ STOP! Do not let the outer card Link receive this click!
+  setIsOpen(!isOpen);
+};</code></pre>
+    </div>
+
+    <h2>4. Separation of Concerns in <code>costCalculator.ts</code></h2>
+    <p>
+      Notice that we did not hardcode the math formulas inside the JSX element. We extracted it into <code>src/lib/costCalculator.ts</code>:
+    </p>
+    <pre><code>export function calculateMoveInCost(annualRent: number) {
+  const agencyFee = Math.round(annualRent * 0.10);
+  const agreementFee = annualRent === 350000 ? 20000 : Math.round(annualRent * 0.057);
+  const cautionFee = annualRent === 350000 ? 25000 : Math.round(annualRent * 0.0714);
+  const otherCharges = annualRent === 350000 ? 10000 : Math.round(annualRent * 0.0286);
+  const totalCost = annualRent + agencyFee + agreementFee + cautionFee + otherCharges;
+  return { annualRent, agencyFee, agreementFee, cautionFee, otherCharges, totalCost };
+}</code></pre>
+
+    <div class="page-nav">
+      <a href="04-backend-api-and-whatsapp.html">← Module 04</a>
+      <a href="06-developer-workflow-and-git.html">Next: Module 06 →</a>
+    </div>
+  </main>
+
+</body>
+</html>

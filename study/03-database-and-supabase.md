@@ -94,3 +94,4 @@ price_annual_kobo BIGINT NOT NULL
 
 ### ⏭️ Next Step:
 Proceed to **[04-backend-api-and-whatsapp.md](./04-backend-api-and-whatsapp.md)** to see how the backend server processes data and connects to WhatsApp!
+

@@ -130,3 +130,4 @@ export function calculateMoveInCost(annualRent: number) {
 
 ### ⏭️ Next Step:
 Proceed to **[06-developer-workflow-and-git.md](./06-developer-workflow-and-git.md)** to learn how to run the project, manage environment variables, and work with Git like a pro!
+

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 02: Architecture & Tech Stack — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.5rem 0 0.5rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .diagram-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    .tech-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .tech-title {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+    .analogy-quote {
+      background: #f1f5f9;
+      border-left: 3px solid var(--primary);
+      padding: 0.75rem 1rem;
+      border-radius: 0.25rem;
+      font-size: 0.9rem;
+      color: #1e293b;
+      margin-top: 0.5rem;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 02</span>
+      <h1>Architecture & Tech Stack</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        How the frontend, backend API, and database talk to each other in real-time.
+      </p>
+    </div>
+
+    <h2>1. The Client-Server Model (The Conversation)</h2>
+    <p>
+      In web development, the <strong>Client</strong> (the student's web browser) and the <strong>Server</strong> (the computer hosting our backend API) communicate through questions and answers called <strong>HTTP Requests and Responses</strong>.
+    </p>
+
+    <div class="diagram-box">
+      <div class="mermaid">
+      sequenceDiagram
+        autonumber
+        actor Student as 📱 Student Browser
+        participant Backend as ⚙️ Express Backend (Port 5000)
+        participant DB as 🗄️ Supabase PostgreSQL
+        
+        Student->>Backend: GET /api/v1/listings (Campus: UNILAG, Max: 400k)
+        Backend->>DB: SQL: SELECT * FROM listings WHERE price <= 40000000
+        DB-->>Backend: Returns 3 matching listing records
+        Backend-->>Student: JSON Response with listings array
+        Note over Student: React renders listing cards on screen!
+      </div>
+    </div>
+
+    <h2>2. Aroom Full System Architecture</h2>
+    <p>
+      Below is the complete architectural map of the entire project:
+    </p>
+
+    <div class="diagram-box">
+      <div class="mermaid">
+      graph TD
+        subgraph Users ["Users & Devices"]
+            Student["📱 Student (Browser)"]
+            Agent["💻 Agent (Dashboard)"]
+            WhatsAppUser["💬 Student (WhatsApp)"]
+        end
+
+        subgraph Frontend ["Frontend (aroom-web)"]
+            ReactApp["React 19 + Vite App<br/>(Components, State, Tailwind)"]
+        end
+
+        subgraph Backend ["Backend API (backend)"]
+            ExpressServer["Express.js Server (Port 5000)"]
+            ListingService["ListingService<br/>(Search & Filters)"]
+            TrustService["TrustService<br/>(Reputation & Reports)"]
+            WebhookRouter["WhatsApp Webhook<br/>(Triage State Machine)"]
+        end
+
+        subgraph Database ["Database Layer (supabase)"]
+            Postgres["PostgreSQL Database<br/>(11 Relational Tables)"]
+            Storage["Supabase Storage Buckets<br/>(Photos & ID Cards)"]
+        end
+
+        Student --> ReactApp
+        Agent --> ReactApp
+        ReactApp -->|HTTP / JSON| ExpressServer
+        WhatsAppUser -->|Meta Cloud API| WebhookRouter
+
+        ExpressServer --> ListingService
+        ExpressServer --> TrustService
+        ExpressServer --> WebhookRouter
+
+        ListingService -->|SQL Connection Pool| Postgres
+        TrustService -->|SQL Connection Pool| Postgres
+        ReactApp -.->|Direct Image URLs| Storage
+      </div>
+    </div>
+
+    <h2>3. The Tech Stack Explained for Beginners</h2>
+
+    <div class="tech-card">
+      <div class="tech-title">TypeScript (.ts & .tsx)</div>
+      <p>JavaScript with strict type safety. It ensures variables hold the types you expect (strings, numbers, objects).</p>
+      <div class="analogy-quote">
+        <strong>💡 Real-World Analogy:</strong> Plain JavaScript is like writing an essay without spellcheck. TypeScript is a live grammar and spelling checker that catches bugs before you run the code.
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-title">React 19 (aroom-web/)</div>
+      <p>A library for building user interfaces using reusable building blocks called <strong>Components</strong>.</p>
+      <div class="analogy-quote">
+        <strong>💡 Real-World Analogy:</strong> Like LEGO bricks. Instead of building one huge web page, you build a <code>&lt;ListingCard /&gt;</code> brick, a <code>&lt;TrustBadge /&gt;</code> brick, and assemble them.
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-title">Vite</div>
+      <p>A modern frontend build tool and local dev server. It recompiles changed files in milliseconds using Hot Module Replacement (HMR).</p>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-title">Tailwind CSS</div>
+      <p>A utility-first CSS framework. Instead of writing custom CSS rules in a separate file, you style directly inside JSX elements (e.g. <code>bg-green-600 text-white rounded-lg</code>).</p>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-title">Node.js & Express (backend/)</div>
+      <p>Node.js runs JavaScript on the server. Express is the web framework that listens on Port 5000 and responds to API requests.</p>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-title">PostgreSQL & Supabase (supabase/)</div>
+      <p>PostgreSQL is a world-class relational database. Supabase provides cloud hosting, authentication, database storage, and a dashboard.</p>
+    </div>
+
+    <div class="page-nav">
+      <a href="01-project-overview.html">← Module 01</a>
+      <a href="03-database-and-supabase.html">Next: Module 03 →</a>
+    </div>
+  </main>
+
+</body>
+</html>

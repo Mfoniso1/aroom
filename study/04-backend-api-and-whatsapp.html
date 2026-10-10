@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 04: Backend API & WhatsApp Bot — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.5rem 0 0.5rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .diagram-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 1.25rem 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    .endpoint-badge {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      color: white;
+      margin-right: 0.5rem;
+    }
+    .get { background: #0284c7; }
+    .post { background: #16a34a; }
+    .patch { background: #d97706; }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 04</span>
+      <h1>The Backend API & WhatsApp Bot (<code>backend/</code>)</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        How Express routes, Clean Architecture services, and WhatsApp conversational triage work.
+      </p>
+    </div>
+
+    <h2>1. What is an Express REST API?</h2>
+    <p>
+      The backend is written in <strong>Node.js</strong> using the <strong>Express</strong> framework. It listens on <strong>Port 5000</strong> and defines routes that respond with JSON.
+    </p>
+
+    <ul>
+      <li><span class="endpoint-badge get">GET</span> <code>/api/v1/listings</code> — Search & filter property listings</li>
+      <li><span class="endpoint-badge post">POST</span> <code>/api/v1/inquiries</code> — Book inspection slot (from Web or WhatsApp)</li>
+      <li><span class="endpoint-badge patch">PATCH</span> <code>/api/v1/listings/:id/status</code> — Agent single-tap toggle (<code>available</code> ↔ <code>held</code> ↔ <code>taken</code>)</li>
+      <li><span class="endpoint-badge post">POST</span> <code>/api/v1/reports/availability</code> — Student flags whether room is taken</li>
+      <li><span class="endpoint-badge post">POST</span> <code>/api/v1/webhook</code> — Meta WhatsApp Cloud message handler</li>
+    </ul>
+
+    <h2>2. Clean Architecture: Why We Separate Routes from Services</h2>
+    <p>
+      In amateur code, developers often mix database queries, calculation formulas, and HTTP handling in a single file. In Aroom, we separate them:
+    </p>
+
+    <pre><code>HTTP Request ──► [ Route Handler ] ──► [ Domain Service ] ──► [ Database Store ]
+                   (Checks inputs)      (Executes logic)       (Saves data)</code></pre>
+
+    <ul>
+      <li><strong><code>ListingService</code>:</strong> Encapsulates multi-parameter search, ensures new listings default to <code>unverified_new</code>, and enforces status transitions.</li>
+      <li><strong><code>InquiryService</code>:</strong> Shared by both the website and WhatsApp! When a student creates an inquiry, this service automatically transitions the listing to <code>held</code> to prevent double bookings.</li>
+      <li><strong><code>TrustService</code>:</strong> Computes agent trust scores (0-100) and reviews crowdsourced availability reports.</li>
+      <li><strong><code>IdentityService</code>:</strong> Checks institutional student email domains (<code>@live.unilag.edu.ng</code>).</li>
+    </ul>
+
+    <h2>3. The WhatsApp Conversational State Machine</h2>
+    <p>
+      The WhatsApp bot is not an unpredictable generic chatbot. It is a structured <strong>Finite State Machine (FSM)</strong>:
+    </p>
+
+    <div class="diagram-box">
+      <div class="mermaid">
+      stateDiagram-v2
+        [*] --> START: Student sends message
+        START --> AWAIT_CAMPUS: Bot asks "Which Campus?"
+        AWAIT_CAMPUS --> AWAIT_BUDGET: Student selects UNILAG
+        AWAIT_BUDGET --> SHOW_LISTINGS: Student sets max budget (e.g. ₦350k)
+        SHOW_LISTINGS --> BOOK_INSPECTION: Student picks Listing #1
+        BOOK_INSPECTION --> [*]: Slot confirmed & agent alerted!
+      </div>
+    </div>
+
+    <h2>4. The 11 Automated Integration Tests</h2>
+    <p>
+      To verify that all services and endpoints work together, we created an automated test suite in <code>backend/test/api.test.ts</code>:
+    </p>
+    <pre><code>& "C:\Program Files\nodejs\npm.cmd" test
+
+✔ Test 1: Health check passed (/health)
+✔ Test 2: Pilot Campus UNILAG loaded with landmarks
+✔ Test 3: Multi-factor search returned: Standard Executive Self-Contain (₦350k/yr)
+✔ Test 4: Agent listing created immediately live as [unverified_new]
+✔ Test 5: Agent single-tap toggled status to [held]
+✔ Test 6: Student registered & verified via @live.unilag.edu.ng domain
+✔ Test 7: Inspection lead created (Listing placed on held)
+✔ Test 8: Agent received qualified lead marked with [isInstitutionVerified: true]
+✔ Test 9: Post-inspection survey transitioned listing status to [taken]
+✔ Test 10: Meta WhatsApp webhook challenge verification succeeded
+✔ Test 11: Inbound WhatsApp message processed through FSM</code></pre>
+
+    <div class="page-nav">
+      <a href="03-database-and-supabase.html">← Module 03</a>
+      <a href="05-frontend-aroom-web.html">Next: Module 05 →</a>
+    </div>
+  </main>
+
+</body>
+</html>

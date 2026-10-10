@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 03: Database & Supabase — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.5rem 0 0.5rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .callout.warning {
+      background: #fffbeb;
+      border-left-color: #f59e0b;
+    }
+    .callout-title { font-weight: 700; color: #1e40af; margin-bottom: 0.25rem; }
+    .callout.warning .callout-title { color: #b45309; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 0.9rem;
+    }
+    td { font-size: 0.92rem; }
+    pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 1.25rem 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 03</span>
+      <h1>The Database & Supabase Layer (<code>supabase/</code>)</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        Understand SQL tables, UUIDs, migrations, Row Level Security, and Kobo pricing.
+      </p>
+    </div>
+
+    <h2>1. What is a Relational Database?</h2>
+    <p>
+      A <strong>relational database</strong> stores data inside structured <strong>tables</strong> (like tabs in Excel). Unlike simple files, relational databases enforce strict types, unique constraints, and relationships between tables using <strong>Foreign Keys</strong>.
+    </p>
+
+    <ul>
+      <li><strong>Table:</strong> The entity (e.g. <code>listings</code>, <code>users</code>).</li>
+      <li><strong>Column:</strong> The specific property (e.g. <code>price_annual_kobo</code>, <code>phone_number</code>).</li>
+      <li><strong>Row / Record:</strong> One specific real-world entry (e.g. "Standard Executive Self-Contain at Akoka").</li>
+      <li><strong>Primary Key (PK):</strong> The unique identity badge of that row (e.g. <code>id UUID PRIMARY KEY</code>).</li>
+      <li><strong>Foreign Key (FK):</strong> A link pointing to another table. For example, <code>listings.agent_id</code> points to <code>agent_profiles.id</code>.</li>
+    </ul>
+
+    <h2>2. Why Do We Use UUIDs?</h2>
+    <p>
+      Beginner apps often use auto-incrementing numbers (<code>id = 1, 2, 3</code>). Aroom uses <strong>UUIDs</strong> (Universally Unique Identifiers) like <code>f1111111-1111-1111-1111-111111111111</code>.
+    </p>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠️ The Hexadecimal Rule (Why We Fixed the UUID Error)</div>
+      A UUID is a 128-bit number formatted as 32 <strong>hexadecimal</strong> characters separated by hyphens.<br>
+      Hexadecimal <strong>only allows digits <code>0-9</code> and letters <code>a-f</code></strong>.<br><br>
+      When we previously used dummy IDs like <code>'u1111111...'</code> (u for user) or <code>'s1111111...'</code> (s for student), PostgreSQL threw:<br>
+      <code>ERROR: 22P02: invalid input syntax for type uuid: "u1111111-1111-1111-1111-111111111111"</code><br><br>
+      Because <code>u</code>, <code>s</code>, and <code>l</code> are not valid hex numbers! We resolved this by using valid hex letters:
+      <ul>
+        <li><code>c...</code> for Campuses (<code>c</code> is hex 12)</li>
+        <li><code>a...</code> for Agents (<code>a</code> is hex 10)</li>
+        <li><code>d...</code> for Users (<code>d</code> is hex 13)</li>
+        <li><code>b...</code> for Student Profiles (<code>b</code> is hex 11)</li>
+        <li><code>f...</code> for Listings (<code>f</code> is hex 15)</li>
+      </ul>
+    </div>
+
+    <h2>3. Why Prices Are Stored in Kobo (<code>BIGINT price_annual_kobo</code>)</h2>
+    <p>
+      In <code>listings</code>, you will see prices written as <code>35000000</code> for a ₦350,000 room.
+    </p>
+    <p>
+      <strong>Why not store <code>350000.00</code> as a decimal or float?</strong><br>
+      In computer processors, floating point math has rounding errors (e.g., <code>0.1 + 0.2 = 0.30000000000000004</code>). By storing money as integers in the smallest currency unit (1 Naira = 100 Kobo), our financial math is always 100% exact.
+    </p>
+
+    <h2>4. The 11 Core Database Tables in Aroom</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Table Name</th>
+          <th>Purpose in the Marketplace</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>campuses</code></td>
+          <td>Master university data (e.g. UNILAG), boundary coordinates, and institutional email domains.</td>
+        </tr>
+        <tr>
+          <td><code>users</code></td>
+          <td>Core login credentials, phone numbers, and user types (<code>student</code>, <code>agent</code>, <code>admin</code>).</td>
+        </tr>
+        <tr>
+          <td><code>student_profiles</code></td>
+          <td>Matriculation numbers, university email, and institution verification status.</td>
+        </tr>
+        <tr>
+          <td><code>agent_profiles</code></td>
+          <td>Agency names, ID cards, trust tiers (<code>gold</code>, <code>silver</code>, <code>bronze</code>), and response rates.</td>
+        </tr>
+        <tr>
+          <td><code>listings</code></td>
+          <td>Accommodation listings: title, room type, annual price in Kobo, landmark, and status.</td>
+        </tr>
+        <tr>
+          <td><code>listing_media</code></td>
+          <td>Photos and videos of properties, including a live camera verification flag.</td>
+        </tr>
+        <tr>
+          <td><code>inquiries</code></td>
+          <td>Inspection booking requests submitted by students from the Web or WhatsApp.</td>
+        </tr>
+        <tr>
+          <td><code>availability_reports</code></td>
+          <td>Crowdsourced reports: students report whether an inspected room is still available or taken.</td>
+        </tr>
+        <tr>
+          <td><code>inspection_reviews</code></td>
+          <td>Post-inspection ratings (1-5 stars), agent punctuality, and property accuracy reviews.</td>
+        </tr>
+        <tr>
+          <td><code>conversation_sessions</code></td>
+          <td>Saves conversation state for WhatsApp bot triage across multiple messages.</td>
+        </tr>
+        <tr>
+          <td><code>audit_logs</code></td>
+          <td>Immutable activity log for security, disputes, and trust score changes.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>5. Row Level Security (RLS) & Storage</h2>
+    <p>
+      Supabase includes <strong>Row Level Security (RLS)</strong> directly inside PostgreSQL. Even if a user connects to the database:
+    </p>
+    <pre><code>-- Public can view listings:
+CREATE POLICY "Public Read Listings" ON listings FOR SELECT USING (true);
+
+-- Agents can only update their own listings:
+CREATE POLICY "Agents can update own listings" ON listings FOR UPDATE
+USING (agent_id IN (SELECT id FROM agent_profiles WHERE user_id = auth.uid()));</code></pre>
+
+    <div class="page-nav">
+      <a href="02-architecture-and-tech-stack.html">← Module 02</a>
+      <a href="04-backend-api-and-whatsapp.html">Next: Module 04 →</a>
+    </div>
+  </main>
+
+</body>
+</html>

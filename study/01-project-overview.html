@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 01: Project Overview & Real Problem — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .callout-title { font-weight: 700; color: #1e40af; margin-bottom: 0.25rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 0.9rem;
+    }
+    td { font-size: 0.92rem; }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 01</span>
+      <h1>Project Overview & Real-World Problem</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        Understand what Aroom is, the accommodation crisis on Nigerian campuses, and how software builds trust.
+      </p>
+    </div>
+
+    <h2>1. What is Aroom?</h2>
+    <p>
+      <strong>Aroom</strong> is a verified student accommodation marketplace tailored for Nigerian university campuses, launching its pilot at the <strong>University of Lagos (UNILAG)</strong> in Akoka/Yaba.
+    </p>
+    <p>
+      It helps students safely find and rent off-campus self-contains, single rooms, and shared apartments, while enabling agents to manage listings and receive serious, qualified student leads.
+    </p>
+
+    <h2>2. What Real Problem Does Aroom Solve?</h2>
+    <p>
+      In Nigerian university towns, accommodation marketplaces typically fail not because of missing software features, but because of <strong>trust breakdowns and fraud</strong>:
+    </p>
+
+    <ul>
+      <li><strong>Phantom Listings & Scams:</strong> Fake agents advertise rooms they do not manage, demand non-refundable "inspection fees" upfront, and vanish.</li>
+      <li><strong>Double-Bookings:</strong> An agent rents out a room to one student, but continues collecting money or bookings from several others.</li>
+      <li><strong>Hidden Move-In Costs:</strong> A student sees an advertised rent of ₦350,000/year, but discovers they actually need ₦440,000 upfront due to agency fees, agreement fees, caution deposits, and service charges.</li>
+      <li><strong>Agent Frustration:</strong> Genuine agents get bombarded by non-students or inquiries from people who aren't serious.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-title">💡 The Core Design Principle</div>
+      Every feature in Aroom is filtered through one lens: <em>Does this increase trust and remove fraud between students and agents?</em>
+    </div>
+
+    <h2>3. How Software Solves These Marketplace Problems</h2>
+    <p>Here is the direct mapping between student pain points and the software features in our code:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Real Problem</th>
+          <th>Software Solution Built in Aroom</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Fake Agents</strong></td>
+          <td>One-time phone OTP verification and ID upload. Agent trust scoring (<code>gold</code>, <code>silver</code>, <code>bronze</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Time-Wasters</strong></td>
+          <td>Student onboarding checks university institutional email domains (e.g. <code>@live.unilag.edu.ng</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Double-Bookings</strong></td>
+          <td>Single-tap availability toggle (<code>available</code> → <code>held</code> → <code>taken</code>). When inspection is booked, room is held automatically.</td>
+        </tr>
+        <tr>
+          <td><strong>Phantom Rooms</strong></td>
+          <td>Crowdsourced availability reports. When a student visits and reports a room is taken, the system flags or demotes it automatically.</td>
+        </tr>
+        <tr>
+          <td><strong>Hidden Upfront Fees</strong></td>
+          <td><strong>"Total Move-In Cost" Calculator</strong> button on every property card showing rent + fees = true cost.</td>
+        </tr>
+        <tr>
+          <td><strong>Slow Mobile Internet</strong></td>
+          <td><strong>WhatsApp AI Triage Bot</strong> allows students to search and qualify rooms via lightweight chat.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. The 3 Pillars of the Codebase</h2>
+    <p>When you look at the project folders in your editor, you will see 3 distinct areas:</p>
+
+    <ol>
+      <li><strong><code>aroom-web/</code> (Frontend):</strong> The React web application where users view pictures, filter prices, and click the Move-In Cost calculator.</li>
+      <li><strong><code>backend/</code> (Backend API):</strong> The Node.js and Express server that processes searches, checks student emails, and manages the WhatsApp bot.</li>
+      <li><strong><code>supabase/</code> (Database & Cloud Storage):</strong> The PostgreSQL database storing all 11 tables, user accounts, and image storage buckets.</li>
+    </ol>
+
+    <div class="page-nav">
+      <a href="index.html">← Back to Index</a>
+      <a href="02-architecture-and-tech-stack.html">Next: Module 02 →</a>
+    </div>
+  </main>
+
+</body>
+</html>

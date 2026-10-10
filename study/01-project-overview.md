@@ -17,7 +17,7 @@ In Nigeria, finding off-campus accommodation is notoriously painful and risky:
 
 ---
 
-## 3. How Does Software Solve This?
+## 3. How Does Aroom Solve This?
 
 Aroom's philosophy is: **Trust, not extra fancy features, determines if the platform survives.**
 
@@ -69,3 +69,4 @@ When exploring the code in your file explorer, you will notice 3 primary pillars
 
 ### ⏭️ Next Step:
 Proceed to **[02-architecture-and-tech-stack.md](./02-architecture-and-tech-stack.md)** to see how these 3 pillars communicate with each other!
+

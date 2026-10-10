@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 06: Developer Workflow & Git — Aroom Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .content {
+      max-width: 900px;
+      margin: 2.5rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .article-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .module-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 2rem 0 1rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.5rem 0 0.5rem;
+    }
+    p { margin-bottom: 1.2rem; color: #334155; }
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; color: #334155; }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .callout.danger {
+      background: #fef2f2;
+      border-left-color: #ef4444;
+    }
+    .callout-title { font-weight: 700; color: #1e40af; margin-bottom: 0.25rem; }
+    .callout.danger .callout-title { color: #b91c1c; }
+    pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 1.25rem 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #e2e8f0;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    .terminal-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .terminal-title {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .page-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .page-nav a:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🏡 Aroom Study Guide</a>
+      <a href="index.html" class="nav-btn">← All Modules</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="article-header">
+      <span class="module-pill">Module 06</span>
+      <h1>Developer Workflow, Git & Running the Project</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">
+        Master the developer toolchain: Git, environment secrets, running both servers, and troubleshooting.
+      </p>
+    </div>
+
+    <h2>1. The 3 Stages of Git</h2>
+    <p>
+      Git is a local version control time machine. Every milestone is saved as a <strong>Commit</strong>:
+    </p>
+
+    <pre><code>[ Working Directory ] ──► git add . ──► [ Staging Area ] ──► git commit ──► [ Local Git History ]
+(Your files in VS Code)                  (Box packed)                       (Snapshot saved)
+                                                                                   │
+                                                                          git push origin main
+                                                                                   ▼
+                                                                           [ GitHub Cloud ]</code></pre>
+
+    <h2>2. Environment Variables & Secrets (<code>.env</code>)</h2>
+
+    <div class="callout danger">
+      <div class="callout-title">🚨 Golden Rule of Software Engineering</div>
+      Never commit secret database passwords or private API tokens to GitHub!<br>
+      Automated crawler bots scan public GitHub repositories every second. If an exposed password is found, hackers can access or destroy your database.
+    </div>
+
+    <p>
+      We store secrets in <code>.env</code> and list <code>.env</code> inside our <code>.gitignore</code> file so Git always ignores it. We provide a safe template called <code>.env.example</code> for teammates.
+    </p>
+
+    <h2>3. How to Run the Project Locally</h2>
+
+    <div class="terminal-card">
+      <div class="terminal-title">🖥️ Terminal 1: Run the Frontend (aroom-web)</div>
+      <pre><code>cd c:\Users\RV\Desktop\Aroom\aroom-web
+& "C:\Program Files\nodejs\npm.cmd" install
+& "C:\Program Files\nodejs\npm.cmd" run dev</code></pre>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+        Open your browser at: <strong>http://localhost:5173/</strong>
+      </p>
+    </div>
+
+    <div class="terminal-card">
+      <div class="terminal-title">⚙️ Terminal 2: Run the Backend API (backend)</div>
+      <pre><code>cd c:\Users\RV\Desktop\Aroom\backend
+& "C:\Program Files\nodejs\npm.cmd" install
+& "C:\Program Files\nodejs\npm.cmd" run dev</code></pre>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+        Health check: <strong>http://localhost:5000/health</strong>
+      </p>
+    </div>
+
+    <div class="terminal-card">
+      <div class="terminal-title">🗄️ Terminal 3: Test and Migrate Database</div>
+      <pre><code>cd c:\Users\RV\Desktop\Aroom\backend
+& "C:\Program Files\nodejs\npm.cmd" run db:test
+& "C:\Program Files\nodejs\npm.cmd" run db:migrate
+& "C:\Program Files\nodejs\npm.cmd" test</code></pre>
+    </div>
+
+    <h2>4. Common Beginner Troubleshooting Tips</h2>
+
+    <ul>
+      <li>
+        <strong>PowerShell execution policy blocks npm:</strong><br>
+        Run npm using <code>& "C:\Program Files\nodejs\npm.cmd"</code> instead of <code>npm</code>.
+      </li>
+      <li>
+        <strong>Port 5000 already in use:</strong><br>
+        A previous Node server is still running in the background. Stop it with:
+        <code>Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force</code>
+      </li>
+      <li>
+        <strong>PostgreSQL UUID error (<code>22P02</code>):</strong><br>
+        PostgreSQL only allows hex characters (<code>0-9</code>, <code>a-f</code>) in UUID fields. Avoid non-hex letters like <code>u</code>, <code>s</code>, <code>l</code>.
+      </li>
+    </ul>
+
+    <div class="callout" style="background: #ecfdf5; border-left-color: #059669;">
+      <div class="callout-title" style="color: #047857;">🎉 Congratulations!</div>
+      You have completed the entire Aroom Study Guide. You now understand how a full-stack marketplace functions from database tables and cloud storage to REST APIs, WhatsApp bots, and modern React components.
+    </div>
+
+    <div class="page-nav">
+      <a href="05-frontend-aroom-web.html">← Module 05</a>
+      <a href="index.html">Back to Home Portal 🏠</a>
+    </div>
+  </main>
+
+</body>
+</html>

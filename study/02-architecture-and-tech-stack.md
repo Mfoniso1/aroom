@@ -103,3 +103,4 @@ Why did we choose these technologies? Here is what each tool does in plain Engli
 
 ### ⏭️ Next Step:
 Proceed to **[03-database-and-supabase.md](./03-database-and-supabase.md)** to explore how our database tables, migrations, and security policies are constructed!
+
