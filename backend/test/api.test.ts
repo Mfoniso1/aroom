@@ -93,7 +93,7 @@ async function runTests() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': 'u1111111-1111-1111-1111-111111111111', // Seed agent Femi
+          'x-user-id': 'd1111111-1111-1111-1111-111111111111', // Seed agent Femi
         },
         body: JSON.stringify(newListingPayload),
       });
@@ -114,7 +114,7 @@ async function runTests() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': 'u1111111-1111-1111-1111-111111111111',
+          'x-user-id': 'd1111111-1111-1111-1111-111111111111',
         },
         body: JSON.stringify({ status: 'held', reason: 'Student inspection underway' }),
       });
@@ -154,7 +154,7 @@ async function runTests() {
     // --------------------------------------------------------------------------
     let inquiryId = '';
     {
-      const targetListingId = 'l1111111-1111-1111-1111-111111111111'; // Verified Akoka room
+      const targetListingId = 'f1111111-1111-1111-1111-111111111111'; // Verified Akoka room
       const res = await fetch(`${BASE_URL}/api/v1/inquiries`, {
         method: 'POST',
         headers: {
@@ -182,7 +182,7 @@ async function runTests() {
     // --------------------------------------------------------------------------
     {
       const res = await fetch(`${BASE_URL}/api/v1/inquiries/agent-queue`, {
-        headers: { 'x-user-id': 'u1111111-1111-1111-1111-111111111111' },
+        headers: { 'x-user-id': 'd1111111-1111-1111-1111-111111111111' },
       });
       const body = await res.json();
       if (!body.success || body.data.length === 0) {
@@ -222,7 +222,7 @@ async function runTests() {
       }
 
       // Verify that listing availability automatically transitioned to 'taken'
-      const listingRes = await fetch(`${BASE_URL}/api/v1/listings/l1111111-1111-1111-1111-111111111111`);
+      const listingRes = await fetch(`${BASE_URL}/api/v1/listings/f1111111-1111-1111-1111-111111111111`);
       const listingBody = await listingRes.json();
       if (listingBody.data.availabilityStatus !== 'taken') {
         throw new Error(`Listing availability should be 'taken', but got: ${listingBody.data.availabilityStatus}`);

@@ -18,7 +18,7 @@ VALUES (
 -- 2. Seed Agents
 INSERT INTO users (id, phone_number, email, user_type, account_status)
 VALUES (
-    'u1111111-1111-1111-1111-111111111111',
+    'd1111111-1111-1111-1111-111111111111',
     '+2348011112222',
     'femi.ogundipe@aroomagents.ng',
     'agent',
@@ -28,7 +28,7 @@ VALUES (
 INSERT INTO agent_profiles (id, user_id, full_name, agency_name, id_card_image_url, is_phone_verified, trust_tier, trust_score, total_inspections, successful_deals, no_show_count, response_rate_pct)
 VALUES (
     'a1111111-1111-1111-1111-111111111111',
-    'u1111111-1111-1111-1111-111111111111',
+    'd1111111-1111-1111-1111-111111111111',
     'Femi Ogundipe',
     'Akoka Campus Homes Ltd',
     'https://cdn.aroom.ng/agents/ids/femi_verified_nin.jpg',
@@ -43,7 +43,7 @@ VALUES (
 
 INSERT INTO users (id, phone_number, email, user_type, account_status)
 VALUES (
-    'u2222222-2222-2222-2222-222222222222',
+    'd2222222-2222-2222-2222-222222222222',
     '+2348033334444',
     'chinedu.eze@yabahouses.ng',
     'agent',
@@ -53,7 +53,7 @@ VALUES (
 INSERT INTO agent_profiles (id, user_id, full_name, agency_name, id_card_image_url, is_phone_verified, trust_tier, trust_score, total_inspections, successful_deals, no_show_count, response_rate_pct)
 VALUES (
     'a2222222-2222-2222-2222-222222222222',
-    'u2222222-2222-2222-2222-222222222222',
+    'd2222222-2222-2222-2222-222222222222',
     'Chinedu Eze',
     'Lagoon View Realty',
     'https://cdn.aroom.ng/agents/ids/chinedu_id.jpg',
@@ -69,7 +69,7 @@ VALUES (
 -- 3. Seed Students
 INSERT INTO users (id, phone_number, email, user_type, account_status)
 VALUES (
-    'u3333333-3333-3333-3333-333333333333',
+    'd3333333-3333-3333-3333-333333333333',
     '+2348055556666',
     'c.okeke@live.unilag.edu.ng',
     'student',
@@ -78,8 +78,8 @@ VALUES (
 
 INSERT INTO student_profiles (id, user_id, campus_id, matric_number, institutional_email, is_institution_verified, verified_at)
 VALUES (
-    's1111111-1111-1111-1111-111111111111',
-    'u3333333-3333-3333-3333-333333333333',
+    'b1111111-1111-1111-1111-111111111111',
+    'd3333333-3333-3333-3333-333333333333',
     'c1111111-1111-1111-1111-111111111111',
     '190404012',
     'c.okeke@live.unilag.edu.ng',
@@ -93,7 +93,7 @@ INSERT INTO listings (
     price_annual_kobo, landmark_vicinity, move_in_date, 
     availability_status, verification_status, is_boosted, view_count
 ) VALUES (
-    'l1111111-1111-1111-1111-111111111111',
+    'f1111111-1111-1111-1111-111111111111',
     'a1111111-1111-1111-1111-111111111111',
     'c1111111-1111-1111-1111-111111111111',
     'Standard Executive Self-Contain (Serviced water + prepaid meter)',
@@ -110,8 +110,8 @@ INSERT INTO listings (
 
 INSERT INTO listing_media (listing_id, media_url, media_type, is_live_upload, sort_order)
 VALUES 
-    ('l1111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800', 'image', TRUE, 0),
-    ('l1111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800', 'image', FALSE, 1)
+    ('f1111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800', 'image', TRUE, 0),
+    ('f1111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800', 'image', FALSE, 1)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO listings (
@@ -119,7 +119,7 @@ INSERT INTO listings (
     price_annual_kobo, landmark_vicinity, move_in_date, 
     availability_status, verification_status, is_boosted, view_count
 ) VALUES (
-    'l2222222-2222-2222-2222-222222222222',
+    'f2222222-2222-2222-2222-222222222222',
     'a2222222-2222-2222-2222-222222222222',
     'c1111111-1111-1111-1111-111111111111',
     'Budget Single Room in Abule Oja',
@@ -136,7 +136,7 @@ INSERT INTO listings (
 
 INSERT INTO listing_media (listing_id, media_url, media_type, is_live_upload, sort_order)
 VALUES 
-    ('l2222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800', 'image', FALSE, 0)
+    ('f2222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800', 'image', FALSE, 0)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO listings (
@@ -144,7 +144,7 @@ INSERT INTO listings (
     price_annual_kobo, landmark_vicinity, move_in_date, 
     availability_status, verification_status, is_boosted, view_count
 ) VALUES (
-    'l3333333-3333-3333-3333-333333333333',
+    'f3333333-3333-3333-3333-333333333333',
     'a1111111-1111-1111-1111-111111111111',
     'c1111111-1111-1111-1111-111111111111',
     'Modern Shared 2-Bedroom Flat in Onike',

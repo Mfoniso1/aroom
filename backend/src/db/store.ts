@@ -75,7 +75,7 @@ export class DatabaseStore {
 
     // 2. Agents
     // Agent 1: Femi Ogundipe (Gold Tier, 98% response)
-    const femiUserId = 'u1111111-1111-1111-1111-111111111111';
+    const femiUserId = 'd1111111-1111-1111-1111-111111111111';
     const femiAgentId = 'a1111111-1111-1111-1111-111111111111';
     this.users.set(femiUserId, {
       id: femiUserId,
@@ -103,7 +103,7 @@ export class DatabaseStore {
     });
 
     // Agent 2: Chinedu Eze (Silver Tier)
-    const chineduUserId = 'u2222222-2222-2222-2222-222222222222';
+    const chineduUserId = 'd2222222-2222-2222-2222-222222222222';
     const chineduAgentId = 'a2222222-2222-2222-2222-222222222222';
     this.users.set(chineduUserId, {
       id: chineduUserId,
@@ -132,7 +132,7 @@ export class DatabaseStore {
 
     // 3. Students
     // Student 1: Verified UNILAG Student
-    const student1UserId = 'u3333333-3333-3333-3333-333333333333';
+    const student1UserId = 'd3333333-3333-3333-3333-333333333333';
     this.users.set(student1UserId, {
       id: student1UserId,
       phoneNumber: '+2348055556666',
@@ -142,8 +142,8 @@ export class DatabaseStore {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    this.studentProfiles.set('s1111111-1111-1111-1111-111111111111', {
-      id: 's1111111-1111-1111-1111-111111111111',
+    this.studentProfiles.set('b1111111-1111-1111-1111-111111111111', {
+      id: 'b1111111-1111-1111-1111-111111111111',
       userId: student1UserId,
       campusId: unilagId,
       matricNumber: '190404012',
@@ -154,7 +154,7 @@ export class DatabaseStore {
 
     // 4. Initial Seed Listings
     // Listing 1: Verified Self-Contain at Akoka Gate
-    const listing1Id = 'l1111111-1111-1111-1111-111111111111';
+    const listing1Id = 'f1111111-1111-1111-1111-111111111111';
     this.listings.set(listing1Id, {
       id: listing1Id,
       agentId: femiAgentId,
@@ -194,7 +194,7 @@ export class DatabaseStore {
     ]);
 
     // Listing 2: Unverified - New Single Room at Abule Oja
-    const listing2Id = 'l2222222-2222-2222-2222-222222222222';
+    const listing2Id = 'f2222222-2222-2222-2222-222222222222';
     this.listings.set(listing2Id, {
       id: listing2Id,
       agentId: chineduAgentId,
@@ -225,7 +225,7 @@ export class DatabaseStore {
     ]);
 
     // Listing 3: Held / Under Inspection Room in Onike
-    const listing3Id = 'l3333333-3333-3333-3333-333333333333';
+    const listing3Id = 'f3333333-3333-3333-3333-333333333333';
     this.listings.set(listing3Id, {
       id: listing3Id,
       agentId: femiAgentId,
