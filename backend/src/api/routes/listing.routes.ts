@@ -64,7 +64,7 @@ listingRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
 
     // In production, actor is extracted from JWT session token.
     // For MVP testing, allow 'x-user-id' header or fallback to pilot seed agent.
-    const actorUserId = (req.headers['x-user-id'] as string) || 'u1111111-1111-1111-1111-111111111111';
+    const actorUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
     const agentProfile = Array.from(db.agentProfiles.values()).find((a) => a.userId === actorUserId);
 
     if (!agentProfile) {
@@ -98,7 +98,7 @@ listingRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
 listingRouter.patch('/:id/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = UpdateListingStatusSchema.parse(req.body);
-    const actorUserId = (req.headers['x-user-id'] as string) || 'u1111111-1111-1111-1111-111111111111';
+    const actorUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
 
     const listingId = String(req.params.id);
     const updated = await listingService.updateAvailability(
@@ -124,7 +124,7 @@ listingRouter.patch('/:id/status', async (req: Request, res: Response, next: Nex
  */
 listingRouter.post('/:id/request-verification', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const actorUserId = (req.headers['x-user-id'] as string) || 'u1111111-1111-1111-1111-111111111111';
+    const actorUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
     const listingId = String(req.params.id);
     const result = await listingService.requestVerification(listingId, actorUserId);
     res.json({

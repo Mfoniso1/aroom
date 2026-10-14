@@ -12,7 +12,7 @@ const inquiryService = new InquiryService();
 inquiryRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = CreateInquiryBodySchema.parse(req.body);
-    const studentUserId = (req.headers['x-user-id'] as string) || 'u3333333-3333-3333-3333-333333333333';
+    const studentUserId = (req.headers['x-user-id'] as string) || 'd3333333-3333-3333-3333-333333333333';
 
     const newInquiry = await inquiryService.createInquiry({
       listingId: validated.listingId,
@@ -38,7 +38,7 @@ inquiryRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
  */
 inquiryRouter.get('/agent-queue', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const agentUserId = (req.headers['x-user-id'] as string) || 'u1111111-1111-1111-1111-111111111111';
+    const agentUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
     const queue = await inquiryService.getAgentInquiries(agentUserId);
     res.json({
       success: true,
@@ -56,7 +56,7 @@ inquiryRouter.get('/agent-queue', async (req: Request, res: Response, next: Next
  */
 inquiryRouter.patch('/:id/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const actorUserId = (req.headers['x-user-id'] as string) || 'u1111111-1111-1111-1111-111111111111';
+    const actorUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
     const { status, inspectionSlot, agentNote } = req.body;
 
     const inquiryId = String(req.params.id);
@@ -85,7 +85,7 @@ inquiryRouter.patch('/:id/status', async (req: Request, res: Response, next: Nex
 inquiryRouter.post('/feedback', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = SubmitFeedbackBodySchema.parse(req.body);
-    const studentUserId = (req.headers['x-user-id'] as string) || 'u3333333-3333-3333-3333-333333333333';
+    const studentUserId = (req.headers['x-user-id'] as string) || 'd3333333-3333-3333-3333-333333333333';
 
     const review = await inquiryService.submitInspectionFeedback({
       inquiryId: validated.inquiryId,

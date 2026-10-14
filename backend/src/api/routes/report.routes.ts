@@ -12,7 +12,7 @@ const trustService = new TrustService();
 reportRouter.post('/availability', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = SubmitReportBodySchema.parse(req.body);
-    const reporterUserId = (req.headers['x-user-id'] as string) || 'u3333333-3333-3333-3333-333333333333';
+    const reporterUserId = (req.headers['x-user-id'] as string) || 'd3333333-3333-3333-3333-333333333333';
 
     const report = await trustService.submitAvailabilityReport({
       listingId: validated.listingId,
