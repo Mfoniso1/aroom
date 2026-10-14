@@ -1,195 +1,14 @@
 import { useState, useMemo } from 'react'
 import { Filter, MapPin, X, Building2, UserCheck, Video } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
-import { ListingCard, type Listing } from '@/components/shared/ListingCard'
+import { ListingCard } from '@/components/shared/ListingCard'
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
 import { CAMPUSES } from '@/lib/campuses'
-
-const ALL_MOCK_LISTINGS: Listing[] = [
-  {
-    id: '1',
-    title: 'Spacious Self-Contain at Akoka',
-    price: 350000,
-    period: 'yr',
-    landmark: '5 mins walk from UNILAG Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Femi K. (Certified Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 30000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 52500, // 15% of 350,000
-    }
-  },
-  {
-    id: '4',
-    title: 'Executive Self-Contain in Choba',
-    price: 280000,
-    period: 'yr',
-    landmark: '5 mins to UNIPORT Choba Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniport',
-    uploaderType: 'landlord',
-    uploaderName: 'Chief Emeka Eze (Property Owner)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 25000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 0, // Direct landlord - zero agency fee
-    }
-  },
-  {
-    id: '5',
-    title: 'Modern Studio Apartment at Alakahia',
-    price: 320000,
-    period: 'yr',
-    landmark: 'Close to UNIPORT Delta Park',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniport',
-    uploaderType: 'agent',
-    uploaderName: 'David O. (UNIPORT Verified Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 30000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 48000, // 15% of 320,000
-    }
-  },
-  {
-    id: '7',
-    title: '2-Bedroom Shared Flat in Ozuoba',
-    price: 220000,
-    period: 'yr',
-    landmark: 'Near UNIPORT Abuja Campus Gate',
-    verificationStatus: 'unverified_new',
-    availabilityStatus: 'available',
-    campusId: 'uniport',
-    uploaderType: 'landlord',
-    uploaderName: 'Elder Nnamdi (Lodge Landlord)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 0, // Direct landlord
-    }
-  },
-  {
-    id: '2',
-    title: 'Standard Single Room in Yaba',
-    price: 180000,
-    period: 'yr',
-    landmark: 'Near Yabatech Back Gate / UNILAG',
-    verificationStatus: 'unverified_new',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Blessing A. (Lagos Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 27000, // 15% of 180,000
-    }
-  },
-  {
-    id: '3',
-    title: '2-Bedroom Shared Flat Onike',
-    price: 450000,
-    period: 'yr',
-    landmark: 'Onike roundabout near UNILAG',
-    verificationStatus: 'verified',
-    availabilityStatus: 'held',
-    campusId: 'unilag',
-    uploaderType: 'landlord',
-    uploaderName: 'Dr. (Mrs) Johnson (Property Owner)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 40000,
-      legalFee: 25000,
-      utilityFee: 20000,
-      agencyFee: 0, // Direct landlord
-    }
-  },
-  {
-    id: '6',
-    title: 'Serviced Room near Ekosodin Gate',
-    price: 210000,
-    period: 'yr',
-    landmark: 'Ekosodin, UNIBEN Main Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniben',
-    uploaderType: 'agent',
-    uploaderName: 'Victor E. (Benin Campus Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 31500, // 15% of 210,000
-    }
-  },
-  {
-    id: '8',
-    title: 'Self-Contain Apartment at BDPA',
-    price: 260000,
-    period: 'yr',
-    landmark: 'BDPA Estate, Ugbowo (UNIBEN)',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniben',
-    uploaderType: 'landlord',
-    uploaderName: 'Pastor Osa (Direct Landlord)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 25000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 0, // Direct landlord
-    }
-  },
-  {
-    id: '9',
-    title: 'Charming Studio in Agbowo',
-    price: 250000,
-    period: 'yr',
-    landmark: 'Walking distance to UI Main Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'ui',
-    uploaderType: 'landlord',
-    uploaderName: 'Prof. Adeleke (Lodge Landlord)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 0, // Direct landlord
-    }
-  }
-]
+import { useListings } from '@/lib/listingsStore'
 
 export function SearchPage() {
+  const { listings } = useListings()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialCampus = searchParams.get('campus') || 'all'
 
@@ -214,7 +33,7 @@ export function SearchPage() {
   }, [selectedCampus])
 
   const filteredListings = useMemo(() => {
-    return ALL_MOCK_LISTINGS.filter((item) => {
+    return listings.filter((item) => {
       if (selectedCampus !== 'all' && item.campusId !== selectedCampus) {
         return false
       }
@@ -229,10 +48,10 @@ export function SearchPage() {
       }
       return true
     })
-  }, [selectedCampus, maxBudget, verifiedOnly, uploaderFilter])
+  }, [listings, selectedCampus, maxBudget, verifiedOnly, uploaderFilter])
 
-  const landlordCount = ALL_MOCK_LISTINGS.filter((l) => l.uploaderType === 'landlord').length
-  const agentCount = ALL_MOCK_LISTINGS.filter((l) => l.uploaderType === 'agent').length
+  const landlordCount = listings.filter((l) => l.uploaderType === 'landlord').length
+  const agentCount = listings.filter((l) => l.uploaderType === 'agent').length
 
   return (
     <div className="relative">
@@ -302,7 +121,7 @@ export function SearchPage() {
                   <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                     uploaderFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
-                    {ALL_MOCK_LISTINGS.length}
+                    {listings.length}
                   </span>
                 </button>
 
@@ -449,7 +268,7 @@ export function SearchPage() {
                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                 }`}
               >
-                All ({ALL_MOCK_LISTINGS.length})
+                All ({listings.length})
               </button>
 
               <button

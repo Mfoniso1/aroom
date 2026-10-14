@@ -26,6 +26,7 @@ const LISTING_CATALOG: Record<string, {
   utilityFee: number
   agencyFee: number
   imageUrl: string
+  videoUrl?: string
   descriptionText: string
 }> = {
   '1': {
@@ -68,6 +69,8 @@ const LISTING_CATALOG: Record<string, {
   },
 }
 
+import { getListingById } from '@/lib/listingsStore'
+
 export function ListingDetailPage() {
   const { id = '1' } = useParams()
   const navigate = useNavigate()
@@ -75,7 +78,28 @@ export function ListingDetailPage() {
   const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [scheduledSlot, setScheduledSlot] = useState<string | null>(null)
 
-  const resolved = LISTING_CATALOG[id] || {
+  const storeListing = getListingById(id)
+  const resolved = storeListing ? {
+    title: storeListing.title,
+    price: storeListing.price,
+    period: storeListing.period,
+    landmark: storeListing.landmark,
+    verificationStatus: storeListing.verificationStatus,
+    availabilityStatus: storeListing.availabilityStatus,
+    uploaderType: (storeListing.uploaderType || 'agent') as 'landlord' | 'agent',
+    uploaderName: storeListing.uploaderName || (storeListing.uploaderType === 'landlord' ? 'Verified Landlord' : 'Certified Agent'),
+    uploaderRole: storeListing.uploaderType === 'landlord' ? 'Verified Property Owner' : 'Verified Campus Agent',
+    rating: 4.9,
+    responseRate: 98,
+    cautionFee: storeListing.customFees?.cautionFee ?? 25000,
+    legalFee: storeListing.customFees?.legalFee ?? 20000,
+    utilityFee: storeListing.customFees?.utilityFee ?? 15000,
+    agencyFee: storeListing.customFees?.agencyFee ?? (storeListing.uploaderType === 'landlord' ? 0 : Math.round(storeListing.price * 0.15)),
+    inspectionFee: storeListing.customFees?.inspectionFee ?? 0,
+    imageUrl: storeListing.imageUrl,
+    videoUrl: storeListing.videoUrl || '/videos/room-tour.mp4',
+    descriptionText: storeListing.description || `${storeListing.title} located at ${storeListing.landmark}. Verified walkthrough video recorded on site.`,
+  } : (LISTING_CATALOG[id] || {
     title: 'Executive Student Accommodation',
     price: 300000,
     period: 'yr',
@@ -92,8 +116,9 @@ export function ListingDetailPage() {
     utilityFee: 15000,
     agencyFee: Number(id) % 2 === 0 ? 0 : 45000,
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1200&auto=format&fit=crop',
+    videoUrl: '/videos/room-tour.mp4',
     descriptionText: 'Verified campus apartment with video tour. Scam-free walkthrough guaranteed before payment.',
-  }
+  })
 
   const isLandlord = resolved.uploaderType === 'landlord'
   const moveInSum =
@@ -391,7 +416,7 @@ export function ListingDetailPage() {
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
         title={resolved.title}
-        videoUrl="/videos/room-tour.mp4"
+        videoUrl={resolved.videoUrl || '/videos/room-tour.mp4'}
         uploaderName={resolved.uploaderName}
         uploaderType={resolved.uploaderType}
       />

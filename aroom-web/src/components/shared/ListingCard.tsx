@@ -25,6 +25,7 @@ export type Listing = {
     legalFee?: number
     utilityFee?: number
     agencyFee?: number
+    inspectionFee?: number
   }
 }
 

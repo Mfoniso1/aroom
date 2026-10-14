@@ -901,3 +901,38 @@ The background uses CSS `position: fixed` (Tailwind: `fixed`) so the photo stays
 - Production build `npm run build` executed cleanly in 4.18s with 0 errors.
 - Dev server running on `http://localhost:5174/`.
 
+---
+
+## Entry 022 — Device Storage Video Upload & Explore Page Video Playback
+**Date:** 2026-10-14  
+**Task:**
+1. Enable video uploading directly from device storage (MP4, MOV, WebM) on Agent and Landlord listing workflows.
+2. Display newly uploaded listings with their walkthrough videos directly on the Explore page (`/search`) and Homepage (`/`).
+3. Ensure uploaded walkthrough videos play smoothly in `VideoModal` upon clicking "View Video".
+
+### What was built
+
+1. **Device Storage Video Upload Workflow ([`NewListingPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/NewListingPage.tsx) & [`LandlordNewListingPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/LandlordNewListingPage.tsx))**:
+   - Integrated file input accepting `video/mp4,video/webm,video/quicktime,video/*` from local device storage (phones, laptops, tablets).
+   - Live video preview player right inside Step 2 showing the uploaded file, file size in MB, and replace/remove actions.
+   - Built automatic video thumbnail frame extraction using an off-screen HTML5 `<canvas>` element at 1.0s timestamp.
+   - Added optional custom cover photo upload fallback.
+
+2. **Unified Listing & Media Storage ([`listingsStore.ts`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/lib/listingsStore.ts))**:
+   - Built browser IndexedDB persistence (`aroom_listings_db` / `uploaded_listings`) capable of storing full binary video Blobs beyond standard localStorage limits.
+   - Provides reactive `useListings()` hook and global change dispatcher so newly uploaded listings appear at the very top of the Explore page (`/search`) and Homepage (`/`) instantly.
+   - Implemented `getListingById(id)` lookup for [`ListingDetailPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/ListingDetailPage.tsx) to resolve dynamic uploaded listings and play custom device video walkthroughs.
+
+3. **Explore Page & Video Player Integration ([`SearchPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/SearchPage.tsx) & [`VideoModal.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/VideoModal.tsx))**:
+   - Replaced static mock arrays on `/search` and `/` with reactive `useListings()` hook.
+   - Direct button in Step 3 of listing publishing: "View on Explore Page Now" to navigate and see the new listing immediately.
+   - Clicking "View Video" on the card opens `VideoModal` and plays the exact video file uploaded from the user's device.
+
+### Curriculum Link
+- `curriculum.md` → Module 3.1 (HTML5 File API, Blob object URLs, IndexedDB binary storage, Canvas frame extraction), Module 4.2 (Two-way listing state synchronization across marketplace).
+
+### Verification
+- Production build `npm run build` executed cleanly in 1.95s with 0 errors.
+- Dev server running on `http://localhost:5174/`.
+
+

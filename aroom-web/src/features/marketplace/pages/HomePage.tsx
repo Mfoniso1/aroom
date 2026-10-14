@@ -1,97 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Search as SearchIcon, ShieldCheck, Sparkles, MapPin } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { ListingCard, type Listing } from '@/components/shared/ListingCard'
+import { ListingCard } from '@/components/shared/ListingCard'
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
 import { CAMPUSES } from '@/lib/campuses'
-
-const MOCK_LISTINGS: Listing[] = [
-  {
-    id: '1',
-    title: 'Spacious Self-Contain at Akoka',
-    price: 350000,
-    period: 'yr',
-    landmark: '5 mins walk from UNILAG Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Femi K. (Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '4',
-    title: 'Executive Self-Contain in Choba',
-    price: 280000,
-    period: 'yr',
-    landmark: '5 mins to UNIPORT Choba Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniport',
-    uploaderType: 'landlord',
-    uploaderName: 'Chief Emeka Eze (Owner)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    title: 'Standard Single Room in Yaba',
-    price: 180000,
-    period: 'yr',
-    landmark: 'Near Yabatech Back Gate / UNILAG',
-    verificationStatus: 'unverified_new',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Blessing A. (Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '5',
-    title: 'Modern Studio Apartment at Alakahia',
-    price: 320000,
-    period: 'yr',
-    landmark: 'Close to UNIPORT Delta Park',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniport',
-    uploaderType: 'agent',
-    uploaderName: 'David O. (Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '3',
-    title: '2-Bedroom Shared Flat Onike',
-    price: 450000,
-    period: 'yr',
-    landmark: 'Onike roundabout',
-    verificationStatus: 'verified',
-    availabilityStatus: 'held',
-    campusId: 'unilag',
-    uploaderType: 'landlord',
-    uploaderName: 'Dr. Johnson (Owner)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '6',
-    title: 'Serviced Room near Ekosodin Gate',
-    price: 210000,
-    period: 'yr',
-    landmark: 'Ekosodin, UNIBEN Main Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniben',
-    uploaderType: 'agent',
-    uploaderName: 'Victor E. (Agent)',
-    hasVideoTour: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop'
-  }
-]
+import { useListings } from '@/lib/listingsStore'
 
 const ROTATING_ACCOMMODATIONS = [
   'Student Accommodation',
@@ -103,6 +17,7 @@ const ROTATING_ACCOMMODATIONS = [
 
 export function HomePage() {
   const navigate = useNavigate()
+  const { listings } = useListings()
   const [termIndex, setTermIndex] = useState(0)
   const [selectedCampus, setSelectedCampus] = useState('')
   const [selectedRoomType, setSelectedRoomType] = useState('')
@@ -258,7 +173,7 @@ export function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {MOCK_LISTINGS.map(listing => (
+            {listings.slice(0, 6).map(listing => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>

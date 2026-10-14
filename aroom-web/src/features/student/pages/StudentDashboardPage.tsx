@@ -115,7 +115,7 @@ export function StudentDashboardPage() {
         {/* ── Student Profile Overview ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 flex flex-col md:flex-row gap-6 items-start justify-between">
           <div className="flex gap-4 sm:gap-5 items-start">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-extrabold shadow-sm shrink-0">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-extrabold shadow-sm shrink-0">
               {MOCK_STUDENT.name.charAt(0)}
             </div>
             <div className="flex items-center">
