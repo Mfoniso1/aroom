@@ -63,11 +63,11 @@ export function calculateMoveInCost(
       : (customFees?.agencyFee ?? Math.round(annualRent * 0.15))
 
   // 5. Inspection Fee:
-  // Aroom strictly enforces ₦0 inspection policy for both
-  const inspectionFee = 0
+  // Aroom default: ₦0 (free). Agents can set a custom inspection fee which will be included in the total.
+  const inspectionFee = customFees?.inspectionFee ?? 0
 
-  // 6. Total Move-In Sum Package
-  const totalCost = annualRent + cautionFee + agreementFee + utilityFee + agencyFee
+  // 6. Total Move-In Sum Package (includes inspection fee when agent sets it)
+  const totalCost = annualRent + cautionFee + agreementFee + utilityFee + agencyFee + inspectionFee
 
   return {
     annualRent,

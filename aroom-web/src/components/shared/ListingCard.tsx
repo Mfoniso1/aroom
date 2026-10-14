@@ -47,12 +47,12 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden hover:shadow-md transition-shadow relative flex flex-col justify-between">
+      <div className="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-visible hover:shadow-md transition-shadow relative flex flex-col justify-between">
         
         {/* ── Video / Media Container (Clean & Uncluttered) ── */}
         <div 
           onClick={handlePlayVideo}
-          className="h-52 bg-slate-900 relative overflow-hidden cursor-pointer group"
+          className="h-52 bg-slate-900 relative overflow-hidden cursor-pointer group rounded-t-2xl"
           title="Click to play walkthrough video"
         >
           <img

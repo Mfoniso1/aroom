@@ -23,7 +23,7 @@ export function NewListingPage() {
   const [cautionFee, setCautionFee] = useState<string>('30000')
   const [legalFee, setLegalFee] = useState<string>('20000')
   const [utilityFee, setUtilityFee] = useState<string>('15000')
-  const [inspectionFee, setInspectionFee] = useState<string>('0') // 100% Free on Aroom policy
+  const [inspectionFee, setInspectionFee] = useState<string>('0')
   const [hasUtilityFee, setHasUtilityFee] = useState(true)
 
   // Numeric computations
@@ -36,7 +36,7 @@ export function NewListingPage() {
   // Agency fee: automatically 15% of the annual rent
   const agencyFee = Math.round(rentNum * 0.15)
 
-  // Total move-in package
+  // Total move-in package (inspection fee now included when agent sets it)
   const totalPackage = rentNum + cautionNum + legalNum + agencyFee + utilityNum + inspectionNum
 
   const selectedCampus = CAMPUSES.find((c) => c.id === campusId)
@@ -223,24 +223,35 @@ export function NewListingPage() {
                   )}
                 </div>
 
-                {/* 6. Inspection Fee Policy */}
+                {/* 6. Inspection Fee */}
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Physical Inspection Fee (₦)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Physical Inspection Fee (₦)
+                    </label>
+                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Visible to students
+                    </span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
+                      min="0"
                       value={inspectionFee}
                       onChange={(e) => setInspectionFee(e.target.value)}
-                      disabled
-                      className="w-32 border border-slate-200 bg-slate-100 rounded-xl p-2.5 text-sm font-bold text-slate-500 outline-none"
+                      placeholder="0"
+                      className="w-36 border border-slate-200 rounded-xl p-2.5 text-sm font-bold text-slate-900 outline-none focus:border-emerald-500"
                     />
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-2 rounded-xl">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      Free on Aroom (Zero student inspection charge)
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      {inspectionNum === 0
+                        ? 'Free on Aroom (Recommended — builds trust)'
+                        : `₦${inspectionNum.toLocaleString()} will appear in student breakdown`}
                     </span>
                   </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Set ₦0 for a free inspection — Aroom strongly recommends this as it prevents scams and increases booking rates.
+                  </p>
                 </div>
               </div>
             </div>
@@ -279,7 +290,9 @@ export function NewListingPage() {
                 )}
                 <div className="flex justify-between text-slate-400">
                   <span>Inspection Fee:</span>
-                  <span className="text-emerald-400 font-semibold">₦0 (Free)</span>
+                  <span className={inspectionNum === 0 ? 'text-emerald-400 font-semibold' : 'text-white font-semibold'}>
+                    {inspectionNum === 0 ? '₦0 (Free — Recommended)' : `₦${inspectionNum.toLocaleString()}`}
+                  </span>
                 </div>
               </div>
 
