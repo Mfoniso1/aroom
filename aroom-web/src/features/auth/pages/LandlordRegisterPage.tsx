@@ -644,7 +644,7 @@ export function LandlordRegisterPage() {
 
               <button
                 type="button"
-                onClick={() => navigate('/portal/dashboard')}
+                onClick={() => navigate('/portal/landlord/dashboard')}
                 className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer"
               >
                 Go to Landlord Dashboard <ChevronRight className="w-4 h-4" />

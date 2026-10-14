@@ -9,7 +9,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  GraduationCap, Search, Heart, Calendar, MapPin,
+  Search, Heart, Calendar, MapPin,
   ShieldCheck, Clock, ArrowUpRight,
   MessageSquare, XCircle, ArrowRight
 } from 'lucide-react'
@@ -19,13 +19,6 @@ import { DashboardTicker } from '@/components/shared/DashboardTicker'
 
 const MOCK_STUDENT = {
   name: 'Amara Chukwuemeka',
-  email: 'amara.c@uniport.edu.ng',
-  campus: 'University of Port Harcourt (UNIPORT)',
-  campusShort: 'UNIPORT',
-  matricNumber: 'U2023/5548901',
-  faculty: 'Engineering & Technology',
-  isVerified: true,
-  joinedDate: 'October 2026',
 }
 
 const INITIAL_SAVED_LISTINGS = [
@@ -125,24 +118,8 @@ export function StudentDashboardPage() {
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-extrabold shadow-sm shrink-0">
               {MOCK_STUDENT.name.charAt(0)}
             </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">{MOCK_STUDENT.name}</h1>
-                <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified Student ID
-                </span>
-              </div>
-              <p className="text-sm font-medium text-slate-600 flex items-center gap-1.5 mt-0.5">
-                <GraduationCap className="w-4 h-4 text-emerald-600 shrink-0" />
-                {MOCK_STUDENT.campus}
-              </p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-2.5">
-                <span><strong>Matric No:</strong> {MOCK_STUDENT.matricNumber}</span>
-                <span>•</span>
-                <span><strong>Email:</strong> {MOCK_STUDENT.email}</span>
-                <span>•</span>
-                <span><strong>Faculty:</strong> {MOCK_STUDENT.faculty}</span>
-              </div>
+            <div className="flex items-center">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900">{MOCK_STUDENT.name}</h1>
             </div>
           </div>
 

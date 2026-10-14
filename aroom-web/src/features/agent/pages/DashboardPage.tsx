@@ -209,15 +209,9 @@ export function DashboardPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <Link
                 to="/portal/listings/new"
-                className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
               >
-                <Plus className="w-4 h-4" /> Agent Listing (15% Agency)
-              </Link>
-              <Link
-                to="/portal/landlord/new"
-                className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" /> Landlord Listing (Direct)
+                <Plus className="w-4 h-4" /> Add New Listing (15% Agency)
               </Link>
             </div>
           </div>

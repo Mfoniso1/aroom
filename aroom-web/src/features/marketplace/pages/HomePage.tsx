@@ -16,6 +16,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'unilag',
+    uploaderType: 'agent',
+    uploaderName: 'Femi K. (Agent)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop'
   },
   {
@@ -27,6 +30,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'uniport',
+    uploaderType: 'landlord',
+    uploaderName: 'Chief Emeka Eze (Owner)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop'
   },
   {
@@ -38,6 +44,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'unverified_new',
     availabilityStatus: 'available',
     campusId: 'unilag',
+    uploaderType: 'agent',
+    uploaderName: 'Blessing A. (Agent)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop'
   },
   {
@@ -49,6 +58,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'uniport',
+    uploaderType: 'agent',
+    uploaderName: 'David O. (Agent)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop'
   },
   {
@@ -60,6 +72,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'verified',
     availabilityStatus: 'held',
     campusId: 'unilag',
+    uploaderType: 'landlord',
+    uploaderName: 'Dr. Johnson (Owner)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop'
   },
   {
@@ -71,6 +86,9 @@ const MOCK_LISTINGS: Listing[] = [
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'uniben',
+    uploaderType: 'agent',
+    uploaderName: 'Victor E. (Agent)',
+    hasVideoTour: true,
     imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop'
   }
 ]

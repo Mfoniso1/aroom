@@ -6,7 +6,11 @@ import { BackButton } from '@/components/shared/BackButton'
 export function AgentLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const isRootDashboard = location.pathname === '/portal/dashboard'
+  const isLandlord = location.pathname.includes('/landlord')
+  const isRootDashboard = location.pathname === '/portal/dashboard' || location.pathname === '/portal/landlord/dashboard'
+  const dashboardPath = isLandlord ? '/portal/landlord/dashboard' : '/portal/dashboard'
+  const newListingPath = isLandlord ? '/portal/landlord/new' : '/portal/listings/new'
+  const portalBadge = isLandlord ? 'Landlord' : 'Agent'
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${
@@ -17,18 +21,18 @@ export function AgentLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
       <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/portal" id="app-header-logo" aria-label="Aroom Agent Portal">
-            <Logo variant="dark" size="sm" badge="Agent" />
+          <Link to={dashboardPath} id="app-header-logo" aria-label={`Aroom ${portalBadge} Portal`}>
+            <Logo variant="dark" size="sm" badge={portalBadge} />
           </Link>
 
           <nav className="flex items-center gap-1">
-            <NavLink to="/portal/dashboard" className={linkClass}>
+            <NavLink to={dashboardPath} className={linkClass} end>
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
             </NavLink>
-            <NavLink to="/portal/listings/new" className={linkClass}>
+            <NavLink to={newListingPath} className={linkClass}>
               <Plus className="w-4 h-4" />
-              New Listing
+              {isLandlord ? 'Add Property' : 'New Listing'}
             </NavLink>
 
             {/* Divider */}

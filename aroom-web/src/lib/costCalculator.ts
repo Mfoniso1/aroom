@@ -1,54 +1,83 @@
+/**
+ * costCalculator.ts
+ * Calculation logic for Total Move-In Cost on Aroom listings:
+ * - Agent Listings: Rent + Caution + Legal + 15% Agency Fee + Utility + Free Inspection (₦0)
+ * - Landlord Listings: Rent + Caution + Legal + Utilities + 0% Agency Fee (Direct Landlord Savings)
+ */
+
 export interface MoveInCostBreakdown {
   annualRent: number
   agencyFee: number
-  agreementFee: number
+  agencyRate: number // 0 for landlord, 0.15 for agent
+  agreementFee: number // Legal fee
   cautionFee: number
-  otherCharges: number
+  utilityFee: number
+  inspectionFee: number
   totalCost: number
+  uploaderType: 'agent' | 'landlord'
 }
 
 export function calculateMoveInCost(
   annualRent: number,
   customFees?: {
     agencyFee?: number
-    agreementFee?: number
+    agreementFee?: number // Legal
+    legalFee?: number
     cautionFee?: number
     otherCharges?: number
-  }
+    utilityFee?: number
+    inspectionFee?: number
+  },
+  uploaderType: 'agent' | 'landlord' = 'agent'
 ): MoveInCostBreakdown {
-  // Standard Nigerian Off-Campus Housing Breakdown
-  // Agency Fee: 10%
-  const agencyFee = customFees?.agencyFee ?? Math.round(annualRent * 0.1)
-
-  // Agreement / Legal Fee: ~5.7% (exact 20,000 for 350,000)
-  const agreementFee =
-    customFees?.agreementFee ??
-    (annualRent === 350000
-      ? 20000
-      : Math.max(10000, Math.round((annualRent * 0.057) / 1000) * 1000))
-
-  // Caution Fee / Refundable Deposit: ~7.1% (exact 25,000 for 350,000)
+  // 1. Caution Fee (Refundable Deposit)
   const cautionFee =
     customFees?.cautionFee ??
     (annualRent === 350000
       ? 25000
-      : Math.max(15000, Math.round((annualRent * 0.0714) / 1000) * 1000))
+      : Math.max(15000, Math.round((annualRent * 0.08) / 1000) * 1000))
 
-  // Other Charges (Service/Security/Waste Levy): ~2.8% (exact 10,000 for 350,000)
-  const otherCharges =
+  // 2. Legal / Tenancy Agreement Fee
+  const agreementFee =
+    customFees?.legalFee ??
+    customFees?.agreementFee ??
+    (annualRent === 350000
+      ? 20000
+      : Math.max(15000, Math.round((annualRent * 0.06) / 1000) * 1000))
+
+  // 3. Utility Fee (water, borehole, waste, gate security levy)
+  const utilityFee =
+    customFees?.utilityFee ??
     customFees?.otherCharges ??
     (annualRent === 350000
-      ? 10000
-      : Math.max(5000, Math.round((annualRent * 0.0286) / 1000) * 1000))
+      ? 15000
+      : Math.max(10000, Math.round((annualRent * 0.04) / 1000) * 1000))
 
-  const totalCost = annualRent + agencyFee + agreementFee + cautionFee + otherCharges
+  // 4. Agency Fee:
+  // - For Landlord uploads: ₦0 (0% agency fee, saving 15% for student)
+  // - For Agent uploads: 15% of annual rent
+  const agencyRate = uploaderType === 'landlord' ? 0 : 0.15
+  const agencyFee =
+    uploaderType === 'landlord'
+      ? 0
+      : (customFees?.agencyFee ?? Math.round(annualRent * 0.15))
+
+  // 5. Inspection Fee:
+  // Aroom strictly enforces ₦0 inspection policy for both
+  const inspectionFee = 0
+
+  // 6. Total Move-In Sum Package
+  const totalCost = annualRent + cautionFee + agreementFee + utilityFee + agencyFee
 
   return {
     annualRent,
     agencyFee,
+    agencyRate,
     agreementFee,
     cautionFee,
-    otherCharges,
+    utilityFee,
+    inspectionFee,
     totalCost,
+    uploaderType,
   }
 }

@@ -813,3 +813,91 @@ The background uses CSS `position: fixed` (Tailwind: `fixed`) so the photo stays
 ### Verification
 - Production build `npm run build` executed cleanly in 1.66s with 0 errors.
 - Dev server running on `http://localhost:5174/`.
+
+---
+
+## Entry 020 — Direct Landlord vs Agent Explore Filters, Video Badges & Dedicated Landlord Dashboard
+**Date:** 2026-10-14  
+**Task:**
+1. Update Explore page (`/search`) filter:
+   - Add filter to show Direct Landlord uploads.
+   - Add filter to show Agent uploads.
+2. Indicate clearly on each video/card whether uploaded by Landlord (0% agency fee) or Agent (15% agency fee).
+3. On descriptions, only include details previously required for agents (rent, caution, legal, 15% agency fee, utility, ₦0 inspection) and landlords (rent, caution, legal, utilities, 0% agency fee).
+4. On the Agent's Dashboard, exclude the landlord listing button/page.
+5. Create a separate, dedicated dashboard for the Landlord with property management, vacancy tracking, and direct student inspection schedules.
+
+### What was built
+
+1. **Explore Filter & Video Badges ([`SearchPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/SearchPage.tsx))**:
+   - Sidebar filter controls with 3 modes: All Uploads, Direct Landlord Uploads (0% Agency Fee), and Agent Uploads (15% Agency Fee).
+   - Quick pill toggles at the top of the search grid displaying real-time listing counts for each category.
+   - Video walkthrough indicators (`🎥 Video Tour`) on listing cards.
+
+2. **Tailored Listing Cards & Move-In Breakdown ([`ListingCard.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/ListingCard.tsx) & [`MoveInCostCalculator.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/MoveInCostCalculator.tsx))**:
+   - Direct Landlord uploads display gold/amber badges with `👑 Direct Landlord • 0% Fee` and calculate:
+     $$\text{Landlord Move-In} = \text{Rent} + \text{Caution} + \text{Legal} + \text{Utilities} + (\text{Agency Fee: } ₦0)$$
+   - Agent uploads display slate/emerald badges with `🏢 Agent Upload • 15% Fee` and calculate:
+     $$\text{Agent Move-In} = \text{Rent} + \text{Caution} + \text{Legal} + \text{Utilities} + (\text{Agency: } 15\%) + (\text{Inspection: } ₦0)$$
+
+3. **Description & Detail Pages ([`ListingDetailPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/ListingDetailPage.tsx))**:
+   - Dynamically resolves uploader source (Direct Landlord vs. Verified Agent).
+   - Displays description and fee schedule containing only the exact fields required for that specific role.
+
+4. **Agent Dashboard Cleanup ([`DashboardPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/DashboardPage.tsx))**:
+   - Excluded the landlord listing button; agents now only see their dedicated `Add New Listing (15% Agency)` action.
+
+5. **Dedicated Landlord Dashboard ([`LandlordDashboardPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/LandlordDashboardPage.tsx))**:
+   - Landlord profile showing verified property ownership, NIN verification, and registered campus lodges.
+   - Direct action button: `List Property (Direct Landlord)`.
+   - Vacancy manager with units occupancy toggles and zero-agency move-in packages.
+   - Direct student physical inspection schedule requests with one-click WhatsApp message triggers.
+   - Configured routes in [`App.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/App.tsx) (`/portal/landlord/dashboard`, `/landlord/dashboard`) and updated role routing in [`LoginPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/auth/pages/LoginPage.tsx) and [`LandlordRegisterPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/auth/pages/LandlordRegisterPage.tsx).
+
+### Curriculum Link
+- `curriculum.md` → Module 3.2 (Composite filtering & polymorphic card rendering), Module 4.1 (Role-segregated routing & layout adaptation).
+
+### Verification
+- Production build `npm run build` executed cleanly in 4.23s with 0 errors.
+- Dev server running on `http://localhost:5174/`.
+
+---
+
+## Entry 021 — Clean Video Overlays, Interactive Video Playback & Minimal Student Profile
+**Date:** 2026-10-14  
+**Task:**
+1. Clean up crowded video tags:
+   - Remove verified/unverified tag from video containers.
+   - Remove the 15% text.
+   - Remove the "Zero middleman" tag.
+   - Remove the 0% text.
+2. Change "Video Tour" text to "View Video" and make video playable on click.
+3. Streamline Student Dashboard profile:
+   - Remove matric number.
+   - Remove faculty.
+   - Remove email.
+   - Keep only the student's name.
+
+### What was built
+
+1. **Uncluttered Video Media Containers ([`ListingCard.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/ListingCard.tsx) & [`ListingDetailPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/ListingDetailPage.tsx))**:
+   - Stripped away crowded tags directly overlying the video: verified/unverified badges, 15% commission tags, 0% tags, and "Zero middleman" badges.
+   - Retained the `TrustBadge` in the card metadata / text row below the media box so trust indicators remain visible without obstructing the apartment footage.
+   - Renamed "Video Tour" to **"View Video"** with a red action pill (`▶ View Video`) and a centered hover play button.
+
+2. **Interactive Video Modal Player ([`VideoModal.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/VideoModal.tsx))**:
+   - Built a responsive backdrop-blurred modal window embedding an HTML5 `<video controls autoPlay playsInline />` player.
+   - Linked `/videos/room-tour.mp4` (verified room walkthrough) directly to thumbnail clicks and "View Video" button clicks.
+   - Includes escape key dismiss, backdrop dismissal, title display, and uploader attribution badge.
+
+3. **Minimal Student Profile ([`StudentDashboardPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/student/pages/StudentDashboardPage.tsx))**:
+   - Removed matric number (`matricNumber`), faculty (`faculty`), and email (`email`) from the profile card.
+   - Kept only the student's name (`Amara Chukwuemeka`) with their initial avatar and prominent search room CTA.
+
+### Curriculum Link
+- `curriculum.md` → Module 3.1 (HTML5 media elements, accessible modal overlays, keyboard event cleanup), Module 4.2 (User privacy and minimal profile rendering).
+
+### Verification
+- Production build `npm run build` executed cleanly in 4.18s with 0 errors.
+- Dev server running on `http://localhost:5174/`.
+

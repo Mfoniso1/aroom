@@ -14,6 +14,7 @@ import { StudentDashboardPage } from '@/features/student/pages/StudentDashboardP
 import { DashboardPage } from '@/features/agent/pages/DashboardPage'
 import { NewListingPage } from '@/features/agent/pages/NewListingPage'
 import { LandlordNewListingPage } from '@/features/agent/pages/LandlordNewListingPage'
+import { LandlordDashboardPage } from '@/features/agent/pages/LandlordDashboardPage'
 import { OnboardingPage } from '@/features/agent/pages/OnboardingPage'
 import { SplashScreen } from '@/components/shared/SplashScreen'
 
@@ -58,12 +59,19 @@ function App() {
             <Route path="dashboard" element={<MainLayout><StudentDashboardPage /></MainLayout>} />
           </Route>
 
+          {/* Direct Landlord Portal */}
+          <Route path="/landlord">
+            <Route index element={<Navigate to="/portal/landlord/dashboard" replace />} />
+            <Route path="dashboard" element={<Navigate to="/portal/landlord/dashboard" replace />} />
+          </Route>
+
           {/* Agent & Landlord Portal */}
           <Route path="/portal">
             <Route index element={<Navigate to="/portal/dashboard" replace />} />
             <Route path="login" element={<MainLayout><LoginPage /></MainLayout>} />
             <Route path="dashboard" element={<AgentLayout><DashboardPage /></AgentLayout>} />
             <Route path="listings/new" element={<AgentLayout><NewListingPage /></AgentLayout>} />
+            <Route path="landlord/dashboard" element={<AgentLayout><LandlordDashboardPage /></AgentLayout>} />
             <Route path="landlord/new" element={<AgentLayout><LandlordNewListingPage /></AgentLayout>} />
             <Route path="onboarding" element={<AgentLayout><OnboardingPage /></AgentLayout>} />
           </Route>

@@ -43,8 +43,8 @@ const ROLES: RoleTab[] = [
     id: 'landlord',
     label: 'Landlord',
     icon: <Building2 className="w-5 h-5" />,
-    destination: '/portal/dashboard',
-    subtext: 'Track direct bookings and verify listings',
+    destination: '/portal/landlord/dashboard',
+    subtext: 'Manage owned properties & direct zero-agency listings',
   },
 ]
 
