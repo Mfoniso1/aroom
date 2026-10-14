@@ -168,8 +168,8 @@ export function ListingDetailPage() {
           <div className="md:col-span-2 space-y-6">
             
             {/* Media Box with Video Tour Overlay */}
-            <div className="h-80 sm:h-96 bg-slate-900 rounded-2xl overflow-hidden relative shadow-md group">
-              <img src={resolved.imageUrl} alt={resolved.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="h-80 sm:h-96 bg-slate-950 rounded-2xl overflow-hidden relative shadow-md group">
+              <img src={resolved.imageUrl} alt={resolved.title} className="w-full h-full object-cover object-center" />
               
               {/* Center Play Button Overlay */}
               <button

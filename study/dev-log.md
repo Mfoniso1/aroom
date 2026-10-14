@@ -935,4 +935,38 @@ The background uses CSS `position: fixed` (Tailwind: `fixed`) so the photo stays
 - Production build `npm run build` executed cleanly in 1.95s with 0 errors.
 - Dev server running on `http://localhost:5174/`.
 
+---
+
+## Entry 023 — Unmuted Video Volume, Reduced Zoom Clarity & Auto-Captured Cover Page
+**Date:** 2026-10-14  
+**Task:**
+1. Enable video volume on uploaded walkthrough videos (remove forced mute, add volume/unmute controls, handle browser autoplay policies gracefully).
+2. Reduce video zoom in card previews and playback modal for clear, unobstructed room viewing.
+3. Automatically capture the initial view of the video as the cover page; eliminate asking for a separate cover page/photo upload.
+
+### What was built
+
+1. **Unmuted Audio & Sound Controls ([`VideoModal.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/VideoModal.tsx))**:
+   - Initialized video playback unmuted (`muted = false`, `volume = 1.0`).
+   - Added browser autoplay safety: if autoplay with sound is blocked by browser security policies, playback seamlessly falls back to muted mode while displaying an interactive `"Click to turn on sound 🔊"` toggle pill.
+   - Synchronized volume change events (`onVolumeChange`) and provided a header audio toggle button.
+
+2. **Reduced Zoom & Natural Framing ([`VideoModal.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/VideoModal.tsx), [`ListingCard.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/components/shared/ListingCard.tsx), & [`ListingDetailPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/marketplace/pages/ListingDetailPage.tsx))**:
+   - Expanded modal container to `max-w-4xl lg:max-w-5xl` with `max-h-[75vh]` and `object-contain`, displaying both 16:9 landscape and 9:16 portrait smartphone walkthroughs at their true native resolution without cropping.
+   - Removed aggressive `group-hover:scale-105` zoom animations on card and hero media containers.
+   - Increased card media container height to `h-60 sm:h-64` with `object-cover object-center` for balanced, clear framing.
+
+3. **Automatic Initial-View Cover Extraction ([`listingsStore.ts`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/lib/listingsStore.ts), [`NewListingPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/NewListingPage.tsx), & [`LandlordNewListingPage.tsx`](file:///c:/Users/Admin/Desktop/AROOM%20NEW/aroom/aroom-web/src/features/agent/pages/LandlordNewListingPage.tsx))**:
+   - Updated `extractThumbnailFromVideo` to capture the exact first frame (`currentTime = 0.05s`) at full native resolution with 0.92 JPEG quality.
+   - Completely removed separate cover photo file upload inputs from both Agent and Landlord listing wizards.
+   - The initial video view is automatically extracted, previewed with a `"Cover Page Captured (First frame)"` badge, and saved directly as the listing's cover image.
+
+### Curriculum Link
+- `curriculum.md` → Module 3.1 (HTML5 media autoplay policies, `<canvas>` video frame extraction, responsive CSS aspect ratio & object fit), Module 3.2 (Streamlined multi-step form UX).
+
+### Verification
+- Production build `npm run build` executed cleanly in 2.31s with 0 errors.
+- Dev server running on `http://localhost:5174/`.
+
+
 

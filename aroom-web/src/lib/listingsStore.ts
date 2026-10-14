@@ -380,7 +380,7 @@ export function useListings() {
 }
 
 /**
- * Helper: Extracts a video frame at 1s as a thumbnail data URI
+ * Helper: Extracts the initial view (first frame) of a video as the cover page data URI
  */
 export function extractThumbnailFromVideo(videoFile: File): Promise<string> {
   return new Promise((resolve) => {
@@ -390,21 +390,24 @@ export function extractThumbnailFromVideo(videoFile: File): Promise<string> {
       video.src = blobUrl
       video.muted = true
       video.playsInline = true
-      video.preload = 'metadata'
+      video.preload = 'auto'
 
-      video.onloadedmetadata = () => {
-        video.currentTime = Math.min(1.0, (video.duration || 1) / 2)
+      video.onloadeddata = () => {
+        // Capture initial view (very start of the video)
+        video.currentTime = 0.05
       }
 
       video.onseeked = () => {
         try {
+          const width = video.videoWidth || 1280
+          const height = video.videoHeight || 720
           const canvas = document.createElement('canvas')
-          canvas.width = video.videoWidth || 640
-          canvas.height = video.videoHeight || 360
+          canvas.width = width
+          canvas.height = height
           const ctx = canvas.getContext('2d')
           if (ctx) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+            ctx.drawImage(video, 0, 0, width, height)
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.92)
             URL.revokeObjectURL(blobUrl)
             resolve(dataUrl)
             return

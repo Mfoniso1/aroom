@@ -53,14 +53,14 @@ export function ListingCard({ listing }: ListingCardProps) {
         {/* ── Video / Media Container (Clean & Uncluttered) ── */}
         <div 
           onClick={handlePlayVideo}
-          className="h-52 bg-slate-900 relative overflow-hidden cursor-pointer group rounded-t-2xl"
+          className="h-60 sm:h-64 bg-slate-950 relative overflow-hidden cursor-pointer group rounded-t-2xl"
           title="Click to play walkthrough video"
         >
           <img
             src={imgSrc}
             alt={listing.title}
             onError={() => setImgSrc(FALLBACK_IMAGE)}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95 group-hover:opacity-90"
+            className="w-full h-full object-cover object-center opacity-95 group-hover:opacity-90 transition-opacity"
           />
 
           {/* Subtle Top Gradient for readability */}

@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { CAMPUSES } from '@/lib/campuses'
 import {
   Calculator,
-  Camera,
   CheckCircle2,
   Video,
   Upload,
@@ -12,6 +11,7 @@ import {
   ArrowRight,
   Eye,
   Loader2,
+  Image as ImageIcon,
 } from 'lucide-react'
 import { addCustomListing, extractThumbnailFromVideo } from '@/lib/listingsStore'
 import type { Listing } from '@/components/shared/ListingCard'
@@ -41,18 +41,16 @@ export function LandlordNewListingPage() {
   const [utilityFee, setUtilityFee] = useState<string>('10000')
   const [hasUtilities, setHasUtilities] = useState(true)
 
-  // Media state (Video upload from device + photo)
+  // Media state (Video upload from device storage)
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null)
   const [videoThumbnailUrl, setVideoThumbnailUrl] = useState<string | null>(null)
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
   const [isProcessingVideo, setIsProcessingVideo] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [createdListingId, setCreatedListingId] = useState<string | null>(null)
 
   const videoInputRef = useRef<HTMLInputElement>(null)
-  const photoInputRef = useRef<HTMLInputElement>(null)
+  const previewVideoRef = useRef<HTMLVideoElement>(null)
 
   const rentNum = Number(rent) || 0
   const cautionNum = Number(cautionFee) || 0
@@ -72,8 +70,14 @@ export function LandlordNewListingPage() {
     const objectUrl = URL.createObjectURL(file)
     setVideoPreviewUrl(objectUrl)
 
+    if (previewVideoRef.current) {
+      previewVideoRef.current.muted = false
+      previewVideoRef.current.volume = 1.0
+    }
+
     setIsProcessingVideo(true)
     try {
+      // Automatically extract initial view (first frame) of video as cover page
       const thumb = await extractThumbnailFromVideo(file)
       setVideoThumbnailUrl(thumb)
     } catch (err) {
@@ -81,14 +85,6 @@ export function LandlordNewListingPage() {
     } finally {
       setIsProcessingVideo(false)
     }
-  }
-
-  // Handle photo selection
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setPhotoFile(file)
-    setPhotoPreviewUrl(URL.createObjectURL(file))
   }
 
   const handleRemoveVideo = () => {
@@ -99,13 +95,6 @@ export function LandlordNewListingPage() {
     if (videoInputRef.current) videoInputRef.current.value = ''
   }
 
-  const handleRemovePhoto = () => {
-    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl)
-    setPhotoFile(null)
-    setPhotoPreviewUrl(null)
-    if (photoInputRef.current) photoInputRef.current.value = ''
-  }
-
   // Publish listing to store
   const handlePublish = async () => {
     setIsPublishing(true)
@@ -113,8 +102,8 @@ export function LandlordNewListingPage() {
     const roomLabel = LANDLORD_ROOM_TYPES.find((r) => r.value === roomType)?.label || 'Self Contain'
     const title = lodgeName ? `${lodgeName} (${roomLabel})` : `${roomLabel} at ${landmark || selectedCampus?.popularLandmarks[0] || 'Campus Area'}`
 
+    // Initial view of video used directly as cover image
     const finalImage =
-      photoPreviewUrl ||
       videoThumbnailUrl ||
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop'
 
@@ -143,7 +132,7 @@ export function LandlordNewListingPage() {
     }
 
     try {
-      await addCustomListing(newListing, videoFile || undefined, photoFile || undefined)
+      await addCustomListing(newListing, videoFile || undefined, undefined)
       setCreatedListingId(newId)
       setStep(3)
     } catch (err) {
@@ -398,12 +387,12 @@ export function LandlordNewListingPage() {
               }}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] cursor-pointer"
             >
-              Next: Upload Video Tour &amp; Photos
+              Next: Upload Room Walkthrough Video
             </button>
           </div>
         )}
 
-        {/* ── STEP 2: Video Walkthrough Upload from Device Storage & Photos ── */}
+        {/* ── STEP 2: Video Walkthrough Upload (Initial view automatically set as cover) ── */}
         {step === 2 && (
           <div className="space-y-6">
             <div>
@@ -411,14 +400,14 @@ export function LandlordNewListingPage() {
                 Step 2 of 3
               </span>
               <h2 className="text-xl font-bold text-slate-900 mt-1.5">
-                Upload Property Video &amp; Photos
+                Upload Property Video Walkthrough
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Upload a real walkthrough video of your lodge from your phone or device storage. It will appear on the Explore page with the Direct Landlord badge.
+                Upload a real walkthrough video of your lodge from your device. The initial view of the video is automatically captured as the listing cover page.
               </p>
             </div>
 
-            {/* ── 1. Video Upload Box (From Device Storage) ── */}
+            {/* Video Upload Box from Device Storage */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
@@ -446,9 +435,9 @@ export function LandlordNewListingPage() {
                       MP4, MOV, WebM recorded inside room or compound
                     </p>
                   </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold text-amber-700 shadow-2xs">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold text-amber-700 shadow-2xs">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>Browse files</span>
+                    <span>Browse device storage</span>
                   </div>
                   <input
                     ref={videoInputRef}
@@ -459,7 +448,7 @@ export function LandlordNewListingPage() {
                   />
                 </div>
               ) : (
-                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-900 text-white space-y-3 shadow-md">
+                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-950 text-white space-y-3 shadow-md">
                   <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
                     <span className="flex items-center gap-1.5 text-amber-400 font-bold truncate">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -470,13 +459,14 @@ export function LandlordNewListingPage() {
                     </span>
                   </div>
 
-                  {/* Video Player Preview */}
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                  {/* Video Player Preview — Natural Unzoomed View with Audio Enabled */}
+                  <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center min-h-[240px] max-h-[360px]">
                     <video
+                      ref={previewVideoRef}
                       src={videoPreviewUrl}
                       controls
                       playsInline
-                      className="w-full h-full object-contain"
+                      className="w-full max-h-[360px] object-contain mx-auto"
                     />
                   </div>
 
@@ -486,7 +476,7 @@ export function LandlordNewListingPage() {
                       onClick={() => videoInputRef.current?.click()}
                       className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
                     >
-                      <Upload className="w-3.5 h-3.5" /> Change video file
+                      <Upload className="w-3.5 h-3.5" /> Change video
                     </button>
                     <button
                       type="button"
@@ -509,51 +499,35 @@ export function LandlordNewListingPage() {
               {isProcessingVideo && (
                 <p className="text-xs text-amber-600 flex items-center gap-1">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Generating video thumbnail cover...
+                  Capturing initial frame for cover page...
                 </p>
               )}
             </div>
 
-            {/* ── 2. Additional Photos Upload (Optional) ── */}
-            <div className="space-y-3 pt-2 border-t border-slate-100">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-slate-500" />
-                  <span>Custom Cover Photo (Optional)</span>
-                </label>
-                <span className="text-[10px] text-slate-400">
-                  {videoThumbnailUrl ? 'Auto-extracted from video' : 'Optional'}
-                </span>
-              </div>
-
-              {!photoPreviewUrl ? (
-                <div
-                  onClick={() => photoInputRef.current?.click()}
-                  className="border border-dashed border-slate-300 hover:border-slate-400 rounded-xl p-4 text-center space-y-1 bg-slate-50 hover:bg-slate-100/70 transition-all cursor-pointer"
-                >
-                  <p className="text-xs font-semibold text-slate-700">Click to upload photos</p>
-                  <p className="text-[11px] text-slate-400">If omitted, the first frame of your video will be used</p>
-                  <input
-                    ref={photoInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="hidden"
+            {/* ── Automatic Initial View Cover Page Preview ── */}
+            {videoThumbnailUrl && (
+              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Listing Cover Page (Captured from Initial Video View)</span>
+                  </span>
+                  <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                    Automatic
+                  </span>
+                </div>
+                <div className="h-32 sm:h-36 rounded-lg overflow-hidden bg-slate-900 border border-amber-200 relative">
+                  <img
+                    src={videoThumbnailUrl}
+                    alt="Cover preview"
+                    className="w-full h-full object-cover object-center"
                   />
+                  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] font-semibold backdrop-blur-xs">
+                    Initial Frame • Listing Cover
+                  </div>
                 </div>
-              ) : (
-                <div className="relative rounded-xl overflow-hidden border border-slate-200 h-32 bg-slate-100 flex items-center justify-center">
-                  <img src={photoPreviewUrl} alt="Cover preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={handleRemovePhoto}
-                    className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:bg-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1 text-slate-700">
               <p><strong>Campus:</strong> {selectedCampus?.name || 'Selected Campus'}</p>
@@ -597,7 +571,7 @@ export function LandlordNewListingPage() {
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900">Your property is now listed!</h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">
-                Students near {selectedCampus?.shortCode || 'campus'} can now watch your walkthrough video on the Explore page and contact you directly with zero agency fees.
+                Students near {selectedCampus?.shortCode || 'campus'} can now watch your walkthrough video on the Explore page with audio and contact you directly with zero agency fees.
               </p>
             </div>
 
@@ -610,8 +584,8 @@ export function LandlordNewListingPage() {
                 <strong>Total Move-in Package:</strong> ₦{totalPackage.toLocaleString()}
               </p>
               <p className="text-emerald-700 font-bold flex items-center gap-1 pt-0.5">
-                <Play className="w-3.5 h-3.5 fill-emerald-700" />
-                <span>Uploaded walkthrough video is active on Explore page!</span>
+                <Play className="w-3.5 h-3.5 fill-emerald-700 text-emerald-700" />
+                <span>Uploaded walkthrough video with audio &amp; initial view cover is live on Explore page!</span>
               </p>
             </div>
 
