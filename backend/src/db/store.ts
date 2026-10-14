@@ -56,7 +56,7 @@ export class DatabaseStore {
   }
 
   private seedPilotData() {
-    // 1. Campus: UNILAG
+    // 1. Campuses
     const unilagId = 'c1111111-1111-1111-1111-111111111111';
     this.campuses.set(unilagId, {
       id: unilagId,
@@ -69,6 +69,38 @@ export class DatabaseStore {
         center: [6.5181, 3.3995],
         radiusKm: 4.5,
         popularLandmarks: ['Akoka Gate', 'Abule Oja', 'Onike', 'Bariga', 'St. Finbarrs', 'Yaba Tech Junction'],
+      },
+      createdAt: new Date(),
+    });
+
+    const uniportId = 'c2222222-2222-2222-2222-222222222222';
+    this.campuses.set(uniportId, {
+      id: uniportId,
+      name: 'University of Port Harcourt',
+      shortCode: 'UNIPORT',
+      city: 'Port Harcourt',
+      state: 'Rivers State',
+      institutionalEmailDomains: ['@uniport.edu.ng'],
+      geographicBoundaries: {
+        center: [4.8988, 6.9242],
+        radiusKm: 6.0,
+        popularLandmarks: ['Choba Gate', 'Alakahia', 'Delta Park', 'University Park', 'Abuja Campus Gate', 'Ozuoba'],
+      },
+      createdAt: new Date(),
+    });
+
+    const unibenId = 'c3333333-3333-3333-3333-333333333333';
+    this.campuses.set(unibenId, {
+      id: unibenId,
+      name: 'University of Benin',
+      shortCode: 'UNIBEN',
+      city: 'Benin City',
+      state: 'Edo State',
+      institutionalEmailDomains: ['@uniben.edu'],
+      geographicBoundaries: {
+        center: [6.3984, 5.6171],
+        radiusKm: 5.0,
+        popularLandmarks: ['Ugbowo Main Gate', 'Ekosodin', 'BDPA', 'Osasogie', 'Isiohor'],
       },
       createdAt: new Date(),
     });

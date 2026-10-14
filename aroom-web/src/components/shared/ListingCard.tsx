@@ -12,6 +12,7 @@ export type Listing = {
   verificationStatus: 'verified' | 'unverified_new'
   availabilityStatus: 'available' | 'held' | 'taken'
   imageUrl: string
+  campusId?: string
 }
 
 type ListingCardProps = {
