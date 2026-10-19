@@ -25,7 +25,30 @@ async function runTests() {
     });
   });
 
+  const api = async (path: string, init: { method?: string; token?: string; body?: unknown } = {}) => {
+    const res = await fetch(`${BASE_URL}/api/v1${path}`, {
+      method: init.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init.token ? { Authorization: `Bearer ${init.token}` } : {}),
+      },
+      body: init.body ? JSON.stringify(init.body) : undefined,
+    });
+    return { status: res.status, body: (await res.json()) as any };
+  };
+  const assert = (cond: unknown, msg: string) => {
+    if (!cond) throw new Error(msg);
+  };
+
   try {
+    // Seeded Femi (approved agent) logs in with phone + password
+    const femiLogin = await api('/auth/login', {
+      method: 'POST',
+      body: { phoneNumber: '+2348011112222', password: process.env.SEED_AGENT_PASSWORD || 'Agent@12345' },
+    });
+    assert(femiLogin.body.success, `Seed agent login failed: ${JSON.stringify(femiLogin.body)}`);
+    const femiToken: string = femiLogin.body.data.token;
+
     // --------------------------------------------------------------------------
     // Test 1: Health Check
     // --------------------------------------------------------------------------
@@ -93,7 +116,7 @@ async function runTests() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': 'd1111111-1111-1111-1111-111111111111', // Seed agent Femi
+          Authorization: `Bearer ${femiToken}`, // Seed agent Femi (JWT)
         },
         body: JSON.stringify(newListingPayload),
       });
@@ -114,7 +137,7 @@ async function runTests() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': 'd1111111-1111-1111-1111-111111111111',
+          Authorization: `Bearer ${femiToken}`,
         },
         body: JSON.stringify({ status: 'held', reason: 'Student inspection underway' }),
       });
@@ -182,7 +205,7 @@ async function runTests() {
     // --------------------------------------------------------------------------
     {
       const res = await fetch(`${BASE_URL}/api/v1/inquiries/agent-queue`, {
-        headers: { 'x-user-id': 'd1111111-1111-1111-1111-111111111111' },
+        headers: { Authorization: `Bearer ${femiToken}` },
       });
       const body = await res.json();
       if (!body.success || body.data.length === 0) {
@@ -290,7 +313,94 @@ async function runTests() {
       console.log(green('Test 11: Inbound WhatsApp message processed through FSM & queried ListingService'));
     }
 
-    console.log(bold('\n🎉 ALL 11 TESTS PASSED SUCCESSFULLY! Database & API design fully operational.\n'));
+    // --------------------------------------------------------------------------
+    // Tests 12-18: Team-Leader approval flow (pilot)
+    // --------------------------------------------------------------------------
+    const unique = Date.now().toString().slice(-8);
+    const phone = `0803${unique}`;
+    const password = 'Pilot@12345';
+
+    // Test 12: signup creates a PENDING agent (no OTP) and notifies the Team Leader
+    const signup = await api('/auth/agent/signup', {
+      method: 'POST',
+      body: { fullName: 'Amina Yusuf', phoneNumber: phone, password, agentKind: 'landlord', idCardImageUrl: 'https://example.com/id.jpg' },
+    });
+    assert(signup.status === 201 && signup.body.data.status === 'pending', `Signup should be pending: ${JSON.stringify(signup.body)}`);
+    const newToken: string = signup.body.data.token;
+    const newAgentProfileId: string = signup.body.data.agentProfileId;
+    console.log(green('Test 12: New agent signup is [pending] with no OTP step'));
+
+    // Test 13: pending agent cannot create a listing (backend enforced)
+    const listingPayload = {
+      campusId: 'c1111111-1111-1111-1111-111111111111',
+      title: 'Pilot approval test room',
+      description: 'A decent room used to test the approval gate.',
+      roomType: 'single_room',
+      priceAnnualNaira: 200000,
+      landmarkVicinity: 'Akoka Gate',
+      moveInDate: '2026-12-01',
+    };
+    const blocked = await api('/listings', { method: 'POST', token: newToken, body: listingPayload });
+    assert(blocked.status === 403, `Pending agent must get 403, got ${blocked.status}: ${JSON.stringify(blocked.body)}`);
+    console.log(green('Test 13: Pending agent blocked from listing (403)'));
+
+    // Test 14: non-admin cannot use admin endpoints; anonymous gets 401
+    const nonAdmin = await api('/admin/agents', { token: newToken });
+    assert(nonAdmin.status === 403, `Agent calling /admin must get 403, got ${nonAdmin.status}`);
+    const anon = await api('/admin/agents');
+    assert(anon.status === 401, `Anonymous /admin must get 401, got ${anon.status}`);
+    console.log(green('Test 14: /admin/* rejects agents (403) and anonymous users (401)'));
+
+    // Test 15: Team Leader logs in, sees the pending application and a notification
+    const tl = await api('/auth/login', {
+      method: 'POST',
+      body: { phoneNumber: '+2340000000001', password: process.env.TEAM_LEADER_PASSWORD || 'TeamLead@12345' },
+    });
+    assert(tl.body.success && tl.body.data.me.role === 'admin', `Team Leader login failed: ${JSON.stringify(tl.body)}`);
+    const tlToken: string = tl.body.data.token;
+    const queue = await api('/admin/agents?status=pending', { token: tlToken });
+    assert(queue.body.data.items.some((a: any) => a.agentProfileId === newAgentProfileId), 'Pending agent missing from queue');
+    const bell = await api('/notifications', { token: tlToken });
+    assert(bell.body.data.items.some((n: any) => n.type === 'agent_signup'), 'Team Leader was not notified of the signup');
+    console.log(green('Test 15: Team Leader sees the pending agent and got a signup notification'));
+
+    // Test 16: reject requires a reason; approve lets the agent list and appear in search
+    const noReason = await api(`/admin/agents/${newAgentProfileId}/reject`, { method: 'POST', token: tlToken, body: {} });
+    assert(noReason.status === 400, 'Reject without a reason must fail validation');
+    const approve = await api(`/admin/agents/${newAgentProfileId}/approve`, { method: 'POST', token: tlToken, body: { phoneContacted: true } });
+    assert(approve.body.data.status === 'approved', `Approve failed: ${JSON.stringify(approve.body)}`);
+    const me = await api('/auth/me', { token: newToken });
+    assert(me.body.data.approvalStatus === 'approved', 'Agent session should now be approved');
+    const created = await api('/listings', { method: 'POST', token: newToken, body: listingPayload });
+    assert(created.status === 201, `Approved agent should be able to list: ${JSON.stringify(created.body)}`);
+    const search = await api('/listings/search?campus_code=UNILAG&limit=50');
+    assert(search.body.data.items.some((l: any) => l.id === created.body.data.id), 'Approved agent listing missing from search');
+    console.log(green('Test 16: Approved agent can list and the listing is publicly searchable'));
+
+    // Test 17: suspend hides listings from search
+    const suspend = await api(`/admin/agents/${newAgentProfileId}/suspend`, { method: 'POST', token: tlToken, body: { reason: 'test' } });
+    assert(suspend.body.data.status === 'suspended', 'Suspend failed');
+    const search2 = await api('/listings/search?campus_code=UNILAG&limit=50');
+    assert(!search2.body.data.items.some((l: any) => l.id === created.body.data.id), 'Suspended agent listing still public');
+    console.log(green('Test 17: Suspended agent hidden from search'));
+
+    // Test 18: rejected applicant sees the reason; wrong password gives 401
+    const rejectedPhone = `0804${unique}`;
+    const signup2 = await api('/auth/agent/signup', {
+      method: 'POST',
+      body: { fullName: 'Rejected Person', phoneNumber: rejectedPhone, password, agentKind: 'agent', idCardImageUrl: 'https://example.com/id2.jpg' },
+    });
+    await api(`/admin/agents/${signup2.body.data.agentProfileId}/reject`, { method: 'POST', token: tlToken, body: { reason: 'ID photo is blurry' } });
+    const rejectedLogin = await api('/auth/login', { method: 'POST', body: { phoneNumber: rejectedPhone, password } });
+    assert(
+      rejectedLogin.body.data.me.approvalStatus === 'rejected' && rejectedLogin.body.data.me.rejectionReason === 'ID photo is blurry',
+      'Rejected agent should see the reason'
+    );
+    const badLogin = await api('/auth/login', { method: 'POST', body: { phoneNumber: rejectedPhone, password: 'wrong-password' } });
+    assert(badLogin.status === 401, 'Wrong password must return 401');
+    console.log(green('Test 18: Rejected agent sees the reason; wrong password returns 401'));
+
+    console.log(bold('\n🎉 ALL 18 TESTS PASSED SUCCESSFULLY! Database & API design fully operational.\n'));
   } finally {
     server.close();
   }

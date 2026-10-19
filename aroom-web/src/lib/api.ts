@@ -11,6 +11,83 @@ export const apiClient = axios.create({
   timeout: 8000,
 })
 
+// ── Session token (JWT) ──────────────────────────────────────────────────────
+export const TOKEN_KEY = 'aroom_token'
+export const UNAUTHORIZED_EVENT = 'aroom:unauthorized'
+
+export function getToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY)
+}
+export function setToken(token: string | null) {
+  if (token) localStorage.setItem(TOKEN_KEY, token)
+  else localStorage.removeItem(TOKEN_KEY)
+}
+
+apiClient.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// A 401 on a protected call means the session expired: tell the AuthProvider.
+apiClient.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const url: string = err?.config?.url || ''
+    if (err?.response?.status === 401 && getToken() && !url.startsWith('/auth/login')) {
+      setToken(null)
+      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
+    }
+    return Promise.reject(err)
+  }
+)
+
+/** Turns an axios error into a readable message from the backend. */
+export function apiErrorMessage(err: unknown, fallback = 'Something went wrong. Please try again.'): string {
+  const e = err as any
+  if (e?.response?.data?.error) return String(e.response.data.error)
+  if (e?.code === 'ERR_NETWORK' || e?.message === 'Network Error') return 'Cannot reach the server. Check your connection.'
+  return fallback
+}
+
+export type ApprovalStatus = 'approved' | 'pending' | 'rejected' | 'suspended' | null
+export interface SessionUser {
+  id: string
+  role: 'student' | 'non_student' | 'agent' | 'admin'
+  phoneNumber: string
+  fullName: string | null
+  agentProfileId: string | null
+  agentKind: 'agent' | 'landlord' | null
+  approvalStatus: ApprovalStatus
+  rejectionReason: string | null
+}
+
+export interface AgentApplication {
+  agentProfileId: string
+  userId: string
+  fullName: string
+  agencyName: string | null
+  phoneNumber: string
+  agentKind: 'agent' | 'landlord'
+  status: 'pending' | 'approved' | 'rejected' | 'suspended'
+  phoneContacted: boolean
+  rejectionReason: string | null
+  reviewedAt: string | null
+  createdAt: string
+  listingCount: number
+  idCardImageUrl?: string | null
+}
+
+export interface AppNotification {
+  id: string
+  type: string
+  title: string
+  body?: string
+  readAt?: string
+  createdAt: string
+  payload?: Record<string, any>
+}
+
 // MOCK SEED FALLBACK (Used if backend server is unreachable)
 export const FALLBACK_LISTINGS: Listing[] = [
   {
@@ -18,7 +95,7 @@ export const FALLBACK_LISTINGS: Listing[] = [
     title: 'Standard Executive Self-Contain (Serviced water + prepaid meter)',
     price: 350000,
     period: 'yr',
-    landmark: 'Akoka Gate (5 mins walk)',
+    landmark: 'Choba Gate (5 mins walk)',
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
@@ -122,7 +199,7 @@ export const api = {
             'A very spacious and clean room near campus with running water and prepaid meter. Close to university main gate.',
           primaryPhotoUrl: match.imageUrl,
           agent: {
-            name: 'Femi Ogundipe',
+            name: 'David Opubo',
             trustTier: 'gold',
             trustScore: 96.5,
             responseRatePct: 98,
@@ -168,9 +245,9 @@ export const api = {
       if (res.data?.success && res.data?.data) {
         return res.data.data
       }
-      return [{ id: 'c1111111-1111-1111-1111-111111111111', name: 'University of Lagos', shortCode: 'UNILAG', city: 'Yaba, Lagos' }]
+      return [{ id: 'c1111111-1111-1111-1111-111111111111', name: 'University of Port Harcourt', shortCode: 'UNIPORT', city: 'Port Harcourt' }]
     } catch {
-      return [{ id: 'c1111111-1111-1111-1111-111111111111', name: 'University of Lagos', shortCode: 'UNILAG', city: 'Yaba, Lagos' }]
+      return [{ id: 'c1111111-1111-1111-1111-111111111111', name: 'University of Port Harcourt', shortCode: 'UNIPORT', city: 'Port Harcourt' }]
     }
   },
 
@@ -187,19 +264,98 @@ export const api = {
     return res.data
   },
 
-  // 4. Auth & Agent Onboarding
-  async agentSignup(payload: {
-    fullName: string
-    phoneNumber: string
-    idCardImageUrl: string
-    agencyName?: string
-  }): Promise<any> {
-    const res = await apiClient.post('/auth/agent/signup', payload)
-    return res.data
+  // 4. Auth & Agent / Landlord onboarding (pilot: no OTP, Team Leader approval)
+  async uploadIdPhoto(file: File): Promise<string> {
+    const dataBase64: string = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+      reader.onerror = () => reject(new Error('Could not read the photo.'))
+      reader.readAsDataURL(file)
+    })
+    const res = await apiClient.post('/auth/upload-id', { contentType: file.type, dataBase64 })
+    return res.data.data.idCardImageUrl as string
   },
 
-  async verifyAgentOtp(phoneNumber: string, otp: string): Promise<any> {
-    const res = await apiClient.post('/auth/agent/verify-otp', { phoneNumber, otp })
-    return res.data
+  async partnerSignup(payload: {
+    fullName: string
+    phoneNumber: string
+    email?: string
+    password: string
+    agentKind: 'agent' | 'landlord'
+    idCardImageUrl: string
+    agencyName?: string
+  }): Promise<{ token: string; status: 'pending'; agentProfileId: string }> {
+    const res = await apiClient.post('/auth/agent/signup', payload)
+    return res.data.data
+  },
+
+  async login(identifier: string, password: string): Promise<{ token: string; me: SessionUser }> {
+    const res = await apiClient.post('/auth/login', { identifier, password })
+    return res.data.data
+  },
+
+  async me(): Promise<SessionUser> {
+    const res = await apiClient.get('/auth/me')
+    return res.data.data
+  },
+
+  // 5. Team Leader (admin)
+  async listApplications(status: 'pending' | 'approved' | 'rejected' | 'suspended' | 'all') {
+    const res = await apiClient.get('/admin/agents', { params: { status } })
+    return res.data.data as {
+      counts: Record<'pending' | 'approved' | 'rejected' | 'suspended', number>
+      items: AgentApplication[]
+    }
+  },
+
+  async getApplication(id: string): Promise<AgentApplication> {
+    const res = await apiClient.get(`/admin/agents/${id}`)
+    return res.data.data
+  },
+
+  async approveApplication(id: string, phoneContacted?: boolean) {
+    const res = await apiClient.post(`/admin/agents/${id}/approve`, { phoneContacted })
+    return res.data.data as AgentApplication
+  },
+
+  async rejectApplication(id: string, reason: string) {
+    const res = await apiClient.post(`/admin/agents/${id}/reject`, { reason })
+    return res.data.data as AgentApplication
+  },
+
+  async suspendApplication(id: string, reason?: string) {
+    const res = await apiClient.post(`/admin/agents/${id}/suspend`, { reason })
+    return res.data.data as AgentApplication
+  },
+
+  async reinstateApplication(id: string) {
+    const res = await apiClient.post(`/admin/agents/${id}/reinstate`)
+    return res.data.data as AgentApplication
+  },
+
+  async setPhoneContacted(id: string, value: boolean) {
+    const res = await apiClient.patch(`/admin/agents/${id}/phone-contacted`, { value })
+    return res.data.data as AgentApplication
+  },
+
+  async createApprovedAgent(payload: {
+    fullName: string
+    phoneNumber: string
+    password: string
+    agentKind: 'agent' | 'landlord'
+    agencyName?: string
+  }) {
+    const res = await apiClient.post('/admin/agents', payload)
+    return res.data.data as AgentApplication
+  },
+
+  // 6. Notifications
+  async getNotifications() {
+    const res = await apiClient.get('/notifications')
+    return res.data.data as { unreadCount: number; items: AppNotification[] }
+  },
+
+  async markAllNotificationsRead() {
+    await apiClient.post('/notifications/read-all')
   },
 }

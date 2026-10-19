@@ -75,11 +75,53 @@ export const SubmitReportBodySchema = z.object({
 
 export const AgentSignupBodySchema = z.object({
   phoneNumber: z.string().min(10).max(20),
+  email: z.string().email().optional(),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(100),
   fullName: z.string().min(2).max(255),
+  agentKind: z.enum(['agent', 'landlord']).default('agent'),
   agencyName: z.string().max(255).optional(),
-  idCardImageUrl: z.string().url(),
+  // Reference returned by POST /auth/upload-id (storage:// path, data URL or https URL)
+  idCardImageUrl: z.string().min(5),
 });
 
+export const LoginBodySchema = z
+  .object({
+    // Phone number OR email address
+    identifier: z.string().min(3).max(255).optional(),
+    phoneNumber: z.string().min(3).max(255).optional(), // legacy alias of identifier
+    password: z.string().min(1),
+  })
+  .refine((v) => v.identifier || v.phoneNumber, { message: 'Enter your phone number or email' })
+  .transform((v) => ({ identifier: (v.identifier || v.phoneNumber)!, password: v.password }));
+
+export const UploadIdBodySchema = z.object({
+  contentType: z.string(),
+  dataBase64: z.string().min(10),
+});
+
+export const RejectAgentBodySchema = z.object({
+  reason: z.string().min(5, 'Please give the applicant a short reason').max(500),
+});
+
+export const ApproveAgentBodySchema = z.object({
+  phoneContacted: z.boolean().optional(),
+});
+
+export const SuspendAgentBodySchema = z.object({
+  reason: z.string().max(500).optional(),
+});
+
+export const PhoneContactedBodySchema = z.object({
+  value: z.boolean(),
+});
+
+export const CreateApprovedAgentBodySchema = z.object({
+  fullName: z.string().min(2).max(255),
+  phoneNumber: z.string().min(10).max(20),
+  password: z.string().min(8).max(100),
+  agentKind: z.enum(['agent', 'landlord']).default('agent'),
+  agencyName: z.string().max(255).optional(),
+});
 export const VerifyOtpBodySchema = z.object({
   phoneNumber: z.string().min(10).max(20),
   otp: z.string().length(6),

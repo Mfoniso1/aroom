@@ -1,48 +1,39 @@
 /**
  * LandlordRegisterPage.tsx
- * Multi-step landlord registration form:
- *   - Quick suggestion from email to auto-fill First Name and Last Name
- *   - Phone number requirement with OTP verification
- *   - Kind of properties owned (Self-Contain, Single Rooms, Flats, Entire Compound/Hostel)
- *   - Location coverage (Choba, Alakahia, Aluu, Back of Chem, and others)
- *   - Verification & immediate onboarding
+ * Pilot multi-step landlord sign-up (NO OTP — manual Team Leader verification):
+ *   Step 1 — Account & Email (with auto-name suggestion, phone number, password)
+ *   Step 2 — ID Verification & Property details
+ *   Step 3 — Application Submitted (Pending Team Leader Approval)
  */
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  User, Mail, Lock, Eye, EyeOff, Phone, Home, MapPin,
+  User, Mail, Lock, Eye, EyeOff, Phone, Home, MapPin, Upload,
   ChevronLeft, ChevronRight, CheckCircle2, AlertCircle,
-  Loader2, ShieldCheck, Sparkles, Building2, Check,
+  Loader2, ShieldCheck, Sparkles, Building2, Clock
 } from 'lucide-react'
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
 import { AGENT_LOCATIONS, LOCATION_CAMPUS_GROUPS } from '@/lib/agentLocations'
+import { registerPartnerApplication, fileToDataUrl } from '@/lib/pilotAuthStore'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 function validateEmail(e: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
 }
 function validatePhone(p: string) {
-  return /^(0[789][01])\d{8}$/.test(p.replace(/\s/g, ''))
+  return /^(\+?234|0)[789][01]\d{8}$/.test(p.replace(/\s/g, ''))
 }
 
-// Extract suggestions for first/last name from email (e.g. emeka.okafor@gmail.com -> Emeka Okafor)
 function parseNameFromEmail(email: string): { first: string; last: string } | null {
   const localPart = email.split('@')[0]
-  if (!localPart) return null
-  const clean = localPart.replace(/[0-9_.-]+/g, ' ').trim()
-  const parts = clean.split(' ').filter(Boolean)
+  if (!localPart || localPart.length < 2) return null
+  const cleaned = localPart.replace(/[0-9]+/g, '')
+  const parts = cleaned.split(/[._-]+/).filter(Boolean)
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
   if (parts.length >= 2) {
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
-    return {
-      first: capitalize(parts[0]),
-      last: capitalize(parts[1]),
-    }
+    return { first: cap(parts[0]), last: cap(parts[1]) }
   } else if (parts.length === 1 && parts[0].length >= 3) {
-    return {
-      first: parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase(),
-      last: '',
-    }
+    return { first: cap(parts[0]), last: '' }
   }
   return null
 }
@@ -63,6 +54,14 @@ function passwordStrength(pw: string) {
   return { score: s, ...map[s] }
 }
 
+const PROPERTY_CATEGORIES = [
+  'Self Contain',
+  'Single Room',
+  'Mini Flat (1 Bedroom)',
+  'Shared Apartment (2-3 Bed)',
+  'Whole Student Hostel / Building',
+]
+
 function Field({
   label, icon, error, children,
 }: { label: string; icon: React.ReactNode; error?: string; children: React.ReactNode }) {
@@ -82,31 +81,57 @@ function Field({
   )
 }
 
-const STEPS = ['Account & Email', 'Phone & OTP', 'Properties & Area', 'Completed']
-
-const PROPERTY_TYPES = [
-  { id: 'self_contain', label: 'Self-Contain Units', desc: 'Private kitchen and bathroom' },
-  { id: 'single_rooms', label: 'Single Student Rooms', desc: 'Shared amenities / hostel style' },
-  { id: 'flats', label: '2–3 Bedroom Flats', desc: 'Full apartment for students/roommates' },
-  { id: 'hostel_complex', label: 'Entire Hostel / Lodge', desc: 'Multi-unit student residential building' },
-  { id: 'studio', label: 'Modern Studio / Mini Flat', desc: 'Premium executive self-serviced unit' },
-]
+const STEPS = ['Account & Phone', 'ID & Properties', 'Pending Approval']
+function StepBar({ current }: { current: number }) {
+  return (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {STEPS.map((label, i) => {
+        const done = i < current
+        const active = i === current
+        return (
+          <div key={label} className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                done ? 'bg-emerald-600 text-white' : active ? 'bg-emerald-700 text-white ring-4 ring-emerald-200' : 'bg-slate-200 text-slate-500'
+              }`}>
+                {done ? <CheckCircle2 className="w-4 h-4" /> : i + 1}
+              </div>
+              <span className={`text-[10px] font-medium whitespace-nowrap ${active ? 'text-emerald-800 font-bold' : done ? 'text-emerald-600' : 'text-slate-400'}`}>{label}</span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <div className={`h-0.5 w-10 mb-4 rounded ${done ? 'bg-emerald-400' : 'bg-slate-200'}`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export function LandlordRegisterPage() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
 
-  // Step 1: Names, Email, Password + Email auto-suggest
+  // Step 1: Names, Email, Phone, Password (No OTP in pilot)
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [phone, setPhone] = useState('')
   const [suggestedName, setSuggestedName] = useState<{ first: string; last: string } | null>(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [step1Errors, setStep1Errors] = useState<Record<string, string>>({})
 
-  // Detect name suggestions when email changes
+  // Step 2: ID Photo & Property Portfolio
+  const [idPreview, setIdPreview] = useState('')
+  const [idFileName, setIdFileName] = useState('')
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([])
+  const [approxUnits, setApproxUnits] = useState('1 - 4 units')
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([])
+  const [step2Error, setStep2Error] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
   useEffect(() => {
     if (email.includes('@')) {
       const parsed = parseNameFromEmail(email)
@@ -120,97 +145,79 @@ export function LandlordRegisterPage() {
     }
   }, [email, firstName, lastName])
 
-  const applySuggestedName = () => {
-    if (suggestedName) {
-      if (suggestedName.first) setFirstName(suggestedName.first)
-      if (suggestedName.last) setLastName(suggestedName.last)
-      setSuggestedName(null)
-    }
+  const applyEmailSuggestion = () => {
+    if (!suggestedName) return
+    if (!firstName && suggestedName.first) setFirstName(suggestedName.first)
+    if (!lastName && suggestedName.last) setLastName(suggestedName.last)
+    setSuggestedName(null)
   }
 
-  // Step 2: Phone & OTP
-  const [phone, setPhone] = useState('')
-  const [phoneError, setPhoneError] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
-  const [otpLoading, setOtpLoading] = useState(false)
-  const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [otpVerified, setOtpVerified] = useState(false)
-  const [otpError, setOtpError] = useState('')
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([])
-
-  // Step 3: Properties & Locations
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([])
-  const [approxUnits, setApproxUnits] = useState('1 - 4 units')
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([])
-  const [step3Errors, setStep3Errors] = useState<Record<string, string>>({})
-
-  // ── Step 1 Validation ──
   const validateStep1 = () => {
     const errs: Record<string, string> = {}
-    if (!firstName.trim()) errs.firstName = 'Enter your first name'
-    if (!lastName.trim()) errs.lastName = 'Enter your last name'
+    if (!firstName.trim() || firstName.trim().length < 2) errs.firstName = 'Enter your first name'
+    if (!lastName.trim() || lastName.trim().length < 2) errs.lastName = 'Enter your last name'
     if (!validateEmail(email)) errs.email = 'Enter a valid email address'
+    if (!validatePhone(phone)) errs.phone = 'Enter a valid Nigerian phone number (e.g. 08012345678)'
     if (password.length < 8) errs.password = 'Password must be at least 8 characters'
     if (password !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
     setStep1Errors(errs)
     return Object.keys(errs).length === 0
   }
 
-  // ── OTP Handlers ──
-  const sendOtp = async () => {
-    if (!validatePhone(phone)) {
-      setPhoneError('Enter a valid 11-digit Nigerian mobile number (e.g. 08012345678)')
-      return
-    }
-    setPhoneError('')
-    setOtpLoading(true)
-    await new Promise((r) => setTimeout(r, 1200))
-    setOtpLoading(false)
-    setOtpSent(true)
+  const handleIdFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIdFileName(file.name)
+    const dataUrl = await fileToDataUrl(file)
+    setIdPreview(dataUrl)
+    setStep2Error('')
   }
 
-  const handleOtpKey = (index: number, value: string) => {
-    if (!/^\d?$/.test(value)) return
-    const next = [...otp]
-    next[index] = value
-    setOtp(next)
-    if (value && index < 5) otpRefs.current[index + 1]?.focus()
-  }
-
-  const verifyOtp = () => {
-    const code = otp.join('')
-    if (code.length < 6) {
-      setOtpError('Please enter the complete 6-digit verification code')
-      return
-    }
-    setOtpError('')
-    setOtpVerified(true)
-  }
-
-  // ── Property & Location Handlers ──
-  const togglePropertyType = (id: string) => {
+  const togglePropertyType = (type: string) => {
     setSelectedPropertyTypes((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
+    setStep2Error('')
   }
 
   const toggleLocation = (id: string) => {
     setSelectedLocations((prev) =>
       prev.includes(id) ? prev.filter((l) => l !== id) : [...prev, id]
     )
+    setStep2Error('')
   }
 
-  const validateStep3 = () => {
-    const errs: Record<string, string> = {}
-    if (selectedPropertyTypes.length === 0) errs.properties = 'Select at least one property type you own'
-    if (selectedLocations.length === 0) errs.locations = 'Select at least one location where your property is situated'
-    setStep3Errors(errs)
-    return Object.keys(errs).length === 0
-  }
-
-  const handleFinish = () => {
-    if (validateStep3()) {
-      setStep(3)
+  const handleFinish = async () => {
+    if (selectedPropertyTypes.length === 0) {
+      setStep2Error('Select at least one property type you own')
+      return
+    }
+    if (selectedLocations.length === 0) {
+      setStep2Error('Select at least one campus zone where your property is located')
+      return
+    }
+    setSubmitting(true)
+    setStep2Error('')
+    try {
+      await registerPartnerApplication({
+        fullName: `${firstName.trim()} ${lastName.trim()}`,
+        email,
+        phoneNumber: phone,
+        password,
+        agentKind: 'landlord',
+        agencyName: `${lastName.trim()} Properties`,
+        idCardImageUrl:
+          idPreview ||
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+        coverageAreas: selectedLocations,
+        propertyTypes: selectedPropertyTypes,
+        approxUnits,
+      })
+      setStep(2)
+    } catch (err: any) {
+      setStep2Error(err.message || 'Could not submit application.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -218,98 +225,70 @@ export function LandlordRegisterPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      <PageBackground image="/images/rooms/house-02-modern.jpg" blackOverlayOpacity={52} />
+      <PageBackground image="/images/rooms/house-05-villa.jpg" blackOverlayOpacity={52} />
 
-      <HeroSection className="py-12 px-4 min-h-52 sm:min-h-60">
-        <div className="text-center max-w-xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs font-semibold mb-3">
-            <Building2 className="w-3.5 h-3.5" /> Direct Landlord Onboarding
+      <HeroSection className="py-12 px-4 min-h-52 sm:min-h-64">
+        <div className="text-center max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-emerald-300 text-xs font-bold mb-3 border border-white/20">
+            <Building2 className="w-3.5 h-3.5" /> Direct Property Owner Portal
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Register as a Verified Landlord
           </h1>
           <p className="mt-2 text-sm sm:text-base text-slate-200">
-            List your campus lodge or apartment, receive direct verified student requests, and eliminate fake middlemen.
+            List your properties directly to university students after quick verification by our Team Leader.
           </p>
         </div>
       </HeroSection>
 
       <div className="flex-1 flex flex-col items-center justify-start px-4 pb-16 -mt-4">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 sm:p-8">
-          
-          {/* Step Indicator */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            {STEPS.map((label, i) => {
-              const done = i < step
-              const active = i === step
-              return (
-                <div key={label} className="flex items-center gap-2">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                      done ? 'bg-amber-600 text-white' : active ? 'bg-amber-500 text-white ring-4 ring-amber-100' : 'bg-slate-200 text-slate-500'
-                    }`}>
-                      {done ? <Check className="w-4 h-4 stroke-[3]" /> : i + 1}
-                    </div>
-                    <span className={`text-[10px] font-medium hidden sm:inline ${
-                      active ? 'text-amber-800 font-bold' : done ? 'text-amber-600' : 'text-slate-400'
-                    }`}>
-                      {label}
-                    </span>
-                  </div>
-                  {i < STEPS.length - 1 && (
-                    <div className={`h-0.5 w-6 sm:w-10 mb-3 sm:mb-4 rounded ${done ? 'bg-amber-500' : 'bg-slate-200'}`} />
-                  )}
-                </div>
-              )
-            })}
-          </div>
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-100 p-8">
+          <StepBar current={step} />
 
-          {/* ── STEP 0: Account & Email with Auto Suggestion ── */}
+          {/* ── STEP 0: Account, Email & Phone (No OTP) ── */}
           {step === 0 && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Personal & Account Information</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Start with your email to quickly auto-suggest your name details.</p>
+                <h2 className="text-xl font-bold text-slate-900">Landlord Account Details</h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  No SMS OTP needed — our Team Leader will verify your ID and phone number directly.
+                </p>
               </div>
 
-              {/* Email with suggestion banner */}
               <Field label="Email Address" icon={<Mail className="w-4 h-4" />} error={step1Errors.email}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. emeka.okafor@gmail.com"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  placeholder="e.g. chinedu.okafor@gmail.com"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </Field>
 
-              {/* Quick suggestion banner if name extracted */}
-              {suggestedName && (suggestedName.first || suggestedName.last) && (
-                <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900 animate-fade-in-up">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>
-                      Detected name: <strong>{suggestedName.first} {suggestedName.last}</strong>
-                    </span>
-                  </div>
+              {suggestedName && (
+                <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                    Suggested from email: <strong>{suggestedName.first} {suggestedName.last}</strong>
+                  </span>
                   <button
                     type="button"
-                    onClick={applySuggestedName}
-                    className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs transition-colors shrink-0 cursor-pointer shadow-xs"
+                    onClick={applyEmailSuggestion}
+                    className="px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold hover:bg-emerald-700 cursor-pointer"
                   >
-                    Use name
+                    Auto-fill
                   </button>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="First Name" icon={<User className="w-4 h-4" />} error={step1Errors.firstName}>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="e.g. Emeka"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="e.g. Chinedu"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </Field>
 
@@ -319,25 +298,33 @@ export function LandlordRegisterPage() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="e.g. Okafor"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </Field>
               </div>
 
-              {/* Password */}
-              <Field label="Create Password" icon={<Lock className="w-4 h-4" />} error={step1Errors.password}>
+              <Field label="Phone Number" icon={<Phone className="w-4 h-4" />} error={step1Errors.phone}>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="e.g. 08012345678"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </Field>
+
+              <Field label="Password" icon={<Lock className="w-4 h-4" />} error={step1Errors.password}>
                 <input
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 8 characters"
-                  className="w-full pl-10 pr-10 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  placeholder="At least 8 characters"
+                  className="w-full pl-10 pr-10 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -347,13 +334,10 @@ export function LandlordRegisterPage() {
                 <div>
                   <div className="flex gap-1 h-1.5">
                     {[1, 2, 3, 4].map((n) => (
-                      <div
-                        key={n}
-                        className={`flex-1 rounded-full transition-all ${pw.score >= n ? pw.color : 'bg-slate-200'}`}
-                      />
+                      <div key={n} className={`flex-1 rounded-full ${n <= pw.score ? pw.color : 'bg-slate-200'}`} />
                     ))}
                   </div>
-                  {pw.label && <p className="text-xs text-slate-500 mt-1">Strength: <span className="font-semibold">{pw.label}</span></p>}
+                  {pw.label && <p className="text-xs text-slate-500 mt-1">Password strength: <span className="font-semibold">{pw.label}</span></p>}
                 </div>
               )}
 
@@ -362,232 +346,125 @@ export function LandlordRegisterPage() {
                   type={showPw ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-type your password"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  placeholder="Repeat your password"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </Field>
 
               <button
                 type="button"
                 onClick={() => { if (validateStep1()) setStep(1) }}
-                className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer"
               >
-                Proceed to Phone Verification <ChevronRight className="w-4 h-4" />
+                Continue to ID &amp; Properties <ChevronRight className="w-4 h-4" />
               </button>
 
               <p className="text-center text-xs text-slate-500">
-                Already registered as a landlord or agent?{' '}
-                <button type="button" onClick={() => navigate('/login')} className="text-amber-700 font-semibold hover:underline">
-                  Log in here
+                Already registered?{' '}
+                <button type="button" onClick={() => navigate('/login')} className="text-emerald-700 font-semibold hover:underline cursor-pointer">
+                  Log in
                 </button>
               </p>
             </div>
           )}
 
-          {/* ── STEP 1: Phone & OTP ── */}
+          {/* ── STEP 1: ID Photo & Property Portfolio ── */}
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Phone Verification (OTP)</h2>
+                <h2 className="text-xl font-bold text-slate-900">Verification ID &amp; Property Info</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Verified landlord phone numbers ensure safe transactions and prevent impersonation.
+                  Upload your ID for our Team Leader and select the types of accommodation you own.
                 </p>
               </div>
 
-              <Field label="Phone Number" icon={<Phone className="w-4 h-4" />} error={phoneError}>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. 08023456789"
-                  disabled={otpSent}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-50 disabled:text-slate-500"
-                />
-              </Field>
-
-              {!otpSent && (
-                <button
-                  type="button"
-                  onClick={sendOtp}
-                  disabled={otpLoading}
-                  className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-sm"
-                >
-                  {otpLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending verification code…</> : 'Send 6-Digit OTP'}
-                </button>
-              )}
-
-              {otpSent && !otpVerified && (
-                <div className="space-y-4 pt-2">
-                  <p className="text-sm text-slate-600 text-center">
-                    Enter the 6-digit code sent via SMS to <strong>{phone}</strong>
-                  </p>
-
-                  <div className="flex justify-center gap-2">
-                    {otp.map((digit, i) => (
-                      <input
-                        key={i}
-                        ref={(el) => { otpRefs.current[i] = el }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpKey(i, e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Backspace' && !otp[i] && i > 0) {
-                            otpRefs.current[i - 1]?.focus()
-                          }
-                        }}
-                        className="w-11 h-13 text-center text-xl font-bold border-2 border-slate-200 rounded-lg focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
-                      />
-                    ))}
-                  </div>
-
-                  {otpError && (
-                    <p className="text-xs text-red-600 text-center flex items-center justify-center gap-1">
-                      <AlertCircle className="w-3 h-3" />{otpError}
-                    </p>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={verifyOtp}
-                    className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-md"
-                  >
-                    <ShieldCheck className="w-4 h-4" /> Confirm &amp; Verify Code
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => { setOtpSent(false); setOtp(['','','','','','']); setOtpError('') }}
-                    className="w-full text-xs text-slate-500 hover:text-slate-800 underline text-center cursor-pointer"
-                  >
-                    Change phone number or resend
-                  </button>
+              {step2Error && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{step2Error}</span>
                 </div>
               )}
 
-              {otpVerified && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2.5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm font-semibold">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    Phone number verified! Direct student inspection requests will reach this line.
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-md"
-                  >
-                    Continue to Property Information <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setStep(0)}
-                className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 py-1"
-              >
-                <ChevronLeft className="w-4 h-4" /> Back to Account Details
-              </button>
-            </div>
-          )}
-
-          {/* ── STEP 2: Properties Owned & Locations ── */}
-          {step === 2 && (
-            <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Your Property &amp; Location Details</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Tell us what kind of properties you own and where they are located.</p>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Valid ID Card / Proof of Ownership Photo
+                </label>
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-4 cursor-pointer bg-slate-50 transition-colors">
+                  <Upload className="w-6 h-6 text-slate-400 mb-1" />
+                  <span className="text-xs font-semibold text-slate-700">
+                    {idFileName ? `Selected: ${idFileName}` : 'Click to upload ID card photo'}
+                  </span>
+                  <input type="file" accept="image/*" onChange={handleIdFile} className="hidden" />
+                </label>
+                {idPreview && (
+                  <img src={idPreview} alt="ID preview" className="mt-2 h-28 w-full object-cover rounded-lg border border-slate-200" />
+                )}
               </div>
 
-              {/* Property types */}
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
-                  What kind of properties do you own?
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Property Types You Own
                 </label>
-                {step3Errors.properties && (
-                  <p className="text-xs text-red-600 mb-2 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />{step3Errors.properties}
-                  </p>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {PROPERTY_TYPES.map((pt) => {
-                    const active = selectedPropertyTypes.includes(pt.id)
+                <div className="flex flex-wrap gap-2">
+                  {PROPERTY_CATEGORIES.map((cat) => {
+                    const active = selectedPropertyTypes.includes(cat)
                     return (
                       <button
-                        key={pt.id}
+                        key={cat}
                         type="button"
-                        onClick={() => togglePropertyType(pt.id)}
-                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-col gap-0.5 ${
+                        onClick={() => togglePropertyType(cat)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                           active
-                            ? 'border-amber-600 bg-amber-50/70 text-amber-950 shadow-xs'
-                            : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-400'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-sm flex items-center gap-1.5">
-                            <Home className="w-3.5 h-3.5 text-amber-600" /> {pt.label}
-                          </span>
-                          {active && <Check className="w-4 h-4 text-amber-700 stroke-[3]" />}
-                        </div>
-                        <span className="text-xs text-slate-500">{pt.desc}</span>
+                        <Home className="w-3.5 h-3.5" />
+                        {cat}
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* Approximate unit size */}
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                  Estimated number of rooms/units available
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Approximate Number of Units
                 </label>
                 <select
                   value={approxUnits}
                   onChange={(e) => setApproxUnits(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm bg-slate-50 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm bg-white"
                 >
-                  <option value="1 - 2 units">1 – 2 units</option>
-                  <option value="3 - 6 units">3 – 6 units</option>
-                  <option value="7 - 15 units">7 – 15 units (Full Lodge)</option>
-                  <option value="16+ units">16+ units (Large Student Hostel)</option>
+                  <option value="1 - 4 units">1 - 4 units</option>
+                  <option value="5 - 10 units">5 - 10 units</option>
+                  <option value="11 - 25 units">11 - 25 units</option>
+                  <option value="25+ units (Full Hostel)">25+ units (Full Hostel)</option>
                 </select>
               </div>
 
-              {/* Locations covered */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-semibold text-slate-800">
-                    Where is your property located?
-                  </label>
-                  <span className="text-xs text-amber-700 font-semibold">
-                    {selectedLocations.length} selected
-                  </span>
-                </div>
-                {step3Errors.locations && (
-                  <p className="text-xs text-red-600 mb-2 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />{step3Errors.locations}
-                  </p>
-                )}
-                <div className="max-h-60 overflow-y-auto space-y-3 p-3 border border-slate-200 rounded-xl bg-slate-50/50">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Campus Vicinity Where Your Property is Located
+                </label>
+                <div className="space-y-3 max-h-48 overflow-y-auto pr-1 border border-slate-100 rounded-xl p-3 bg-slate-50/60">
                   {LOCATION_CAMPUS_GROUPS.map((campus) => {
                     const locs = AGENT_LOCATIONS.filter((l) => l.campus === campus)
                     return (
                       <div key={campus}>
-                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">{campus} Area</p>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{campus}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {locs.map((loc) => {
-                            const isPicked = selectedLocations.includes(loc.id)
+                            const active = selectedLocations.includes(loc.id)
                             return (
                               <button
                                 key={loc.id}
                                 type="button"
                                 onClick={() => toggleLocation(loc.id)}
-                                className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
-                                  isPicked
-                                    ? 'bg-amber-600 border-amber-600 text-white shadow-xs'
-                                    : 'bg-white border-slate-200 text-slate-600 hover:border-amber-400 hover:text-amber-800'
+                                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                                  active
+                                    ? 'bg-emerald-600 border-emerald-600 text-white'
+                                    : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-400'
                                 }`}
                               >
                                 <MapPin className="w-3 h-3" />
@@ -604,54 +481,65 @@ export function LandlordRegisterPage() {
 
               <button
                 type="button"
+                disabled={submitting}
                 onClick={handleFinish}
-                className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer"
               >
-                Complete Registration <ChevronRight className="w-4 h-4" />
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Submitting for Team Leader Approval…</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Submit Landlord Application</span>
+                  </>
+                )}
               </button>
 
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 py-1"
+                onClick={() => setStep(0)}
+                className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4" /> Back to Phone Step
+                <ChevronLeft className="w-4 h-4" /> Back
               </button>
             </div>
           )}
 
-          {/* ── STEP 3: Complete / Success ── */}
-          {step === 3 && (
+          {/* ── STEP 2: Pending Team Leader Approval ── */}
+          {step === 2 && (
             <div className="text-center space-y-5 py-4">
               <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 animate-pulse">
-                  <CheckCircle2 className="w-10 h-10" />
+                <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center">
+                  <Clock className="w-10 h-10 text-amber-600" />
                 </div>
               </div>
               <h2 className="text-2xl font-extrabold text-slate-900">
-                Welcome, {firstName || 'Landlord'}!
+                Welcome, {firstName}! Awaiting Approval
               </h2>
               <p className="text-slate-600 text-sm max-w-sm mx-auto">
-                Your landlord profile has been registered. You can now access your dashboard to post listings, set inspection availability, and view student inquiries.
+                Our Team Leader has been notified of your Landlord registration. Once they verify and approve your account, you can list your properties directly to students.
               </p>
-
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-1 text-slate-600">
-                <p><strong>Registered Email:</strong> {email}</p>
-                <p><strong>Verified Phone:</strong> {phone}</p>
-                <p><strong>Properties:</strong> {selectedPropertyTypes.join(', ')} ({approxUnits})</p>
-                <p><strong>Locations:</strong> {selectedLocations.join(', ')}</p>
+              <div className="space-y-2.5">
+                <button
+                  type="button"
+                  onClick={() => navigate('/portal/status')}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer"
+                >
+                  Check My Approval Status <ChevronRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/admin/approvals')}
+                  className="w-full py-2.5 text-xs font-semibold text-emerald-700 hover:underline cursor-pointer"
+                >
+                  Open Team Leader Approval Console &rarr;
+                </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => navigate('/portal/landlord/dashboard')}
-                className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer"
-              >
-                Go to Landlord Dashboard <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
           )}
-
         </div>
       </div>
     </div>

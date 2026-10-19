@@ -4,12 +4,29 @@
 // ==============================================================================
 
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
 import { db } from '../../db/store.js';
-import { User, StudentProfile, AgentProfile } from '../entities/types.js';
+import { User, StudentProfile, AgentProfile, AgentKind } from '../entities/types.js';
+import { signToken } from '../../api/middleware/auth.middleware.js';
+import { NotificationService } from './notification.service.js';
+
+const notifications = new NotificationService();
+
+/** Normalises Nigerian numbers: 0801 234 5678 / 234801... / +234801... -> +234801... */
+export function normalizePhone(raw: string): string {
+  const digits = raw.replace(/[^\d+]/g, '');
+  if (digits.startsWith('+')) return digits;
+  if (digits.startsWith('234')) return `+${digits}`;
+  if (digits.startsWith('0')) return `+234${digits.slice(1)}`;
+  return `+${digits}`;
+}
 
 export interface RegisterAgentInput {
   phoneNumber: string;
+  email?: string;
+  password: string;
   fullName: string;
+  agentKind: AgentKind;
   agencyName?: string;
   idCardImageUrl: string;
 }
@@ -24,13 +41,21 @@ export interface RegisterStudentInput {
 
 export class IdentityService {
   /**
-   * Onboard Agent: Instant registration, sends phone OTP.
+   * Pilot onboarding: agents/landlords sign up with phone + password + ID photo.
+   * No OTP: the Team Leader reviews every applicant manually. The account stays
+   * `pending_verification` until approved, and the Team Leader is notified.
    */
   public async registerAgent(input: RegisterAgentInput) {
-    // Check if phone already registered
-    const existing = Array.from(db.users.values()).find((u) => u.phoneNumber === input.phoneNumber);
+    const phoneNumber = normalizePhone(input.phoneNumber);
+
+    const existing = Array.from(db.users.values()).find((u) => u.phoneNumber === phoneNumber);
     if (existing) {
-      throw new Error(`Phone number already registered: ${input.phoneNumber}`);
+      throw new Error(`Phone number already registered: ${phoneNumber}`);
+    }
+
+    const email = input.email?.trim().toLowerCase() || undefined;
+    if (email && Array.from(db.users.values()).some((u) => u.email?.toLowerCase() === email)) {
+      throw new Error(`Email already registered: ${email}`);
     }
 
     const userId = uuidv4();
@@ -38,9 +63,11 @@ export class IdentityService {
 
     const newUser: User = {
       id: userId,
-      phoneNumber: input.phoneNumber,
+      phoneNumber,
+      email,
+      passwordHash: await bcrypt.hash(input.password, 10),
       userType: 'agent',
-      accountStatus: 'active',
+      accountStatus: 'pending_verification',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -51,41 +78,105 @@ export class IdentityService {
       fullName: input.fullName,
       agencyName: input.agencyName,
       idCardImageUrl: input.idCardImageUrl,
-      isPhoneVerified: false, // Must verify OTP
+      isPhoneVerified: false, // set to true by the Team Leader on approval
       trustTier: 'bronze',
       trustScore: 50.0,
       totalInspections: 0,
       successfulDeals: 0,
       noShowCount: 0,
       responseRatePct: 100.0,
+      agentKind: input.agentKind,
+      phoneContacted: false,
       createdAt: new Date(),
     };
 
     db.users.set(userId, newUser);
     db.agentProfiles.set(agentProfileId, newProfile);
 
-    // In a live environment, dispatch SMS OTP via Termii/Twilio
-    // For local development and testing, mock OTP is 123456
-    const mockOtp = '123456';
-
     db.recordAudit('user', userId, 'REGISTER_AGENT', userId, undefined, {
       fullName: input.fullName,
-      trustTier: 'bronze',
+      agentKind: input.agentKind,
+      status: 'pending_verification',
     });
+
+    notifications.notifyAdmins(
+      'agent_signup',
+      'New agent signup',
+      `${input.fullName} (${input.agentKind}) is waiting for approval.`,
+      { agentProfileId, userId }
+    );
 
     return {
       userId,
       agentProfileId,
-      message: 'Agent registered successfully. Enter OTP sent to your phone to verify account.',
-      devOtpHint: mockOtp,
+      status: 'pending' as const,
+      token: signToken({ id: userId, userType: 'agent' }),
+      message: 'Application received. The Aroom team will review and approve your account.',
     };
   }
 
   /**
-   * Verify Agent OTP.
+   * Phone-or-email + password login for agents, landlords and the Team Leader.
+   */
+  public async login(identifier: string, password: string) {
+    const id = identifier.trim();
+    const user = id.includes('@')
+      ? Array.from(db.users.values()).find((u) => u.email?.toLowerCase() === id.toLowerCase())
+      : Array.from(db.users.values()).find((u) => u.phoneNumber === normalizePhone(id));
+    // Same message for unknown phone and wrong password (no account enumeration)
+    const invalid = new Error('Incorrect phone number or password.');
+    (invalid as any).statusCode = 401;
+    if (!user || !user.passwordHash) throw invalid;
+    if (!(await bcrypt.compare(password, user.passwordHash))) throw invalid;
+    if (user.accountStatus === 'suspended') {
+      const e = new Error('This account has been suspended. Please contact the Aroom team.');
+      (e as any).statusCode = 403;
+      throw e;
+    }
+
+    return {
+      token: signToken({ id: user.id, userType: user.userType }),
+      me: this.me(user.id),
+    };
+  }
+
+  /**
+   * Current session: role + approval status (drives route guards in the web app).
+   */
+  public me(userId: string) {
+    const user = db.users.get(userId);
+    if (!user) throw new Error('User not found.');
+    const profile = Array.from(db.agentProfiles.values()).find((p) => p.userId === userId);
+
+    let approvalStatus: 'approved' | 'pending' | 'rejected' | 'suspended' | null = null;
+    if (user.userType === 'agent') {
+      approvalStatus =
+        user.accountStatus === 'active'
+          ? 'approved'
+          : user.accountStatus === 'rejected'
+          ? 'rejected'
+          : user.accountStatus === 'suspended'
+          ? 'suspended'
+          : 'pending';
+    }
+
+    return {
+      id: user.id,
+      role: user.userType,
+      phoneNumber: user.phoneNumber,
+      fullName: profile?.fullName ?? (user.userType === 'admin' ? 'Team Leader' : null),
+      agentProfileId: profile?.id ?? null,
+      agentKind: profile?.agentKind ?? null,
+      approvalStatus,
+      rejectionReason: user.accountStatus === 'rejected' ? profile?.rejectionReason ?? null : null,
+    };
+  }
+
+  /**
+   * Post-pilot: phone OTP verification (kept for the open-signup phase; unused in the pilot).
    */
   public async verifyAgentOtp(phoneNumber: string, otp: string) {
-    const user = Array.from(db.users.values()).find((u) => u.phoneNumber === phoneNumber);
+    const user = Array.from(db.users.values()).find((u) => u.phoneNumber === normalizePhone(phoneNumber));
     if (!user) {
       throw new Error(`Agent user not found for phone: ${phoneNumber}`);
     }
@@ -107,7 +198,7 @@ export class IdentityService {
 
     return {
       success: true,
-      message: 'Phone number verified. Agent account is fully active.',
+      message: 'Phone number verified.',
       agentProfile: profile,
     };
   }

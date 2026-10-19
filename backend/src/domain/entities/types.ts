@@ -3,7 +3,8 @@
 // ==============================================================================
 
 export type UserType = 'student' | 'non_student' | 'agent' | 'admin';
-export type AccountStatus = 'active' | 'suspended' | 'pending_verification';
+export type AccountStatus = 'active' | 'suspended' | 'pending_verification' | 'rejected';
+export type AgentKind = 'agent' | 'landlord';
 export type RoomType = 'self_contain' | 'single_room' | 'flat_shared' | 'flat_entire';
 export type AvailabilityStatus = 'available' | 'held' | 'taken';
 export type VerificationStatus = 'unverified_new' | 'pending_inspection' | 'verified' | 'rejected';
@@ -46,6 +47,22 @@ export interface AgentProfile {
   successfulDeals: number;
   noShowCount: number;
   responseRatePct: number;
+  agentKind: AgentKind;
+  reviewedBy?: string;
+  reviewedAt?: Date;
+  rejectionReason?: string;
+  phoneContacted: boolean;
+  createdAt: Date;
+}
+
+export interface AppNotification {
+  id: string;
+  recipientUserId: string;
+  type: string;
+  title: string;
+  body?: string;
+  payload?: Record<string, any>;
+  readAt?: Date;
   createdAt: Date;
 }
 

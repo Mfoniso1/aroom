@@ -80,7 +80,7 @@ export function InspectionScheduleModal({
   if (!isOpen) return null
 
   const agentPhone = listing.agentPhone || '08034567890'
-  const agentName = listing.agentName || 'Agent Femi'
+  const agentName = listing.agentName || 'Agent David'
 
   const handleImmediateCall = () => {
     setCallInitiated(true)

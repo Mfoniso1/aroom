@@ -16,11 +16,12 @@ import { NewListingPage } from '@/features/agent/pages/NewListingPage'
 import { LandlordNewListingPage } from '@/features/agent/pages/LandlordNewListingPage'
 import { LandlordDashboardPage } from '@/features/agent/pages/LandlordDashboardPage'
 import { OnboardingPage } from '@/features/agent/pages/OnboardingPage'
+import { ApprovalStatusPage } from '@/features/agent/pages/ApprovalStatusPage'
+import { TeamLeaderApprovalsPage } from '@/features/admin/pages/TeamLeaderApprovalsPage'
+import { WhatsAppConciergePage } from '@/features/marketplace/pages/WhatsAppConciergePage'
 import { SplashScreen } from '@/components/shared/SplashScreen'
 
 function App() {
-  // Always show splash on fresh page load/refresh.
-  // SPA navigation never remounts App, so it will not repeat while browsing.
   const [showSplash, setShowSplash] = useState(true)
 
   const handleSplashComplete = () => {
@@ -30,9 +31,9 @@ function App() {
   return (
     <>
       {showSplash && (
-        <SplashScreen 
-          duration={4200} 
-          onComplete={handleSplashComplete} 
+        <SplashScreen
+          duration={4200}
+          onComplete={handleSplashComplete}
         />
       )}
 
@@ -42,16 +43,23 @@ function App() {
           <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
           <Route path="/search" element={<MainLayout><SearchPage /></MainLayout>} />
           <Route path="/listings/:id" element={<MainLayout><ListingDetailPage /></MainLayout>} />
+          <Route path="/whatsapp-ai" element={<MainLayout><WhatsAppConciergePage /></MainLayout>} />
 
           {/* Unified Authentication */}
           <Route path="/login" element={<MainLayout><LoginPage /></MainLayout>} />
           <Route path="/signup" element={<MainLayout><SignUpPage /></MainLayout>} />
-          
-          {/* Dedicated Registration Forms */}
+
+          {/* Dedicated Registration Forms (No OTP in pilot — manual Team Leader approval) */}
           <Route path="/signup/student" element={<MainLayout><StudentRegisterPage /></MainLayout>} />
           <Route path="/signup/agent" element={<MainLayout><AgentRegisterPage /></MainLayout>} />
           <Route path="/signup/landlord" element={<MainLayout><LandlordRegisterPage /></MainLayout>} />
           <Route path="/signup/:role" element={<MainLayout><SignUpPage /></MainLayout>} />
+
+          {/* Team Leader Verification & Approval Console */}
+          <Route path="/admin">
+            <Route index element={<Navigate to="/admin/approvals" replace />} />
+            <Route path="approvals" element={<TeamLeaderApprovalsPage />} />
+          </Route>
 
           {/* Student Portal */}
           <Route path="/student">
@@ -69,6 +77,7 @@ function App() {
           <Route path="/portal">
             <Route index element={<Navigate to="/portal/dashboard" replace />} />
             <Route path="login" element={<MainLayout><LoginPage /></MainLayout>} />
+            <Route path="status" element={<AgentLayout><ApprovalStatusPage /></AgentLayout>} />
             <Route path="dashboard" element={<AgentLayout><DashboardPage /></AgentLayout>} />
             <Route path="listings/new" element={<AgentLayout><NewListingPage /></AgentLayout>} />
             <Route path="landlord/dashboard" element={<AgentLayout><LandlordDashboardPage /></AgentLayout>} />

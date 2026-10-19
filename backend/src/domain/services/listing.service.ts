@@ -36,7 +36,35 @@ export interface CreateListingInput {
   }>;
 }
 
+/** An agent can only be public/list if their user account is approved (`active`). */
+function isAgentActive(agentProfileId: string): boolean {
+  const agent = db.agentProfiles.get(agentProfileId);
+  if (!agent) return false;
+  return db.users.get(agent.userId)?.accountStatus === 'active';
+}
+
 export class ListingService {
+  /**
+   * All listings owned by one agent (dashboard), regardless of availability.
+   */
+  public async listByAgent(agentProfileId: string) {
+    return Array.from(db.listings.values())
+      .filter((l) => l.agentId === agentProfileId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .map((l) => ({
+        id: l.id,
+        title: l.title,
+        roomType: l.roomType,
+        priceAnnualNaira: l.priceAnnualKobo / 100,
+        landmarkVicinity: l.landmarkVicinity,
+        availabilityStatus: l.availabilityStatus,
+        verificationStatus: l.verificationStatus,
+        viewCount: l.viewCount,
+        inquiryCount: Array.from(db.inquiries.values()).filter((q) => q.listingId === l.id).length,
+        createdAt: l.createdAt,
+      }));
+  }
+
   /**
    * Universal search query used by both Web and WhatsApp bot.
    */
@@ -59,6 +87,9 @@ export class ListingService {
     if (targetCampusId) {
       allListings = allListings.filter((l) => l.campusId === targetCampusId);
     }
+
+    // Pilot invariant: only approved (active) agents' listings are public
+    allListings = allListings.filter((l) => isAgentActive(l.agentId));
 
     // Filter by Availability (Default: available)
     const targetStatus = filters.status || 'available';
@@ -150,6 +181,9 @@ export class ListingService {
     if (!listing) {
       throw new Error(`Listing not found with ID: ${listingId}`);
     }
+    if (!isAgentActive(listing.agentId)) {
+      throw new Error(`Listing not found with ID: ${listingId}`);
+    }
 
     // Increment view count
     listing.viewCount += 1;
@@ -192,6 +226,11 @@ export class ListingService {
     const agent = db.agentProfiles.get(agentId);
     if (!agent) {
       throw new Error(`Unauthorized or invalid agent profile: ${agentId}`);
+    }
+    if (!isAgentActive(agentId)) {
+      const err: any = new Error('Your account is awaiting approval by the Aroom team. You can list properties once approved.');
+      err.statusCode = 403;
+      throw err;
     }
 
     const campus = db.campuses.get(input.campusId);
@@ -291,6 +330,12 @@ export class ListingService {
     const listing = db.listings.get(listingId);
     if (!listing) {
       throw new Error(`Listing not found: ${listingId}`);
+    }
+
+    const owner = db.agentProfiles.get(listing.agentId);
+    const actor = db.users.get(actorUserId);
+    if (owner?.userId !== actorUserId && actor?.userType !== 'admin') {
+      throw new Error('Unauthorized to request verification for this listing.');
     }
 
     if (listing.verificationStatus === 'verified') {

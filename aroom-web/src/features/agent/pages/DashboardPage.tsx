@@ -2,15 +2,23 @@
  * DashboardPage.tsx
  * Agent portal dashboard — profile overview, listing manager with view/inquiry counts.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   MapPin, Eye, MessageCircle, TrendingUp, Plus,
   User, Star, ShieldCheck, Phone, Mail,
-  CheckCircle2, Clock, XCircle, BarChart2,
+  CheckCircle2, Clock, XCircle, BarChart2, Building2
 } from 'lucide-react'
 import { TrustBadge } from '@/components/shared/TrustBadge'
+import { EditProfileModal } from '@/components/shared/EditProfileModal'
 import { AGENT_LOCATIONS } from '@/lib/agentLocations'
+import {
+  getCurrentSession,
+  AUTH_CHANGE_EVENT,
+  requestPartnerVerification,
+  notifyTeamLeadForListingVerification,
+  type ActiveSession,
+} from '@/lib/pilotAuthStore'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AvailStatus = 'available' | 'held' | 'taken'
@@ -27,19 +35,22 @@ interface AgentListing {
   views: number
   inquiries: number
   postedDate: string
+  verificationRequested?: boolean
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK_AGENT = {
-  name: 'Femi Adeyemi',
-  email: 'femi.adeyemi@gmail.com',
-  phone: '08012345678',
-  joinedDate: 'October 2026',
-  rating: 4.8,
-  reviewCount: 14,
-  responseRate: 97,
-  coverageAreas: ['choba', 'alakahia', 'back_of_chem'],
-  isVerified: true,
+const FALLBACK_AGENT: ActiveSession = {
+  userId: 'd1111111-1111-1111-1111-111111111111',
+  role: 'agent',
+  fullName: 'David Opubo',
+  email: 'david.opubo@aroomagents.ng',
+  phoneNumber: '+2348011112222',
+  agentProfileId: 'a1111111-1111-1111-1111-111111111111',
+  agentKind: 'agent',
+  agencyName: 'Choba & Alakahia Campus Homes',
+  coverageAreas: ['choba', 'alakahia', 'delta_park', 'back_of_chem'],
+  bio: 'Verified UNIPORT student housing agent covering Choba Gate, Alakahia, Delta Park, and Back of Chem.',
+  approvalStatus: 'approved',
+  rejectionReason: null,
 }
 
 const INITIAL_LISTINGS: AgentListing[] = [
@@ -118,14 +129,45 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export function DashboardPage() {
+  const [session, setSession] = useState<ActiveSession>(() => getCurrentSession() || FALLBACK_AGENT)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [listings, setListings] = useState(INITIAL_LISTINGS)
   const [activeTab, setActiveTab] = useState<'all' | AvailStatus>('all')
+
+  useEffect(() => {
+    const sync = () => setSession(getCurrentSession() || FALLBACK_AGENT)
+    window.addEventListener(AUTH_CHANGE_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
 
   const setStatus = (id: string, status: AvailStatus) =>
     setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)))
 
-  const coverageLabels = MOCK_AGENT.coverageAreas
-    .map((id) => AGENT_LOCATIONS.find((l) => l.id === id)?.label)
+  const requestListingVerify = (listing: AgentListing) => {
+    setListings((prev) => prev.map((l) => (l.id === listing.id ? { ...l, verificationRequested: true } : l)))
+    notifyTeamLeadForListingVerification({
+      listingId: listing.id,
+      listingTitle: listing.title,
+      landmark: listing.location,
+      requesterName: session.fullName,
+    })
+  }
+
+  const requestAccountVerify = () => {
+    if (session.agentProfileId) {
+      requestPartnerVerification(session.agentProfileId).catch(() => {})
+    }
+  }
+
+  const coverageIds = session.coverageAreas?.length
+    ? session.coverageAreas
+    : FALLBACK_AGENT.coverageAreas || []
+  const coverageLabels = coverageIds
+    .map((id) => AGENT_LOCATIONS.find((l) => l.id === id)?.label || id)
     .filter(Boolean)
 
   const totalViews = listings.reduce((s, l) => s + l.views, 0)
@@ -141,34 +183,62 @@ export function DashboardPage() {
         {/* ── Agent Profile Card ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row gap-6 items-start">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white text-3xl font-extrabold shrink-0">
-            {MOCK_AGENT.name.charAt(0)}
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white text-3xl font-extrabold shrink-0 overflow-hidden">
+            {session.avatarUrl ? (
+              <img src={session.avatarUrl} alt={session.fullName} className="w-full h-full object-cover" />
+            ) : (
+              session.fullName.charAt(0).toUpperCase()
+            )}
           </div>
 
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h2 className="text-xl font-extrabold text-slate-900">{MOCK_AGENT.name}</h2>
-              {MOCK_AGENT.isVerified && (
+              <h2 className="text-xl font-extrabold text-slate-900">{session.fullName}</h2>
+              {session.approvalStatus === 'approved' ? (
                 <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Verified Agent
+                  <ShieldCheck className="w-3.5 h-3.5" /> Team Leader Verified Agent
                 </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                  <Clock className="w-3.5 h-3.5" /> Verification {session.approvalStatus || 'Pending'}
+                </span>
+              )}
+              {session.approvalStatus !== 'approved' && session.agentProfileId && (
+                session.verificationRequested ? (
+                  <span className="text-xs font-semibold text-amber-700">Request sent to Team Lead</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={requestAccountVerify}
+                    className="text-xs font-bold px-3 py-1 rounded-full bg-green-600 text-white hover:bg-green-700"
+                  >
+                    Ask Team Lead to verify me
+                  </button>
+                )
               )}
             </div>
 
+            {session.agencyName && (
+              <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 mb-2">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>{session.agencyName}</span>
+              </p>
+            )}
+
             <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-3">
-              <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" />{MOCK_AGENT.email}</span>
-              <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{MOCK_AGENT.phone}</span>
-              <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" />Joined {MOCK_AGENT.joinedDate}</span>
+              <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" />{session.email}</span>
+              <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{session.phoneNumber}</span>
+              <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" />Active Partner</span>
             </div>
 
             {/* Rating + Response */}
             <div className="flex flex-wrap gap-3 mb-3">
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {MOCK_AGENT.rating} ({MOCK_AGENT.reviewCount} reviews)
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.8 (14 reviews)
               </span>
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
-                {MOCK_AGENT.responseRate}% response rate
+                97% response rate
               </span>
             </div>
 
@@ -184,7 +254,11 @@ export function DashboardPage() {
           </div>
 
           {/* Edit profile CTA */}
-          <button className="shrink-0 text-sm font-semibold text-green-700 border border-green-200 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg transition-colors">
+          <button
+            type="button"
+            onClick={() => setIsEditingProfile(true)}
+            className="shrink-0 text-sm font-semibold text-green-700 border border-green-200 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg transition-colors cursor-pointer"
+          >
             Edit Profile
           </button>
         </div>
@@ -298,9 +372,19 @@ export function DashboardPage() {
                     </div>
 
                     {listing.verificationStatus === 'unverified_new' && (
-                      <button className="text-xs font-semibold text-green-700 hover:text-green-800 hover:underline ml-2">
-                        + Request Verification
-                      </button>
+                      listing.verificationRequested ? (
+                        <span className="text-xs font-semibold text-amber-700 ml-2 inline-flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" /> Sent to Team Lead — awaiting visit
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => requestListingVerify(listing)}
+                          className="text-xs font-semibold text-green-700 hover:text-green-800 hover:underline ml-2"
+                        >
+                          + Ask Team Lead to verify this lodge
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
@@ -309,6 +393,13 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <EditProfileModal
+        session={session}
+        isOpen={isEditingProfile}
+        onClose={() => setIsEditingProfile(false)}
+        onSaved={(updated) => setSession(updated)}
+      />
     </div>
   )
 }

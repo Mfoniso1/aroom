@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Filter, MapPin, X, Building2, UserCheck, Video } from 'lucide-react'
+import { MapPin, X, Building2, UserCheck, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { ListingCard } from '@/components/shared/ListingCard'
 import { PageBackground } from '@/components/shared/PageBackground'
@@ -16,6 +16,7 @@ export function SearchPage() {
   const [maxBudget, setMaxBudget] = useState(600000)
   const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [uploaderFilter, setUploaderFilter] = useState<'all' | 'landlord' | 'agent'>('all')
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const handleCampusChange = (campusId: string) => {
     setSelectedCampus(campusId)
@@ -52,280 +53,314 @@ export function SearchPage() {
 
   const landlordCount = listings.filter((l) => l.uploaderType === 'landlord').length
   const agentCount = listings.filter((l) => l.uploaderType === 'agent').length
+  const hasActiveFilters =
+    selectedCampus !== 'all' || maxBudget !== 600000 || verifiedOnly || uploaderFilter !== 'all'
+
+  const resetAllFilters = () => {
+    handleCampusChange('all')
+    setMaxBudget(600000)
+    setVerifiedOnly(false)
+    setUploaderFilter('all')
+  }
 
   return (
     <div className="relative">
-      <PageBackground image="/images/rooms/room-06-living-room.jpg" blackOverlayOpacity={52} />
-      
-      {/* High-quality Hero Section */}
-      <HeroSection className="py-14 px-4 min-h-60 sm:min-h-72">
-        <div className="text-center flex flex-col items-center justify-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-xs sm:text-sm font-medium mb-3 backdrop-blur-sm">
-            <MapPin className="w-3.5 h-3.5 text-amber-300" />
-            <span>Verified Campus Accommodations &amp; Video Walkthroughs</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Explore Student Rooms
+      <PageBackground image="/images/rooms/room-06-living-room.jpg" blackOverlayOpacity={55} />
+
+      {/* Compact Hero Header */}
+      <HeroSection className="py-8 sm:py-12 px-4 min-h-0">
+        <div className="text-center max-w-xl mx-auto">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            {activeCampusObj ? `${activeCampusObj.shortCode} Student Housing` : 'Explore Verified Rooms'}
           </h1>
-          <p className="mt-2 text-sm sm:text-base text-slate-200 max-w-xl mx-auto">
-            Choose between Direct Landlord uploads (0% agency fee) and verified Agent uploads with capped 15% agency.
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-200">
+            Compare Direct Landlord rooms (0% fee) and Verified Agent listings (capped 15%).
           </p>
         </div>
       </HeroSection>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8">
-        
-        {/* Sidebar Filters */}
-        <aside className="w-full md:w-76 shrink-0">
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 sticky top-20 space-y-6">
-            <div className="flex items-center justify-between text-slate-900 font-semibold border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-emerald-600" />
-                <span className="font-bold">Filters</span>
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8">
+        {/* ── Mobile Quick-Filter Bar (keeps listings above the fold on phones) ── */}
+        <div className="md:hidden mb-4 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs space-y-2.5">
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedCampus}
+              onChange={(e) => handleCampusChange(e.target.value)}
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 px-3 py-2.5 outline-none"
+            >
+              <option value="all">All UNIPORT Areas</option>
+              {CAMPUSES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.shortCode} — {c.city}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen((v) => !v)}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
+                mobileFiltersOpen || maxBudget < 600000 || verifiedOnly
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'bg-slate-100 text-slate-700 border-slate-200'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+            </button>
+          </div>
+
+          {/* Horizontal Quick Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button
+              type="button"
+              onClick={() => setUploaderFilter('all')}
+              className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${
+                uploaderFilter === 'all'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-600'
+              }`}
+            >
+              All ({listings.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setUploaderFilter('landlord')}
+              className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${
+                uploaderFilter === 'landlord'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+              }`}
+            >
+              Direct Landlord • 0% ({landlordCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setUploaderFilter('agent')}
+              className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${
+                uploaderFilter === 'agent'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              }`}
+            >
+              Verified Agent ({agentCount})
+            </button>
+          </div>
+
+          {/* Collapsible Mobile Budget & Verification Drawer */}
+          {mobileFiltersOpen && (
+            <div className="pt-3 border-t border-slate-100 space-y-3">
+              <div>
+                <div className="flex justify-between items-center text-xs mb-1">
+                  <span className="font-semibold text-slate-700">Max Annual Rent</span>
+                  <span className="font-extrabold text-emerald-700">
+                    ₦{maxBudget.toLocaleString()}/yr
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  className="w-full accent-emerald-600 cursor-pointer"
+                  min="100000"
+                  max="1000000"
+                  step="20000"
+                  value={maxBudget}
+                  onChange={(e) => setMaxBudget(Number(e.target.value))}
+                />
               </div>
-              {(selectedCampus !== 'all' || maxBudget !== 600000 || verifiedOnly || uploaderFilter !== 'all') && (
-                <button
-                  onClick={() => {
-                    handleCampusChange('all')
-                    setMaxBudget(600000)
-                    setVerifiedOnly(false)
-                    setUploaderFilter('all')
-                  }}
-                  className="text-xs text-slate-500 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
-                >
-                  Reset <X className="h-3 w-3" />
-                </button>
-              )}
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={verifiedOnly}
+                    onChange={(e) => setVerifiedOnly(e.target.checked)}
+                    className="rounded accent-emerald-600 w-4 h-4"
+                  />
+                  <span>Physically Verified Only</span>
+                </label>
+
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={resetAllFilters}
+                    className="text-xs font-bold text-red-600 hover:underline cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
             </div>
-            
-            {/* 1. Uploader / Video Filter (Direct Landlord vs Agent) */}
-            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                Uploader &amp; Video Source
-              </label>
-              
-              <div className="space-y-2">
+          )}
+        </div>
+
+        {/* ── Desktop 2-Column Layout ── */}
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          {/* Desktop Sidebar Filters */}
+          <aside className="hidden md:block md:w-68 shrink-0">
+            <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 sticky top-20 space-y-5">
+              <div className="flex items-center justify-between text-slate-900 border-b border-slate-100 pb-3">
+                <span className="text-sm font-extrabold flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-emerald-600" />
+                  <span>Filter Rooms</span>
+                </span>
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetAllFilters}
+                    className="text-xs text-slate-500 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                  >
+                    Reset <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+
+              {/* Uploader Type */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Listing Source
+                </label>
                 <button
                   type="button"
                   onClick={() => setUploaderFilter('all')}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     uploaderFilter === 'all'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Video className="w-3.5 h-3.5 text-slate-400" />
-                    <span>All Video Uploads</span>
-                  </span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                    uploaderFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    {listings.length}
-                  </span>
+                  <span>All Rooms</span>
+                  <span>{listings.length}</span>
                 </button>
-
-                {/* Direct Landlord Option */}
                 <button
                   type="button"
                   onClick={() => setUploaderFilter('landlord')}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     uploaderFilter === 'landlord'
-                      ? 'bg-amber-500 text-white shadow-xs ring-2 ring-amber-300'
-                      : 'bg-amber-50/70 text-amber-900 border border-amber-200 hover:bg-amber-100'
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-amber-50/70 text-amber-900 hover:bg-amber-100'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 shrink-0" />
-                    <span>Direct Landlord Uploads</span>
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Direct Landlord (0%)</span>
                   </span>
-                  <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
-                    uploaderFilter === 'landlord' ? 'bg-amber-700 text-white' : 'bg-amber-200 text-amber-900'
-                  }`}>
-                    0% Fee
-                  </span>
+                  <span>{landlordCount}</span>
                 </button>
-
-                {/* Agent Option */}
                 <button
                   type="button"
                   onClick={() => setUploaderFilter('agent')}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     uploaderFilter === 'agent'
-                      ? 'bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-300'
-                      : 'bg-emerald-50/70 text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
-                    <UserCheck className="w-3.5 h-3.5 shrink-0" />
-                    <span>Agent Uploads</span>
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>Verified Agent (15%)</span>
                   </span>
-                  <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
-                    uploaderFilter === 'agent' ? 'bg-emerald-800 text-white' : 'bg-emerald-200 text-emerald-900'
-                  }`}>
-                    15% Fee
-                  </span>
+                  <span>{agentCount}</span>
                 </button>
               </div>
+
+              {/* Campus */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  Campus
+                </label>
+                <select
+                  value={selectedCampus}
+                  onChange={(e) => handleCampusChange(e.target.value)}
+                  className="w-full border-slate-200 rounded-xl text-xs font-semibold p-2.5 outline-none focus:border-emerald-500 border bg-slate-50"
+                >
+                  <option value="all">All Universities</option>
+                  {CAMPUSES.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.shortCode} — {c.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Max Budget */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Max Rent
+                  </label>
+                  <span className="text-xs font-extrabold text-emerald-700">
+                    ₦{maxBudget.toLocaleString()}/yr
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  className="w-full accent-emerald-600 cursor-pointer"
+                  min="100000"
+                  max="1000000"
+                  step="20000"
+                  value={maxBudget}
+                  onChange={(e) => setMaxBudget(Number(e.target.value))}
+                />
+              </div>
+
+              {/* Verified Only */}
+              <div className="pt-3 border-t border-slate-100">
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={verifiedOnly}
+                    onChange={(e) => setVerifiedOnly(e.target.checked)}
+                    className="rounded accent-emerald-600 w-4 h-4 cursor-pointer"
+                  />
+                  <span>Physically Verified Rooms Only</span>
+                </label>
+              </div>
             </div>
+          </aside>
 
-            {/* 2. University Campus */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                University Campus
-              </label>
-              <select 
-                value={selectedCampus}
-                onChange={(e) => handleCampusChange(e.target.value)}
-                className="w-full border-slate-200 rounded-xl text-sm p-2.5 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 border bg-slate-50 font-medium"
-              >
-                <option value="all">All Universities &amp; Campuses</option>
-                {CAMPUSES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.shortCode} - {c.city}
-                  </option>
-                ))}
-              </select>
+          {/* Main Results Grid */}
+          <div className="flex-1 min-w-0 w-full">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/60 shadow-lg">
+              <div className="mb-4 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <span className="text-xs sm:text-sm font-bold text-slate-700">
+                  Showing <strong>{filteredListings.length}</strong> available{' '}
+                  {filteredListings.length === 1 ? 'room' : 'rooms'}
+                </span>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={resetAllFilters}
+                    className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
 
-              {activeCampusObj && (
-                <div className="mt-2.5 p-2.5 bg-emerald-50 rounded-xl border border-emerald-200/60 text-xs text-emerald-800">
-                  <div className="font-bold flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 text-emerald-600" />
-                    {activeCampusObj.name}
-                  </div>
-                  <div className="text-emerald-700 mt-1">
-                    Hubs: {activeCampusObj.popularLandmarks.slice(0, 3).join(', ')}
-                  </div>
+              {filteredListings.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {filteredListings.map((listing) => (
+                    <ListingCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 px-4">
+                  <MapPin className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                  <h3 className="text-base font-bold text-slate-800">
+                    No rooms match that filter
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Try increasing your max budget or switching campus filters.
+                  </p>
+                  <button
+                    onClick={resetAllFilters}
+                    className="mt-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-colors cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
                 </div>
               )}
             </div>
-            
-            {/* 3. Max Budget */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-semibold text-slate-700">Max Budget</label>
-                <span className="text-sm font-extrabold text-emerald-700">
-                  ₦{maxBudget.toLocaleString()}
-                </span>
-              </div>
-              <input 
-                type="range" 
-                className="w-full accent-emerald-600 cursor-pointer" 
-                min="100000" 
-                max="1000000" 
-                step="20000" 
-                value={maxBudget}
-                onChange={(e) => setMaxBudget(Number(e.target.value))}
-              />
-              <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>₦100k</span>
-                <span>₦1.0M/yr</span>
-              </div>
-            </div>
-            
-            {/* 4. Trust Level */}
-            <div className="pt-3 border-t border-slate-100">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Physical Verification</label>
-              <label className="flex items-center gap-2.5 text-sm text-slate-700 cursor-pointer select-none">
-                <input 
-                  type="checkbox" 
-                  checked={verifiedOnly}
-                  onChange={(e) => setVerifiedOnly(e.target.checked)}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 accent-emerald-600 w-4 h-4 cursor-pointer" 
-                />
-                <span className="text-xs font-medium">Physically Verified Rooms Only</span>
-              </label>
-            </div>
           </div>
-        </aside>
-
-        {/* Main Results */}
-        <div className="flex-1 min-w-0">
-          
-          {/* Header Controls & Quick Filter Pills */}
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                {activeCampusObj ? `${activeCampusObj.shortCode} Student Housing` : 'Student Accommodation Listings'}
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                {uploaderFilter === 'landlord'
-                  ? 'Showing verified Direct Landlord uploads (No agency commission).'
-                  : uploaderFilter === 'agent'
-                  ? 'Showing verified Agent uploads (standard 15% agency fee).'
-                  : 'Browse all verified campus video uploads and rooms.'}
-              </p>
-            </div>
-
-            {/* Quick Pills */}
-            <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
-              <button
-                type="button"
-                onClick={() => setUploaderFilter('all')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
-                  uploaderFilter === 'all'
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                All ({listings.length})
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setUploaderFilter('landlord')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer flex items-center gap-1 ${
-                  uploaderFilter === 'landlord'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100'
-                }`}
-              >
-                <span>👑 Direct Landlords</span>
-                <span className="text-[10px] bg-amber-200/80 text-amber-900 px-1.5 py-0.2 rounded-full font-extrabold">{landlordCount}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setUploaderFilter('agent')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer flex items-center gap-1 ${
-                  uploaderFilter === 'agent'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100'
-                }`}
-              >
-                <span>🏢 Agent Uploads</span>
-                <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-1.5 py-0.2 rounded-full font-extrabold">{agentCount}</span>
-              </button>
-            </div>
-          </div>
-          
-          {/* Listings Grid */}
-          {filteredListings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredListings.map(listing => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 p-8 shadow-xs">
-              <MapPin className="h-10 w-10 text-slate-400 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-slate-800">No rooms found matching your filters</h3>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">
-                Try switching between Landlord and Agent uploads, or adjusting your budget range.
-              </p>
-              <button
-                onClick={() => {
-                  handleCampusChange('all')
-                  setMaxBudget(600000)
-                  setVerifiedOnly(false)
-                  setUploaderFilter('all')
-                }}
-                className="mt-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-colors cursor-pointer"
-              >
-                Reset all filters
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

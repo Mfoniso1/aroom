@@ -10,202 +10,133 @@ import type { Listing } from '@/components/shared/ListingCard'
 
 export const SEED_LISTINGS: Listing[] = [
   {
-    id: '1',
-    title: 'Spacious Self-Contain at Akoka',
-    price: 350000,
-    period: 'yr',
-    landmark: '5 mins walk from UNILAG Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Femi K. (Certified Agent)',
-    hasVideoTour: true,
-    videoUrl: '/videos/room-tour.mp4',
-    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 30000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 52500, // 15% of 350,000
-      inspectionFee: 0,
-    },
-  },
-  {
-    id: '4',
+    id: 'uniport-1',
     title: 'Executive Self-Contain in Choba',
     price: 280000,
     period: 'yr',
-    landmark: '5 mins to UNIPORT Choba Gate',
+    landmark: '5 mins walk to UNIPORT Choba Gate',
+    description: 'Tiled self-contain with treated borehole water, prepaid meter, and gated compound with night security. Quiet street, close to Choba Gate.',
+    roomType: 'Self-Contain',
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'landlord',
-    uploaderName: 'Chief Emeka Eze (Property Owner)',
+    uploaderName: 'Chief Emeka Nwosu (Direct Landlord)',
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 25000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 0, // Direct landlord
-      inspectionFee: 0,
-    },
+    customFees: { cautionFee: 25000, legalFee: 20000, utilityFee: 15000, agencyFee: 0, inspectionFee: 0 },
   },
   {
-    id: '5',
-    title: 'Modern Studio Apartment at Alakahia',
+    id: 'uniport-2',
+    title: 'Modern Studio at Alakahia (UPTH Road)',
     price: 320000,
     period: 'yr',
-    landmark: 'Close to UNIPORT Delta Park',
+    landmark: '8 mins to UPTH Gate & Delta Park',
+    description: 'Studio apartment with borehole water, prepaid meter, and standby generator for the compound. Tarred access road.',
+    roomType: 'Studio',
     verificationStatus: 'verified',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'agent',
-    uploaderName: 'David O. (UNIPORT Verified Agent)',
+    uploaderName: 'David Opubo (Verified Agent)',
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 30000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 48000, // 15% of 320,000
-      inspectionFee: 3000,
-    },
+    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 48000, inspectionFee: 0 },
   },
   {
-    id: '7',
+    id: 'uniport-3',
+    title: 'Newly Built Self-Contain at Back of Chem',
+    price: 240000,
+    period: 'yr',
+    landmark: 'Back of Chem, 6 mins to Abuja Campus',
+    description: 'Newly built self-contain, treated borehole water, prepaid meter. Awaiting Aroom Team Lead physical verification.',
+    roomType: 'Self-Contain',
+    verificationStatus: 'unverified_new',
+    verificationRequested: true,
+    verificationRequestedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
+    verificationRequestNote: 'Please inspect before we open to students.',
+    availabilityStatus: 'available',
+    campusId: 'uniport',
+    uploaderType: 'agent',
+    uploaderName: 'David Opubo (Verified Agent)',
+    hasVideoTour: true,
+    videoUrl: '/videos/room-tour.mp4',
+    imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 36000, inspectionFee: 0 },
+  },
+  {
+    id: 'uniport-4',
     title: '2-Bedroom Shared Flat in Ozuoba',
     price: 220000,
     period: 'yr',
     landmark: 'Near UNIPORT Abuja Campus Gate',
+    description: 'Shared 2-bedroom flat for two students. Borehole water and prepaid meter. Landlord lives on the compound.',
+    roomType: 'Shared Flat',
     verificationStatus: 'unverified_new',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'landlord',
-    uploaderName: 'Elder Nnamdi (Lodge Landlord)',
+    uploaderName: 'Elder Nnamdi Wike (Direct Landlord)',
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 0, // Direct landlord
-      inspectionFee: 0,
-    },
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 0, inspectionFee: 0 },
   },
   {
-    id: '2',
-    title: 'Standard Single Room in Yaba',
-    price: 180000,
+    id: 'uniport-5',
+    title: 'Standard Single Room at Delta Park',
+    price: 160000,
     period: 'yr',
-    landmark: 'Near Yabatech Back Gate / UNILAG',
-    verificationStatus: 'unverified_new',
-    availabilityStatus: 'available',
-    campusId: 'unilag',
-    uploaderType: 'agent',
-    uploaderName: 'Blessing A. (Lagos Agent)',
-    hasVideoTour: true,
-    videoUrl: '/videos/room-tour.mp4',
-    imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 27000, // 15% of 180,000
-      inspectionFee: 2000,
-    },
-  },
-  {
-    id: '3',
-    title: '2-Bedroom Shared Flat Onike',
-    price: 450000,
-    period: 'yr',
-    landmark: 'Onike roundabout near UNILAG',
-    verificationStatus: 'verified',
-    availabilityStatus: 'held',
-    campusId: 'unilag',
-    uploaderType: 'landlord',
-    uploaderName: 'Dr. (Mrs) Johnson (Property Owner)',
-    hasVideoTour: true,
-    videoUrl: '/videos/room-tour.mp4',
-    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 40000,
-      legalFee: 25000,
-      utilityFee: 20000,
-      agencyFee: 0, // Direct landlord
-      inspectionFee: 0,
-    },
-  },
-  {
-    id: '6',
-    title: 'Serviced Room near Ekosodin Gate',
-    price: 210000,
-    period: 'yr',
-    landmark: 'Ekosodin, UNIBEN Main Gate',
+    landmark: '10 mins to Choba Gate, Delta Park',
+    description: 'Affordable single room, shared bathroom, borehole water. Ideal for budget-conscious UNIPORT students.',
+    roomType: 'Single Room',
     verificationStatus: 'verified',
     availabilityStatus: 'available',
-    campusId: 'uniben',
+    campusId: 'uniport',
     uploaderType: 'agent',
-    uploaderName: 'Victor E. (Benin Campus Agent)',
+    uploaderName: 'David Opubo (Verified Agent)',
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 31500, // 15% of 210,000
-      inspectionFee: 2500,
-    },
+    customFees: { cautionFee: 15000, legalFee: 10000, utilityFee: 8000, agencyFee: 24000, inspectionFee: 0 },
   },
   {
-    id: '8',
-    title: 'Self-Contain Apartment at BDPA',
-    price: 260000,
+    id: 'uniport-6',
+    title: 'Spacious 2-Bedroom Flat in Aluu',
+    price: 350000,
     period: 'yr',
-    landmark: 'BDPA Estate, Ugbowo (UNIBEN)',
+    landmark: 'Aluu Junction, 15 mins to Abuja Campus',
+    description: 'Large flat for two or three students sharing. Tiled floors, borehole water, prepaid meter, secure fence.',
+    roomType: '2-Bedroom Flat',
     verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'uniben',
+    availabilityStatus: 'held',
+    campusId: 'uniport',
     uploaderType: 'landlord',
-    uploaderName: 'Pastor Osa (Direct Landlord)',
-    hasVideoTour: true,
-    videoUrl: '/videos/room-tour.mp4',
-    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 25000,
-      legalFee: 20000,
-      utilityFee: 15000,
-      agencyFee: 0, // Direct landlord
-      inspectionFee: 0,
-    },
-  },
-  {
-    id: '9',
-    title: 'Charming Studio in Agbowo',
-    price: 250000,
-    period: 'yr',
-    landmark: 'Walking distance to UI Main Gate',
-    verificationStatus: 'verified',
-    availabilityStatus: 'available',
-    campusId: 'ui',
-    uploaderType: 'landlord',
-    uploaderName: 'Prof. Adeleke (Lodge Landlord)',
+    uploaderName: 'Chief Emeka Nwosu (Direct Landlord)',
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
-    customFees: {
-      cautionFee: 20000,
-      legalFee: 15000,
-      utilityFee: 10000,
-      agencyFee: 0, // Direct landlord
-      inspectionFee: 0,
-    },
+    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 0, inspectionFee: 0 },
+  },
+  {
+    id: 'uniport-7',
+    title: 'Neat Self-Contain at Rumuosi',
+    price: 200000,
+    period: 'yr',
+    landmark: 'Rumuosi, off East-West Road',
+    description: 'Self-contain with tiled floor, borehole water and prepaid meter. Short bike ride to campus.',
+    roomType: 'Self-Contain',
+    verificationStatus: 'unverified_new',
+    availabilityStatus: 'available',
+    campusId: 'uniport',
+    uploaderType: 'agent',
+    uploaderName: 'Tariye Briggs (Team Agent)',
+    hasVideoTour: true,
+    videoUrl: '/videos/room-tour.mp4',
+    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 30000, inspectionFee: 0 },
   },
 ]
 
@@ -299,7 +230,58 @@ function notifyListeners() {
  * Returns all current listings (User-uploaded first, then seed listings)
  */
 export function getAllListings(): Listing[] {
-  return [...userListingsCache, ...SEED_LISTINGS]
+  const overrides = loadVerificationOverrides()
+  return [...userListingsCache, ...SEED_LISTINGS].map((l) =>
+    overrides[l.id] ? { ...l, ...overrides[l.id] } : l
+  )
+}
+
+// ── Team Lead Verification Requests ──────────────────────────────────────────
+const VERIFY_KEY = 'aroom_listing_verification_uniport_v2'
+type VerificationPatch = Partial<
+  Pick<Listing, 'verificationStatus' | 'verificationRequested' | 'verificationRequestedAt' | 'verificationRequestNote' | 'verifiedBy'>
+>
+
+function loadVerificationOverrides(): Record<string, VerificationPatch> {
+  try {
+    return JSON.parse(localStorage.getItem(VERIFY_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function saveVerificationOverride(id: string, patch: VerificationPatch) {
+  const all = loadVerificationOverrides()
+  all[id] = { ...all[id], ...patch }
+  try {
+    localStorage.setItem(VERIFY_KEY, JSON.stringify(all))
+  } catch {
+    // ignore quota error
+  }
+  notifyListeners()
+}
+
+/** Agent/landlord asks the Aroom Team Lead to physically verify a lodge */
+export function requestListingVerification(id: string, note?: string) {
+  saveVerificationOverride(id, {
+    verificationRequested: true,
+    verificationRequestedAt: new Date().toISOString(),
+    verificationRequestNote: note?.trim() || undefined,
+  })
+}
+
+/** Team Lead marks a lodge as physically verified */
+export function approveListingVerification(id: string, verifierName = 'Aroom Team Lead') {
+  saveVerificationOverride(id, {
+    verificationStatus: 'verified',
+    verificationRequested: false,
+    verifiedBy: verifierName,
+  })
+}
+
+/** Listings (unverified) that have a pending verification request */
+export function getPendingVerificationListings(): Listing[] {
+  return getAllListings().filter((l) => l.verificationStatus === 'unverified_new' && l.verificationRequested)
 }
 
 /**

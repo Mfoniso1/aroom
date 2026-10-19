@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { InquiryService } from '../../domain/services/inquiry.service.js';
+import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
 import { CreateInquiryBodySchema, SubmitFeedbackBodySchema } from '../dtos/schemas.js';
 
 export const inquiryRouter = Router();
@@ -36,9 +37,9 @@ inquiryRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
  * GET /api/v1/inquiries/agent-queue
  * Qualified leads queue for agents
  */
-inquiryRouter.get('/agent-queue', async (req: Request, res: Response, next: NextFunction) => {
+inquiryRouter.get('/agent-queue', requireAuth, requireRole('agent'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const agentUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
+    const agentUserId = req.user!.id;
     const queue = await inquiryService.getAgentInquiries(agentUserId);
     res.json({
       success: true,
@@ -54,9 +55,9 @@ inquiryRouter.get('/agent-queue', async (req: Request, res: Response, next: Next
  * PATCH /api/v1/inquiries/:id/status
  * Schedule or update appointment status
  */
-inquiryRouter.patch('/:id/status', async (req: Request, res: Response, next: NextFunction) => {
+inquiryRouter.patch('/:id/status', requireAuth, requireRole('agent', 'admin'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const actorUserId = (req.headers['x-user-id'] as string) || 'd1111111-1111-1111-1111-111111111111';
+    const actorUserId = req.user!.id;
     const { status, inspectionSlot, agentNote } = req.body;
 
     const inquiryId = String(req.params.id);

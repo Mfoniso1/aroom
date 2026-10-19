@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aroom — UNIPORT Student Housing Pitch Deck</title>
+  <style>
+    @page {
+      size: 1280px 720px;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      background: #0f172a;
+      color: #0f172a;
+    }
+    .slide {
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 52px 64px 44px 64px;
+    }
+    .slide-dark {
+      background: linear-gradient(135deg, #06281e 0%, #0f172a 60%, #1e1b4b 100%);
+      color: #f8fafc;
+    }
+    .slide-light {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .brand-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      background: #10b981;
+      display: inline-block;
+    }
+    .slide-tag {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    .tag-emerald {
+      background: rgba(16, 185, 129, 0.16);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .tag-dark-emerald {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(110, 231, 183, 0.35);
+    }
+    .tag-amber {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+    .slide-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      opacity: 0.85;
+    }
+    h1 {
+      font-size: 54px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    h2 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 21px;
+      line-height: 1.45;
+      color: #475569;
+    }
+    .slide-dark .subtitle {
+      color: #cbd5e1;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+    .card-dark {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 26px;
+    }
+    .card-emerald {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 2px solid #10b981;
+      border-radius: 20px;
+      padding: 26px;
+    }
+    .card-danger {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 20px;
+      padding: 24px;
+    }
+    .num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    .stat-big {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .bullet-list li {
+      font-size: 17px;
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .check {
+      color: #10b981;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .cross {
+      color: #e11d48;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .wa-bubble {
+      background: #d9fdd3;
+      color: #0f172a;
+      border-radius: 16px 16px 4px 16px;
+      padding: 14px 18px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      align-self: flex-end;
+      max-width: 88%;
+      border: 1px solid #bbf7d0;
+    }
+    .wa-reply {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 16px 16px 16px 4px;
+      padding: 16px 18px;
+      font-size: 15px;
+      line-height: 1.45;
+      border: 1px solid #e2e8f0;
+      max-width: 94%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= SLIDE 1: TITLE SLIDE ================= -->
+  <section class="slide slide-dark">
+    <div class="top-bar">
+      <div class="brand-pill" style="color:#ffffff;">
+        <span class="brand-dot"></span>
+        <span>AROOM</span>
+      </div>
+      <span class="slide-tag tag-dark-emerald">UNIPORT Campus Housing Pitch</span>
+    </div>
+
+    <div style="max-width: 980px; margin: auto 0;">
+      <div style="display:inline-block; background:rgba(16,185,129,0.18); border:1px solid rgba(110,231,183,0.35); color:#6ee7b7; font-weight:800; font-size:15px; padding:8px 18px; border-radius:999px; margin-bottom:22px;">
+        Built for University of Port Harcourt (UNIPORT) Students
+      </div>
+      <h1 style="color:#ffffff; margin-bottom:20px;">
+        Find a Safe Student Room Near <span style="color:#34d399;">UNIPORT</span> — Without Inspection Fees or Scams.
+      </h1>
+      <p class="subtitle" style="max-width: 840px; font-size: 23px;">
+        Aroom connects students in <strong>Choba, Alakahia, Delta Park, Ozuoba &amp; Aluu</strong> with verified landlords and trusted agents, upfront move-in costs, and a 24/7 WhatsApp Housing Assistant.
+      </p>
+
+      <div style="margin-top: 38px; display: flex; gap: 24px;">
+        <div class="card-dark" style="padding: 18px 26px; min-width: 310px;">
+          <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6ee7b7; font-weight: 800;">Presented By</div>
+          <div style="font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 4px;">Don-Amadiwochi Eze</div>
+          <div style="font-size: 14px; color: #94a3b8; margin-top: 2px;">Co-Presenter &amp; Product Lead</div>
+        </div>
+        <div class="card-dark" style="padding: 18px 26px; min-width: 310px;">
+          <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6ee7b7; font-weight: 800;">Presented By</div>
+          <div style="font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 4px;">Enyinma Justice Smart</div>
+          <div style="font-size: 14px; color: #94a3b8; margin-top: 2px;">Co-Presenter &amp; Operations Lead</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Aroom — Verified Student Housing (Web + WhatsApp)</span>
+      <span>Slide 1 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 2: THE UNIPORT REALITY ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-amber">The Problem at UNIPORT</span>
+    </div>
+
+    <div>
+      <h2>The Reality of House Hunting Around UNIPORT</h2>
+      <p class="subtitle">
+        Every session, thousands of UNIPORT students must find off-campus lodges in <strong>Choba, Alakahia, Delta Park, Ozuoba, and Aluu</strong>—and the process is broken.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="stat-big" style="color:#059669;">35,000+</div>
+        <div style="font-size:18px; font-weight:800; margin-bottom:8px;">Students Need Off-Campus Rooms</div>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Campus hostels inside Abuja Park &amp; Delta Park can only house a small fraction of students. Most Freshers and returning students must rent lodges outside the gate.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="stat-big" style="color:#e11d48;">₦5k – ₦10k</div>
+        <div style="font-size:18px; font-weight:800; margin-bottom:8px;">Charged Just to "Go and Look"</div>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Street agents around Choba Junction and Alakahia collect an "inspection fee" or "registration fee" before showing you a single room—even if the room is terrible.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="stat-big" style="color:#d97706;">Zero Trust</div>
+        <div style="font-size:18px; font-weight:800; margin-bottom:8px;">No Way to Verify Who Is Real</div>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Students coming from outside Rivers State have no way to tell if a WhatsApp number belongs to a real landlord, a genuine agent, or a scammer.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="background:#0f172a; color:#ffffff; padding:20px 28px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="font-size:18px; font-weight:700;">
+        💬 <span style="color:#6ee7b7;">Common UNIPORT Student Experience:</span> "I paid three different agents ₦5,000 each in Choba under the rain, and I still didn't get a room."
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 2 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 3: 3 PAINFUL TRAPS ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-amber">Why Students Lose Money</span>
+    </div>
+
+    <div>
+      <h2>3 Painful Traps UNIPORT Students Face Every Semester</h2>
+      <p class="subtitle">Why house hunting in Choba, Alakahia &amp; Ozuoba drains students' pocket money before lectures even start.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card-danger">
+        <div class="num-badge" style="background:#e11d48; color:#fff;">1</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px; color:#881337;">The Inspection Fee Hustle</h3>
+        <p style="font-size:15.5px; color:#4c0519; line-height:1.5;">
+          Unverified agents make more money collecting <strong>₦5,000 inspection fees</strong> from 20 desperate students than actually renting out the room. Once you pay, they show you a flooded or uncompleted lodge.
+        </p>
+      </div>
+
+      <div class="card-danger">
+        <div class="num-badge" style="background:#e11d48; color:#fff;">2</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px; color:#881337;">"Someone Just Paid Now!"</h3>
+        <p style="font-size:15.5px; color:#4c0519; line-height:1.5;">
+          Agents post clean pictures of an Alakahia self-contain online. When you trek there under the Port Harcourt sun, they say: <em>"Ah, someone just paid 15 minutes ago, let me take you to another place far inside."</em>
+        </p>
+      </div>
+
+      <div class="card-danger">
+        <div class="num-badge" style="background:#e11d48; color:#fff;">3</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px; color:#881337;">Hidden Move-In Price Shock</h3>
+        <p style="font-size:15.5px; color:#4c0519; line-height:1.5;">
+          A student budgets <strong>₦220,000</strong> for rent, only to be told at the last minute to bring <strong>₦360,000</strong> because of surprise Agreement, Caution, Caretaker, Water, and inflated Agency fees.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px 26px; background: #fffbeb; border-color: #fde68a;">
+      <p style="font-size: 16px; font-weight: 700; color: #92400e;">
+        ⚠️ Result: Students miss classes, lose part of their school fees to bad agents, or end up in unsafe lodges far from campus gates.
+      </p>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 3 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 4: MEET AROOM (OUR SOLUTION) ================= -->
+  <section class="slide slide-dark">
+    <div class="top-bar">
+      <div class="brand-pill" style="color:#fff;"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-dark-emerald">Our Solution</span>
+    </div>
+
+    <div>
+      <h2 style="color:#ffffff;">Meet Aroom: Safe, Honest Student Housing</h2>
+      <p class="subtitle">
+        We built Aroom to remove every trap between a UNIPORT student and a safe room—both on our <strong>Mobile Web App</strong> and directly inside <strong>WhatsApp</strong>.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-dark">
+        <div style="font-size:14px; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">1. Vetted People Only</div>
+        <h3 style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px;">Team Leader Verification Gate</h3>
+        <p style="font-size:15.5px; color:#cbd5e1; line-height:1.5;">
+          No random street agent can post on Aroom. Every Agent and Direct Landlord must upload their ID card and pass a phone check by our Team Leader before their account is unlocked.
+        </p>
+      </div>
+
+      <div class="card-dark">
+        <div style="font-size:14px; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">2. Zero Inspection Fees (₦0)</div>
+        <h3 style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px;">Free Physical Walkthroughs</h3>
+        <p style="font-size:15.5px; color:#cbd5e1; line-height:1.5;">
+          Students never pay a kobo to inspect a house. You book a verified agent or landlord, walk through the room physically in Choba or Alakahia, and check the water and light for free.
+        </p>
+      </div>
+
+      <div class="card-dark">
+        <div style="font-size:14px; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">3. Upfront Total Cost</div>
+        <h3 style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px;">Complete Move-In Cost Calculator</h3>
+        <p style="font-size:15.5px; color:#cbd5e1; line-height:1.5;">
+          Every room shows the exact <strong>Total Move-In Cost</strong> upfront (Rent + Caution + Legal + Utility + Capped 15% Agent Fee, or <strong>0% Fee</strong> for Direct Landlords).
+        </p>
+      </div>
+
+      <div class="card-dark">
+        <div style="font-size:14px; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">4. Works on WhatsApp</div>
+        <h3 style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px;">24/7 WhatsApp Housing Assistant</h3>
+        <p style="font-size:15.5px; color:#cbd5e1; line-height:1.5;">
+          Even when a student doesn't want to browse a website, they can chat with Aroom on WhatsApp in plain English or Pidgin to see available rooms, compare total costs, and book an agent.
+        </p>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 4 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 5: TEAM LEADER VERIFICATION GATE ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-emerald">Trust &amp; Safety Architecture</span>
+    </div>
+
+    <div>
+      <h2>How We Stop Fake Agents Before They Reach Students</h2>
+      <p class="subtitle">
+        Instead of an open marketplace where anyone can post fake photos, Aroom uses a strict <strong>Team Leader Approval Gate</strong>.
+      </p>
+    </div>
+
+    <div class="grid-4">
+      <div class="card">
+        <div class="num-badge" style="background:#0f172a; color:#fff;">1</div>
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Partner Applies</h3>
+        <p style="font-size:14.5px; color:#475569; line-height:1.45;">
+          An Agent or Landlord in UNIPORT signs up with their full name, phone number, lodge areas, and uploads their Government ID Card.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="num-badge" style="background:#d97706; color:#fff;">2</div>
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Held in Queue</h3>
+        <p style="font-size:14.5px; color:#475569; line-height:1.45;">
+          Their account is automatically locked in <strong>Pending Review</strong>. They cannot publish any room or appear on WhatsApp yet.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="num-badge" style="background:#4f46e5; color:#fff;">3</div>
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Team Leader Vets</h3>
+        <p style="font-size:14.5px; color:#475569; line-height:1.45;">
+          From a dedicated Command Center, our Team Leader inspects their ID card, calls their phone number, and confirms their lodges.
+        </p>
+      </div>
+
+      <div class="card-emerald">
+        <div class="num-badge" style="background:#059669; color:#fff;">4</div>
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:8px; color:#064e3b;">Approved &amp; Live</h3>
+        <p style="font-size:14.5px; color:#065f46; line-height:1.45;">
+          Once approved, they earn the <strong>Verified Partner Badge</strong> and students can book them for free inspections on Web &amp; WhatsApp.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between; background:#f1f5f9;">
+      <div style="font-size:15.5px; font-weight:700; color:#1e293b;">
+        🛡️ Accountability Rule: If any verified agent ever demands an inspection fee from a UNIPORT student, the Team Leader suspends their account in one click.
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 5 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 6: TRANSPARENT MOVE-IN COST ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-emerald">Radical Price Honesty</span>
+    </div>
+
+    <div>
+      <h2>No More Price Shock for Students &amp; Parents</h2>
+      <p class="subtitle">
+        Before a student even steps out to inspect a lodge in Choba or Alakahia, Aroom shows every single fee clearly.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <span style="font-size:12px; font-weight:800; text-transform:uppercase; background:#e0e7ff; color:#3730a3; padding:4px 10px; border-radius:999px;">Option A: Verified Campus Agent</span>
+        <h3 style="font-size:22px; font-weight:800; margin-top:12px; margin-bottom:4px;">Tiled Self-Contain at Alakahia</h3>
+        <p style="font-size:14px; color:#64748b; margin-bottom:16px;">📍 5 mins walk to UNIPORT Teaching Hospital (UPTH) Gate</p>
+
+        <ul class="bullet-list" style="border-top:1px solid #e2e8f0; padding-top:14px;">
+          <li style="justify-content:space-between;"><span>Annual Rent (Yearly)</span><strong>₦250,000</strong></li>
+          <li style="justify-content:space-between;"><span>Caution Fee (Refundable)</span><strong>₦20,000</strong></li>
+          <li style="justify-content:space-between;"><span>Legal &amp; Agreement Fee</span><strong>₦15,000</strong></li>
+          <li style="justify-content:space-between;"><span>Utility / Compound Fee</span><strong>₦10,000</strong></li>
+          <li style="justify-content:space-between;"><span>Verified Agent Fee (Capped at 15%)</span><strong>₦37,500</strong></li>
+          <li style="justify-content:space-between; color:#059669;"><span>Physical Inspection Fee</span><strong>₦0 (FREE)</strong></li>
+        </ul>
+        <div style="margin-top:16px; padding-top:14px; border-top:2px dashed #cbd5e1; display:flex; justify-content:space-between; font-size:20px; font-weight:900; color:#0f172a;">
+          <span>Total Move-In Cost:</span>
+          <span style="color:#059669;">₦332,500</span>
+        </div>
+      </div>
+
+      <div class="card-emerald">
+        <span style="font-size:12px; font-weight:800; text-transform:uppercase; background:#059669; color:#ffffff; padding:4px 10px; border-radius:999px;">Option B: Direct Landlord (0% Agent Fee)</span>
+        <h3 style="font-size:22px; font-weight:800; margin-top:12px; margin-bottom:4px; color:#064e3b;">Executive Self-Contain at Choba</h3>
+        <p style="font-size:14px; color:#047857; margin-bottom:16px;">📍 Opposite Choba Gate, UNIPORT • Direct Property Owner</p>
+
+        <ul class="bullet-list" style="border-top:1px solid rgba(5,150,105,0.25); padding-top:14px; color:#064e3b;">
+          <li style="justify-content:space-between;"><span>Annual Rent (Yearly)</span><strong>₦220,000</strong></li>
+          <li style="justify-content:space-between;"><span>Caution Fee (Refundable)</span><strong>₦20,000</strong></li>
+          <li style="justify-content:space-between;"><span>Legal &amp; Agreement Fee</span><strong>₦10,000</strong></li>
+          <li style="justify-content:space-between;"><span>Utility / Compound Fee</span><strong>₦10,000</strong></li>
+          <li style="justify-content:space-between; color:#059669;"><span>Agency Commission Fee</span><strong>₦0 (You Save 15%!)</strong></li>
+          <li style="justify-content:space-between; color:#059669;"><span>Physical Inspection Fee</span><strong>₦0 (FREE)</strong></li>
+        </ul>
+        <div style="margin-top:16px; padding-top:14px; border-top:2px dashed rgba(5,150,105,0.35); display:flex; justify-content:space-between; font-size:20px; font-weight:900; color:#064e3b;">
+          <span>Total Move-In Cost:</span>
+          <span>₦260,000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 6 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 7: WHATSAPP HOUSING ASSISTANT ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-emerald">WhatsApp Housing Assistant</span>
+    </div>
+
+    <div>
+      <h2>Find Rooms &amp; Book Agents Right Inside WhatsApp</h2>
+      <p class="subtitle">
+        Students don't even need to visit the website. They simply chat with Aroom on WhatsApp in natural English or Pidgin.
+      </p>
+    </div>
+
+    <div class="grid-2" style="align-items:center;">
+      <div class="card" style="background:#efeae2; border-color:#cbd5e1; display:flex; flex-direction:column; padding:22px;">
+        <div style="background:#075e54; color:#fff; padding:12px 16px; border-radius:12px; margin-bottom:14px; font-weight:800; font-size:15px;">
+          🟢 Aroom Housing Assistant • Online (WhatsApp)
+        </div>
+        <div class="wa-bubble">
+          Abeg I need a self-contain near UNIPORT Choba under 250k. Who can I book for inspection?
+        </div>
+        <div class="wa-reply">
+          <strong>Hi Amara! 👋 Here is a verified room near UNIPORT Choba:</strong><br/><br/>
+          🏠 <strong>Executive Tiled Self-Contain at Choba</strong><br/>
+          📍 Opposite Choba Gate, UNIPORT<br/>
+          👤 Verified Landlord: <strong>Chief Emeka Nwachukwu</strong> (+2348033334444)<br/>
+          💰 Rent: ₦220,000/yr + Other Fees: ₦40,000 + Agency: <strong>₦0 (Direct Landlord)</strong><br/>
+          👉 <strong>Total Move-In Cost: ₦260,000</strong> <em>(Free Inspection)</em><br/><br/>
+          Reply <strong>"Book Emeka tomorrow at 2pm"</strong> and I'll lock in your free inspection immediately!
+        </div>
+      </div>
+
+      <div class="card" style="display:flex; flex-direction:column; justify-content:center; gap:18px; height:100%;">
+        <h3 style="font-size:24px; font-weight:800;">Why WhatsApp Matters for UNIPORT Students</h3>
+        <ul class="bullet-list">
+          <li><span class="check">✔</span><span><strong>Zero Learning Curve:</strong> Every student and parent already uses WhatsApp daily on their phone.</span></li>
+          <li><span class="check">✔</span><span><strong>Works on Low Data:</strong> Even when campus network is slow in Choba or Aluu, WhatsApp messages go through instantly.</span></li>
+          <li><span class="check">✔</span><span><strong>Only Recommends Approved Partners:</strong> Our WhatsApp Assistant is connected directly to the Team Leader's verified roster—unapproved agents are never shown.</span></li>
+          <li><span class="check">✔</span><span><strong>Instant Booking Reference:</strong> Gives the student a confirmed Booking Reference (e.g. <code>#ARM-4821</code>) and the verified agent's direct WhatsApp link.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 7 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 8: SIMPLE 4-STEP STUDENT JOURNEY ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-emerald">How It Works</span>
+    </div>
+
+    <div>
+      <h2>From Searching to Moving In — 4 Simple Steps</h2>
+      <p class="subtitle">Designed to be fast, clear, and mobile-friendly with zero confusing jargon.</p>
+    </div>
+
+    <div class="grid-4">
+      <div class="card">
+        <div class="num-badge" style="background:#10b981; color:#fff;">1</div>
+        <h3 style="font-size:19px; font-weight:800; margin-bottom:8px;">Tell Us Your Area &amp; Budget</h3>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Pick your UNIPORT area (Choba, Alakahia, Delta Park, Ozuoba, or Aluu) on the mobile web app or send a message on WhatsApp.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="num-badge" style="background:#10b981; color:#fff;">2</div>
+        <h3 style="font-size:19px; font-weight:800; margin-bottom:8px;">See the True Total Cost</h3>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Compare verified rooms side-by-side with the full move-in package clearly calculated so you and your parents know the exact amount.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="num-badge" style="background:#10b981; color:#fff;">3</div>
+        <h3 style="font-size:19px; font-weight:800; margin-bottom:8px;">Book a Free Inspection</h3>
+        <p style="font-size:15px; color:#475569; line-height:1.5;">
+          Pick a convenient time slot to meet the Team-Leader-Verified Agent or Direct Landlord. Physical inspection is <strong>₦0 (100% Free)</strong>.
+        </p>
+      </div>
+
+      <div class="card-emerald">
+        <div class="num-badge" style="background:#065f46; color:#fff;">4</div>
+        <h3 style="font-size:19px; font-weight:800; margin-bottom:8px; color:#064e3b;">Inspect First, Then Rent</h3>
+        <p style="font-size:15px; color:#065f46; line-height:1.5;">
+          Check the water, security, and walking distance to UNIPORT gate in person before paying a single kobo for rent.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="background:#ecfdf5; border-color:#a7f3d0; padding:18px 26px;">
+      <p style="font-size:16px; font-weight:700; color:#065f46;">
+        🔔 Smart Room-Taken Protection: If a room is rented before your inspection time, Aroom automatically alerts you on WhatsApp with matching available rooms so you never waste a trip!
+      </p>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 8 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 9: WHY EVERYONE WINS & BUSINESS MODEL ================= -->
+  <section class="slide slide-light">
+    <div class="top-bar">
+      <div class="brand-pill"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-emerald">Value &amp; Sustainability</span>
+    </div>
+
+    <div>
+      <h2>Why Students, Landlords &amp; Honest Agents All Win</h2>
+      <p class="subtitle">Aroom rewards honest housing partners and saves students money.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div style="font-size:13px; font-weight:800; text-transform:uppercase; color:#059669; margin-bottom:8px;">For UNIPORT Students</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px;">Safe &amp; Affordable</h3>
+        <ul class="bullet-list">
+          <li><span class="check">✔</span><span>Save ₦15,000–₦30,000 in wasted inspection fees.</span></li>
+          <li><span class="check">✔</span><span>Save 15% agency commission on Direct Landlord lodges.</span></li>
+          <li><span class="check">✔</span><span>Zero WhatsApp rent scams.</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div style="font-size:13px; font-weight:800; text-transform:uppercase; color:#4f46e5; margin-bottom:8px;">For Direct Landlords</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px;">Fill Lodges Faster</h3>
+        <ul class="bullet-list">
+          <li><span class="check">✔</span><span>List rooms directly to verified UNIPORT students.</span></li>
+          <li><span class="check">✔</span><span>Prevent street agents from inflating the rent of their building.</span></li>
+          <li><span class="check">✔</span><span>Get responsible, verified student tenants.</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div style="font-size:13px; font-weight:800; text-transform:uppercase; color:#d97706; margin-bottom:8px;">For Verified Agents</div>
+        <h3 style="font-size:21px; font-weight:800; margin-bottom:10px;">More Closed Deals</h3>
+        <ul class="bullet-list">
+          <li><span class="check">✔</span><span>Official <strong>Verified Partner Badge</strong> builds instant student trust.</span></li>
+          <li><span class="check">✔</span><span>Receive ready-to-rent student bookings directly on WhatsApp.</span></li>
+          <li><span class="check">✔</span><span>Earn transparent 15% commission on completed rentals.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="background:#0f172a; color:#fff; padding:18px 26px;">
+      <p style="font-size:15.5px; font-weight:600;">
+        💡 <strong>How Aroom Sustains Operations:</strong> Small partner verification &amp; featured lodge placement fees from verified agents/landlords, while keeping house hunting and physical inspections <strong>100% FREE for students</strong>.
+      </p>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 9 of 10</span>
+    </div>
+  </section>
+
+  <!-- ================= SLIDE 10: UNIPORT LAUNCH ROADMAP & CLOSING ================= -->
+  <section class="slide slide-dark">
+    <div class="top-bar">
+      <div class="brand-pill" style="color:#fff;"><span class="brand-dot"></span><span>AROOM</span></div>
+      <span class="slide-tag tag-dark-emerald">Launch Roadmap &amp; Vision</span>
+    </div>
+
+    <div>
+      <h2 style="color:#ffffff;">Starting at UNIPORT, Scaling Across Nigeria</h2>
+      <p class="subtitle">
+        Our MVP is live today with Unified Role Portals, Team Leader Verification, and our 24/7 WhatsApp Housing Assistant.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card-dark" style="border-color:#10b981;">
+        <div style="font-size:13px; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:6px;">Phase 1 • Now</div>
+        <h3 style="font-size:21px; font-weight:800; color:#fff; margin-bottom:10px;">UNIPORT Campus Rollout</h3>
+        <p style="font-size:15px; color:#cbd5e1; line-height:1.5;">
+          Onboard our initial team of trusted agents &amp; direct landlords across <strong>Choba, Alakahia, Delta Park, Ozuoba &amp; Aluu</strong> to serve Freshers and returning UNIPORT students.
+        </p>
+      </div>
+
+      <div class="card-dark">
+        <div style="font-size:13px; font-weight:800; color:#6ee7b7; text-transform:uppercase; margin-bottom:6px;">Phase 2 • Next</div>
+        <h3 style="font-size:21px; font-weight:800; color:#fff; margin-bottom:10px;">Rivers State Expansion</h3>
+        <p style="font-size:15px; color:#cbd5e1; line-height:1.5;">
+          Expand our verified partner network to <strong>RSU (Nkpolu-Oroworukwo)</strong> and <strong>IAUE (Rumuolumeni)</strong> so every student in Port Harcourt can rent safely.
+        </p>
+      </div>
+
+      <div class="card-dark">
+        <div style="font-size:13px; font-weight:800; color:#6ee7b7; text-transform:uppercase; margin-bottom:6px;">Phase 3 • Scale</div>
+        <h3 style="font-size:21px; font-weight:800; color:#fff; margin-bottom:10px;">Nationwide Campus Network</h3>
+        <p style="font-size:15px; color:#cbd5e1; line-height:1.5;">
+          Replicate our Team-Leader-Verified + WhatsApp model across <strong>UNILAG, UNIBEN, DELSU, and UI</strong>—making student housing scam-free nationwide.
+        </p>
+      </div>
+    </div>
+
+    <div class="card-dark" style="background:rgba(16,185,129,0.14); border-color:rgba(52,211,153,0.4); display:flex; align-items:center; justify-content:space-between; padding:22px 30px;">
+      <div>
+        <div style="font-size:22px; font-weight:900; color:#ffffff;">Thank You! Let's Make UNIPORT Student Housing Safe Together.</div>
+        <div style="font-size:15px; color:#a7f3d0; margin-top:4px;">
+          Presented by <strong>Don-Amadiwochi Eze</strong> &amp; <strong>Enyinma Justice Smart</strong>
+        </div>
+      </div>
+      <div style="text-align:right; font-size:14px; color:#ffffff; font-weight:700;">
+        <div>🌐 Web App + WhatsApp Assistant Ready</div>
+        <div style="color:#6ee7b7; margin-top:2px;">Zero Inspection Fees • 100% Verified Partners</div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Aroom — UNIPORT Student Housing Pitch Deck</span>
+      <span>Slide 10 of 10</span>
+    </div>
+  </section>
+
+</body>
+</html>

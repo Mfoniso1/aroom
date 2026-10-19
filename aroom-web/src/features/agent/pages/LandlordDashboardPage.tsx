@@ -7,12 +7,19 @@
  * - Move-in cost breakdown (Rent, Caution, Legal, Utilities, 0% Agency fee)
  * - Direct student inspection schedule bookings & WhatsApp inquiries
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Building2, Plus, Eye, MessageCircle, TrendingUp,
-  MapPin, ShieldCheck, Phone, Mail, Home, Calendar
+  MapPin, ShieldCheck, Phone, Mail, Home, Calendar, UserCog, Clock
 } from 'lucide-react'
+import { EditProfileModal } from '@/components/shared/EditProfileModal'
+import { AGENT_LOCATIONS } from '@/lib/agentLocations'
+import {
+  getCurrentSession,
+  AUTH_CHANGE_EVENT,
+  type ActiveSession,
+} from '@/lib/pilotAuthStore'
 
 type PropertyStatus = 'available' | 'held' | 'taken'
 
@@ -32,16 +39,19 @@ interface LandlordProperty {
   imageUrl: string
 }
 
-const MOCK_LANDLORD = {
-  name: 'Chief Emeka Eze',
-  email: 'emeka.eze@property.ng',
-  phone: '0803 123 4567',
-  accountType: 'Verified Property Owner',
-  propertiesCount: 3,
-  totalUnits: 24,
-  campusAreas: ['Choba (UNIPORT)', 'Alakahia (Delta Park)', 'Aluu Gate'],
-  isOwnershipVerified: true,
-  joinedDate: 'August 2026',
+const FALLBACK_LANDLORD: ActiveSession = {
+  userId: 'd4444444-4444-4444-4444-444444444444',
+  role: 'landlord',
+  fullName: 'Chief Emeka Nwosu',
+  email: 'emeka.nwosu@directlodge.ng',
+  phoneNumber: '+2348022223333',
+  agentProfileId: 'a3333333-3333-3333-3333-333333333333',
+  agentKind: 'landlord',
+  agencyName: 'Nwosu Executive Student Suites',
+  coverageAreas: ['uniport-choba', 'uniport-alakahia'],
+  bio: 'Verified direct landlord offering 0% agency fee student apartments near UNIPORT.',
+  approvalStatus: 'approved',
+  rejectionReason: null,
 }
 
 const INITIAL_PROPERTIES: LandlordProperty[] = [
@@ -93,8 +103,20 @@ const INITIAL_PROPERTIES: LandlordProperty[] = [
 ]
 
 export function LandlordDashboardPage() {
+  const [session, setSession] = useState<ActiveSession>(() => getCurrentSession() || FALLBACK_LANDLORD)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [properties, setProperties] = useState<LandlordProperty[]>(INITIAL_PROPERTIES)
   const [filterTab, setFilterTab] = useState<'all' | PropertyStatus>('all')
+
+  useEffect(() => {
+    const sync = () => setSession(getCurrentSession() || FALLBACK_LANDLORD)
+    window.addEventListener(AUTH_CHANGE_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
 
   const setStatus = (id: string, newStatus: PropertyStatus) => {
     setProperties((prev) =>
@@ -102,6 +124,14 @@ export function LandlordDashboardPage() {
     )
   }
 
+  const coverageIds = session.coverageAreas?.length
+    ? session.coverageAreas
+    : FALLBACK_LANDLORD.coverageAreas || []
+  const coverageLabels = coverageIds
+    .map((id) => AGENT_LOCATIONS.find((l) => l.id === id)?.label || id)
+    .filter(Boolean)
+
+  const totalUnitsCount = properties.reduce((acc, p) => acc + p.totalUnits, 0)
   const totalViews = properties.reduce((acc, p) => acc + p.views, 0)
   const totalInquiries = properties.reduce((acc, p) => acc + p.directInquiries, 0)
   const vacantUnits = properties.reduce((acc, p) => acc + p.availableUnits, 0)
@@ -118,28 +148,42 @@ export function LandlordDashboardPage() {
         {/* ── Top Header / Landlord Profile ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 flex flex-col md:flex-row gap-6 items-start justify-between">
           <div className="flex gap-4 sm:gap-5 items-start">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-3xl font-extrabold shadow-sm shrink-0">
-              <Building2 className="w-9 h-9 text-amber-100" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-3xl font-extrabold shadow-sm shrink-0 overflow-hidden">
+              {session.avatarUrl ? (
+                <img src={session.avatarUrl} alt={session.fullName} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="w-9 h-9 text-amber-100" />
+              )}
             </div>
 
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">{MOCK_LANDLORD.name}</h1>
-                <span className="inline-flex items-center gap-1 text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-700" /> Verified Property Owner
-                </span>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">{session.fullName}</h1>
+                {session.approvalStatus === 'approved' ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-700" /> Team Leader Verified Owner
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-300">
+                    <Clock className="w-3.5 h-3.5" /> Verification {session.approvalStatus || 'Pending'}
+                  </span>
+                )}
               </div>
 
+              {session.agencyName && (
+                <p className="text-xs font-bold text-amber-700">{session.agencyName}</p>
+              )}
+
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-slate-500">
-                <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" />{MOCK_LANDLORD.email}</span>
-                <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" />{MOCK_LANDLORD.phone}</span>
-                <span className="flex items-center gap-1.5"><Home className="w-3.5 h-3.5 text-slate-400" />{MOCK_LANDLORD.propertiesCount} Properties ({MOCK_LANDLORD.totalUnits} Units)</span>
+                <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" />{session.email}</span>
+                <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" />{session.phoneNumber}</span>
+                <span className="flex items-center gap-1.5"><Home className="w-3.5 h-3.5 text-slate-400" />{properties.length} Properties ({totalUnitsCount} Units)</span>
               </div>
 
               {/* Coverage areas */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                {MOCK_LANDLORD.campusAreas.map((loc) => (
+                {coverageLabels.map((loc) => (
                   <span key={loc} className="text-xs bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200 font-medium">
                     {loc}
                   </span>
@@ -148,14 +192,22 @@ export function LandlordDashboardPage() {
             </div>
           </div>
 
-          {/* Primary Landlord Listing CTA */}
-          <div className="w-full md:w-auto shrink-0">
+          {/* Primary Landlord Listing + Edit Profile CTAs */}
+          <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsEditingProfile(true)}
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-xl text-xs sm:text-sm border border-slate-200 transition-all cursor-pointer"
+            >
+              <UserCog className="w-4 h-4" />
+              <span>Edit Profile</span>
+            </button>
             <Link
               to="/portal/landlord/new"
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold px-5 py-3 rounded-xl text-sm shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>List Property (Direct Landlord)</span>
+              <span>List Property (Direct)</span>
             </Link>
           </div>
         </div>
@@ -165,7 +217,7 @@ export function LandlordDashboardPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
             <p className="text-xs font-medium text-slate-500">Total Properties</p>
             <p className="text-2xl font-extrabold text-slate-900 mt-1">{properties.length} Lodges</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">{MOCK_LANDLORD.totalUnits} units registered</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{totalUnitsCount} units registered</p>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
@@ -388,6 +440,13 @@ export function LandlordDashboardPage() {
         </div>
 
       </div>
+
+      <EditProfileModal
+        session={session}
+        isOpen={isEditingProfile}
+        onClose={() => setIsEditingProfile(false)}
+        onSaved={(updated) => setSession(updated)}
+      />
     </div>
   )
 }

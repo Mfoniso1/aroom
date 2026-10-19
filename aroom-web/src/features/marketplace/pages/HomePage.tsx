@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Search as SearchIcon, ShieldCheck, Sparkles, MapPin } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Search as SearchIcon, ShieldCheck, Sparkles, MessageSquare } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
 import { ListingCard } from '@/components/shared/ListingCard'
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
@@ -8,11 +8,10 @@ import { CAMPUSES } from '@/lib/campuses'
 import { useListings } from '@/lib/listingsStore'
 
 const ROTATING_ACCOMMODATIONS = [
-  'Student Accommodation',
+  'Student Rooms',
   'Campus Hostels',
-  'Self-Contain Rooms',
+  'Self-Contains',
   'Shared Flats',
-  'Off-Campus Housing'
 ]
 
 export function HomePage() {
@@ -37,143 +36,107 @@ export function HomePage() {
     if (selectedRoomType) params.set('roomType', selectedRoomType)
     navigate({
       pathname: '/search',
-      search: params.toString() ? `?${params.toString()}` : ''
+      search: params.toString() ? `?${params.toString()}` : '',
     })
   }
 
   return (
     <div className="relative">
-      <PageBackground image="/images/rooms/room-01-apartment.jpg" blackOverlayOpacity={50} />
-      {/* Hero Section - inherits unified page background with zero photo division */}
-      <HeroSection className="py-24 px-4 min-h-150">
-        {/* Decorative background glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-500/10 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
-        <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+      <PageBackground image="/images/rooms/room-01-apartment.jpg" blackOverlayOpacity={52} />
 
-        {/* Trust Badge Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-600/70 border border-green-400/30 text-green-100 text-xs sm:text-sm font-medium mb-6 shadow-sm backdrop-blur-sm animate-fade-in-up">
-          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-          <span>100% Physical Inspection Guarantee</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-green-300" />
-          <span className="text-green-200">Zero Fake Agent Fees</span>
+      {/* Minimalist Mobile-First Hero Section */}
+      <HeroSection className="py-12 sm:py-20 px-4 min-h-0 sm:min-h-125">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-600/80 border border-emerald-400/30 text-emerald-50 text-xs font-semibold mb-4 backdrop-blur-xs">
+          <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+          <span>Team-Leader Verified • ₦0 Inspection Fee</span>
         </div>
 
-        {/* Animated Hero Headline */}
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto animate-fade-in-up">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-3xl mx-auto">
           <span>Find Verified </span>
-          <span 
-            className="inline-block text-amber-300 drop-shadow-md min-h-[1.2em] transition-all"
-            aria-live="polite"
-          >
+          <span className="inline-block text-amber-300" aria-live="polite">
             <span key={termIndex} className="animate-hero-word">
               {ROTATING_ACCOMMODATIONS[termIndex]}
             </span>
           </span>
-          <span className="block mt-2 sm:mt-1">
-            <span className="relative inline-block">
-              <span className="bg-linear-to-r from-emerald-100 via-white to-amber-200 bg-clip-text text-transparent animate-shimmer-text">
-                No Scams.
-              </span>
-              <svg
-                className="absolute -bottom-2 sm:-bottom-3 left-0 w-full h-3 text-amber-400/90 overflow-visible"
-                viewBox="0 0 200 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  d="M2 9.5C55 2 145 2 198 9.5"
-                  stroke="currentColor"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-          </span>
+          <span className="block mt-1 text-emerald-100">Zero Scams.</span>
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-6 text-xl text-green-100 max-w-2xl mx-auto animate-fade-in-up [animation-delay:150ms]">
-          Connect with trusted agents and view verified listings. Never lose an inspection fee or pay for a phantom room again.
+        <p className="mt-3 sm:mt-4 text-sm sm:text-lg text-slate-200 max-w-xl mx-auto">
+          Transparent move-in costs and Team-Leader-vetted campus agents.
         </p>
 
-        {/* Search Form */}
-        <form 
-          onSubmit={handleSearch} 
-          className="mt-10 w-full max-w-3xl mx-auto bg-white rounded-lg p-2 shadow-2xl flex flex-col sm:flex-row gap-2 text-left animate-fade-in-up [animation-delay:250ms]"
+        {/* Clean Search Bar */}
+        <form
+          onSubmit={handleSearch}
+          className="mt-6 sm:mt-8 w-full max-w-2xl mx-auto bg-white rounded-2xl p-2 shadow-2xl flex flex-col sm:flex-row gap-2 text-left"
         >
-          <select 
+          <select
             value={selectedCampus}
             onChange={(e) => setSelectedCampus(e.target.value)}
-            className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 text-base rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 block w-full p-4 outline-none"
+            className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-3.5 outline-none font-medium"
           >
-            <option value="">Select Campus (e.g., UNIPORT, UNILAG)</option>
+            <option value="">All UNIPORT Areas</option>
             {CAMPUSES.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {c.shortCode} — {c.name}
               </option>
             ))}
           </select>
-          <select 
+          <select
             value={selectedRoomType}
             onChange={(e) => setSelectedRoomType(e.target.value)}
-            className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 text-base rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 block w-full p-4 outline-none"
+            className="sm:w-44 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-3.5 outline-none font-medium"
           >
             <option value="">All Room Types</option>
             <option value="self_contain">Self Contain</option>
             <option value="single_room">Single Room</option>
             <option value="flat_shared">Shared Flat</option>
           </select>
-          <button 
-            type="submit" 
-            className="bg-green-600 hover:bg-green-700 text-white font-bold rounded-md text-base px-8 py-4 flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+          <button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm px-6 py-3.5 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
           >
-            <SearchIcon className="h-5 w-5" />
-            Search
+            <SearchIcon className="h-4 w-4" />
+            <span>Search</span>
           </button>
         </form>
 
-        {/* Trust points under search */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm text-green-200 animate-fade-in-up [animation-delay:350ms]">
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-amber-300" /> Direct physical verification
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-amber-300" /> Escrow payment protection
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-amber-300" /> UNIPORT, UNILAG, UNIBEN &amp; 10+ campuses
-          </span>
+        {/* Secondary WhatsApp AI Shortcut */}
+        <div className="mt-4 flex items-center justify-center">
+          <Link
+            to="/whatsapp-ai"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-200 hover:text-white bg-black/35 hover:bg-black/50 border border-white/15 px-4 py-2 rounded-full backdrop-blur-xs transition-all"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Prefer WhatsApp? Chat with Aroom AI to book a trusted agent →</span>
+          </Link>
         </div>
       </HeroSection>
-      
-      {/* Listings Section - High Visibility Frosted Container */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 sm:p-10 border border-white/60 shadow-2xl">
-          <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-8 gap-4 pb-6 border-b border-slate-100">
+
+      {/* Listings Section */}
+      <section className="relative z-10 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-8 sm:py-14">
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/60 shadow-xl">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-6 gap-3 pb-4 border-b border-slate-100">
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                Verified Student Accommodations
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold uppercase tracking-wider mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Verified Listings</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-sans">
-                Recently Added Near You
+              <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Available Campus Rooms
               </h2>
-              <p className="text-slate-600 mt-2 text-base sm:text-lg">
-                Explore the latest verified student housing across top Nigerian universities.
-              </p>
             </div>
             <button
               onClick={() => navigate('/search')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 self-start sm:self-auto shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all self-start sm:self-auto shrink-0 cursor-pointer"
             >
-              <span>View all campus listings</span>
+              <span>View all ({listings.length})</span>
               <span>&rarr;</span>
             </button>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {listings.slice(0, 6).map(listing => (
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {listings.slice(0, 6).map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>

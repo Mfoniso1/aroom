@@ -17,6 +17,7 @@ import {
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
 import { CAMPUSES } from '@/lib/campuses'
+import { registerStudentAccount } from '@/lib/pilotAuthStore'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormData {
@@ -170,15 +171,27 @@ export function StudentRegisterPage() {
     return e
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length > 0) {
       setErrors(errs)
       return
     }
-    setSubmitted(true)
-    // TODO: call auth API here
+    try {
+      await registerStudentAccount({
+        fullName: form.fullName,
+        email: form.email,
+        phoneNumber: form.phone,
+        campus: form.campus,
+        matricNumber: form.matricNumber,
+        password: form.password,
+        avatarUrl: avatarPreview || undefined,
+      })
+      setSubmitted(true)
+    } catch (err: any) {
+      setErrors({ email: err.message || 'Could not create student account' })
+    }
   }
 
   const strength = passwordStrength(form.password)
@@ -190,17 +203,25 @@ export function StudentRegisterPage() {
         <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
           <CheckCircle2 className="w-10 h-10 text-emerald-600" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Account created! 🎉</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Student Account Ready! 🎉</h2>
         <p className="text-slate-500 max-w-sm mb-8">
           Welcome to Aroom, <span className="font-semibold text-slate-700">{form.fullName.split(' ')[0]}</span>!
-          Check your email to verify your account, then start finding your perfect room.
+          Your student profile is active — you can now save rooms and schedule physical inspections.
         </p>
-        <button
-          onClick={() => navigate('/')}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-8 py-3 transition-all"
-        >
-          Go to Homepage
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate('/student/dashboard')}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-8 py-3 transition-all cursor-pointer"
+          >
+            Go to Student Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/search')}
+            className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl px-6 py-3 transition-all cursor-pointer"
+          >
+            Explore Campus Rooms
+          </button>
+        </div>
       </div>
     )
   }

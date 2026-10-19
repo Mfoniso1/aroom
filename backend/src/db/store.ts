@@ -3,7 +3,9 @@
 // Emulates the PostgreSQL schema with composite indexes and transactions.
 // ==============================================================================
 
+import 'dotenv/config';
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
 import {
   User,
   StudentProfile,
@@ -16,7 +18,10 @@ import {
   InspectionReview,
   ConversationSession,
   AuditLog,
+  AppNotification,
 } from '../domain/entities/types.js';
+
+export const TEAM_LEADER_USER_ID = 'e0000000-0000-0000-0000-000000000001';
 
 export class DatabaseStore {
   public users: Map<string, User> = new Map();
@@ -29,6 +34,7 @@ export class DatabaseStore {
   public availabilityReports: Map<string, AvailabilityReport> = new Map();
   public inspectionReviews: Map<string, InspectionReview> = new Map();
   public conversationSessions: Map<string, ConversationSession> = new Map();
+  public notifications: Map<string, AppNotification> = new Map();
   public auditLogs: AuditLog[] = [];
 
   constructor() {
@@ -105,7 +111,22 @@ export class DatabaseStore {
       createdAt: new Date(),
     });
 
-    // 2. Agents
+    // 2. Agents (demo accounts share SEED_AGENT_PASSWORD; dev only)
+    const demoAgentHash = bcrypt.hashSync(process.env.SEED_AGENT_PASSWORD || 'Agent@12345', 10);
+    const teamLeaderHash = bcrypt.hashSync(process.env.TEAM_LEADER_PASSWORD || 'TeamLead@12345', 10);
+
+    // Team Leader (admin) who approves agents and landlords
+    this.users.set(TEAM_LEADER_USER_ID, {
+      id: TEAM_LEADER_USER_ID,
+      phoneNumber: process.env.TEAM_LEADER_PHONE || '+2340000000001',
+      email: 'teamleader@aroom.ng',
+      passwordHash: teamLeaderHash,
+      userType: 'admin',
+      accountStatus: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     // Agent 1: Femi Ogundipe (Gold Tier, 98% response)
     const femiUserId = 'd1111111-1111-1111-1111-111111111111';
     const femiAgentId = 'a1111111-1111-1111-1111-111111111111';
@@ -113,6 +134,7 @@ export class DatabaseStore {
       id: femiUserId,
       phoneNumber: '+2348011112222',
       email: 'femi.ogundipe@aroomagents.ng',
+      passwordHash: demoAgentHash,
       userType: 'agent',
       accountStatus: 'active',
       createdAt: new Date(),
@@ -131,6 +153,8 @@ export class DatabaseStore {
       successfulDeals: 38,
       noShowCount: 0,
       responseRatePct: 98.0,
+      agentKind: 'agent',
+      phoneContacted: true,
       createdAt: new Date(),
     });
 
@@ -141,6 +165,7 @@ export class DatabaseStore {
       id: chineduUserId,
       phoneNumber: '+2348033334444',
       email: 'chinedu.eze@yabahouses.ng',
+      passwordHash: demoAgentHash,
       userType: 'agent',
       accountStatus: 'active',
       createdAt: new Date(),
@@ -159,6 +184,8 @@ export class DatabaseStore {
       successfulDeals: 14,
       noShowCount: 1,
       responseRatePct: 91.5,
+      agentKind: 'agent',
+      phoneContacted: true,
       createdAt: new Date(),
     });
 

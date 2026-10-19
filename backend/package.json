@@ -11,6 +11,7 @@
     "test": "tsx test/api.test.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:test": "tsx scripts/test-db.ts",
+    "seed:team-leader": "tsx scripts/seed-team-leader.ts",
     "push:github": "tsx scripts/push-to-github.ts"
   },
   "keywords": [
@@ -24,10 +25,12 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "isomorphic-git": "^1.42.6",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",
     "uuid": "^14.0.2",
     "zod": "^4.6.5"
@@ -35,6 +38,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.3",
     "@types/pg": "^8.23.1",
     "@types/uuid": "^10.0.0",

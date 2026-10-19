@@ -6,41 +6,58 @@
  * - Scheduled physical inspections with WhatsApp reminders
  * - Automated "Room Taken" alert with instant similar-budget alternatives
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Search, Heart, Calendar, MapPin,
   ShieldCheck, Clock, ArrowUpRight,
-  MessageSquare, XCircle, ArrowRight
+  MessageSquare, XCircle, ArrowRight,
+  GraduationCap, Mail, Phone, UserCog
 } from 'lucide-react'
 import { TrustBadge } from '@/components/shared/TrustBadge'
 import { InspectionScheduleModal } from '@/components/shared/InspectionScheduleModal'
-import { DashboardTicker } from '@/components/shared/DashboardTicker'
+import { EditProfileModal } from '@/components/shared/EditProfileModal'
+import {
+  getCurrentSession,
+  AUTH_CHANGE_EVENT,
+  type ActiveSession,
+} from '@/lib/pilotAuthStore'
+import { CAMPUSES } from '@/lib/campuses'
 
-const MOCK_STUDENT = {
-  name: 'Amara Chukwuemeka',
+const FALLBACK_STUDENT: ActiveSession = {
+  userId: 'd3333333-3333-3333-3333-333333333333',
+  role: 'student',
+  fullName: 'Amara Nwosu',
+  email: 'amara.nwosu@uniport.edu.ng',
+  phoneNumber: '+2348055556666',
+  campus: 'uniport',
+  matricNumber: 'U2022/5570042',
+  agentProfileId: null,
+  agentKind: null,
+  approvalStatus: null,
+  rejectionReason: null,
 }
 
 const INITIAL_SAVED_LISTINGS = [
   {
-    id: '1',
-    title: 'Spacious Self-Contain at Akoka',
-    price: 350000,
+    id: 'uniport-1',
+    title: 'Executive Self-Contain in Choba',
+    price: 280000,
     period: 'yr',
-    landmark: '5 mins walk from UNILAG Gate',
+    landmark: '5 mins walk to UNIPORT Choba Gate',
     verificationStatus: 'verified' as const,
     availabilityStatus: 'available' as const,
-    campus: 'UNILAG',
+    campus: 'UNIPORT',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
     inspectionSlot: 'Thu, Oct 15 at 1:30 PM',
     hasWhatsappReminder: true,
   },
   {
-    id: '4',
-    title: 'Executive Self-Contain in Choba',
-    price: 280000,
+    id: 'uniport-5',
+    title: 'Standard Single Room at Delta Park',
+    price: 160000,
     period: 'yr',
-    landmark: '5 mins to UNIPORT Choba Gate',
+    landmark: '10 mins to Choba Gate, Delta Park',
     verificationStatus: 'verified' as const,
     availabilityStatus: 'available' as const,
     campus: 'UNIPORT',
@@ -49,11 +66,11 @@ const INITIAL_SAVED_LISTINGS = [
     hasWhatsappReminder: false,
   },
   {
-    id: '5',
-    title: 'Modern Studio Apartment at Alakahia',
+    id: 'uniport-2',
+    title: 'Modern Studio at Alakahia (UPTH Road)',
     price: 320000,
     period: 'yr',
-    landmark: 'Close to UNIPORT Delta Park',
+    landmark: '8 mins to UPTH Gate & Delta Park',
     verificationStatus: 'verified' as const,
     availabilityStatus: 'available' as const,
     campus: 'UNIPORT',
@@ -65,24 +82,24 @@ const INITIAL_SAVED_LISTINGS = [
 
 // Mock alert for a room that was taken right before student inspection
 const INITIAL_TAKEN_ALERT = {
-  originalTitle: 'Single Room near Yaba / Akoka',
-  originalLocation: 'Yaba / Akoka Gate',
-  originalPrice: 180000,
+  originalTitle: 'Single Room near Choba Gate',
+  originalLocation: 'Choba Gate',
+  originalPrice: 170000,
   takenTime: '25 mins ago',
   suggestedAlternatives: [
     {
-      id: '2',
-      title: 'Standard Single Room in Yaba',
-      price: 180000,
-      landmark: 'Near Yabatech Back Gate / UNILAG',
+      id: 'uniport-5',
+      title: 'Standard Single Room at Delta Park',
+      price: 160000,
+      landmark: '10 mins to Choba Gate, Delta Park',
       imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=400&auto=format&fit=crop',
       verificationStatus: 'unverified_new' as const,
     },
     {
-      id: '6',
-      title: 'Serviced Room near Main Gate',
-      price: 210000,
-      landmark: 'Ekosodin / Campus Gate',
+      id: 'uniport-7',
+      title: 'Neat Self-Contain at Rumuosi',
+      price: 200000,
+      landmark: 'Rumuosi, off East-West Road',
       imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=400&auto=format&fit=crop',
       verificationStatus: 'verified' as const,
     },
@@ -91,9 +108,26 @@ const INITIAL_TAKEN_ALERT = {
 
 export function StudentDashboardPage() {
   const navigate = useNavigate()
+  const [session, setSession] = useState<ActiveSession>(() => getCurrentSession() || FALLBACK_STUDENT)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [savedListings, setSavedListings] = useState(INITIAL_SAVED_LISTINGS)
   const [takenAlert, setTakenAlert] = useState<typeof INITIAL_TAKEN_ALERT | null>(INITIAL_TAKEN_ALERT)
   const [activeSchedulingListing, setActiveSchedulingListing] = useState<typeof INITIAL_SAVED_LISTINGS[0] | null>(null)
+
+  useEffect(() => {
+    const sync = () => setSession(getCurrentSession() || FALLBACK_STUDENT)
+    window.addEventListener(AUTH_CHANGE_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
+
+  const campusName =
+    CAMPUSES.find((c) => c.id === session.campus)?.name ||
+    session.campus?.toUpperCase() ||
+    'University of Port Harcourt (UNIPORT)'
 
   const handleRemove = (id: string) => {
     setSavedListings((prev) => prev.filter((l) => l.id !== id))
@@ -102,87 +136,111 @@ export function StudentDashboardPage() {
   const bookedInspections = savedListings.filter((l) => l.inspectionSlot !== null)
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-16">
-      {/* ── Top Dashboard Heading Banner with Continuous Text Animation ── */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5">
-          <DashboardTicker variant="banner" />
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-7">
-        
-        {/* ── Student Profile Overview ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 flex flex-col md:flex-row gap-6 items-start justify-between">
-          <div className="flex gap-4 sm:gap-5 items-start">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-extrabold shadow-sm shrink-0">
-              {MOCK_STUDENT.name.charAt(0)}
+    <div className="bg-slate-50 min-h-screen pb-12">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 space-y-6">
+        {/* ── Minimalist Student Profile Card ── */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="flex gap-3.5 sm:gap-4 items-center min-w-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold shadow-xs shrink-0 overflow-hidden">
+              {session.avatarUrl ? (
+                <img src={session.avatarUrl} alt={session.fullName} className="w-full h-full object-cover" />
+              ) : (
+                session.fullName.charAt(0).toUpperCase()
+              )}
             </div>
-            <div className="flex items-center">
-              <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900">{MOCK_STUDENT.name}</h1>
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 truncate">{session.fullName}</h1>
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Student
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                <span className="flex items-center gap-1 truncate">
+                  <GraduationCap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="truncate">{campusName}</span>
+                </span>
+                {session.matricNumber && (
+                  <span className="font-mono text-[11px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-700">
+                    {session.matricNumber}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-400">
+                <span className="flex items-center gap-1 truncate">
+                  <Mail className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{session.email}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Phone className="w-3 h-3 shrink-0" />
+                  <span>{session.phoneNumber}</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex sm:flex-col gap-2 w-full md:w-auto">
+          <div className="flex gap-2 w-full md:w-auto shrink-0">
+            <button
+              onClick={() => setIsEditingProfile(true)}
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs border border-slate-200 transition-all cursor-pointer"
+            >
+              <UserCog className="w-3.5 h-3.5" /> Edit Profile
+            </button>
+            <button
+              onClick={() => navigate('/whatsapp-ai')}
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 bg-[#075e54] hover:bg-[#064e46] text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-2xs transition-all cursor-pointer"
+            >
+              <MessageSquare className="w-3.5 h-3.5" /> WhatsApp AI
+            </button>
             <button
               onClick={() => navigate('/search')}
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-sm transition-all cursor-pointer"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-2xs transition-all cursor-pointer"
             >
-              <Search className="w-4 h-4" /> Search Rooms
+              <Search className="w-3.5 h-3.5" /> Explore
             </button>
           </div>
         </div>
 
-        {/* ── AUTOMATIC "ROOM TAKEN" NOTICE WITH SIMILAR ALTERNATIVES ── */}
+        {/* ── COMPACT "ROOM TAKEN" NOTICE WITH SIMILAR ALTERNATIVES ── */}
         {takenAlert && (
-          <div className="p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-400/80 space-y-4 animate-fade-in-up">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-amber-500 text-white shrink-0 mt-0.5">
-                  <XCircle className="w-5 h-5" />
-                </div>
+          <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-300 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-2.5">
+                <XCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                    <MessageSquare className="w-3 h-3 text-emerald-600" /> WhatsApp Instant Alert Sent ({takenAlert.takenTime})
-                  </div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    "{takenAlert.originalTitle}" has just been rented out!
+                  <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
+                    "{takenAlert.originalTitle}" was rented ({takenAlert.takenTime}) — matching alternatives ready:
                   </h3>
-                  <p className="text-xs text-slate-600 mt-0.5 max-w-xl">
-                    Don't worry — to save your time and transport fare, Aroom automatically detected the payment and flagged this room. Here are <strong>verified alternative rooms</strong> near <strong>{takenAlert.originalLocation}</strong> matching your budget (₦{takenAlert.originalPrice.toLocaleString()}):
-                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setTakenAlert(null)}
-                className="text-xs text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                className="text-xs text-slate-400 hover:text-slate-700 px-1 cursor-pointer"
                 title="Dismiss alert"
               >
                 ✕
               </button>
             </div>
 
-            {/* Quick alternative cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {takenAlert.suggestedAlternatives.map((alt) => (
                 <div
                   key={alt.id}
-                  className="bg-white p-3.5 rounded-xl border border-amber-200/90 shadow-2xs flex items-center justify-between gap-3 hover:border-emerald-400 transition-colors"
+                  className="bg-white p-2.5 rounded-xl border border-amber-200 flex items-center justify-between gap-2.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <img src={alt.imageUrl} alt={alt.title} className="w-14 h-14 rounded-lg object-cover shrink-0" />
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{alt.title}</h4>
-                      <p className="text-[11px] text-slate-500">{alt.landmark}</p>
-                      <p className="text-xs font-extrabold text-emerald-700 mt-0.5">₦{alt.price.toLocaleString()}/yr</p>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <img src={alt.imageUrl} alt={alt.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-bold text-slate-900 truncate">{alt.title}</h4>
+                      <p className="text-[11px] font-extrabold text-emerald-700">₦{alt.price.toLocaleString()}/yr</p>
                     </div>
                   </div>
                   <button
                     onClick={() => navigate(`/listings/${alt.id}`)}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg shrink-0 cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 rounded-lg shrink-0 cursor-pointer"
                   >
-                    <span>Inspect</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>View</span>
+                    <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               ))}
@@ -347,7 +405,7 @@ export function StudentDashboardPage() {
           <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
             <li>Never pay any form of inspection fee or upfront cash before seeing the apartment physically.</li>
             <li>All agents on Aroom are required to conduct free physical walkthroughs for verified students.</li>
-            <li>If a house is taken, our automated triage messages you directly on WhatsApp with matching alternatives so you never make wasted trips.</li>
+            <li>If a house is taken, we message you directly on WhatsApp with matching available rooms so you never make a wasted trip.</li>
           </ul>
         </div>
 
@@ -382,6 +440,13 @@ export function StudentDashboardPage() {
           }}
         />
       )}
+
+      <EditProfileModal
+        session={session}
+        isOpen={isEditingProfile}
+        onClose={() => setIsEditingProfile(false)}
+        onSaved={(updated) => setSession(updated)}
+      />
     </div>
   )
 }

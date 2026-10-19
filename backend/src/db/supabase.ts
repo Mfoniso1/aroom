@@ -37,8 +37,9 @@ export async function query(text: string, params?: any[]) {
   return res;
 }
 
-// 2. Supabase SDK Client (for Storage, Auth, Realtime)
-const supabaseUrl = process.env.SUPABASE_URL || '';
+// 2. Supabase SDK Client (for Storage, Auth, Realtime, PostgREST)
+const rawSupabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/$/, '');
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
 
 export const supabase: SupabaseClient | null =

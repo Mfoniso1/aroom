@@ -6,6 +6,7 @@ import { listingRouter } from './api/routes/listing.routes.js';
 import { inquiryRouter } from './api/routes/inquiry.routes.js';
 import { reportRouter } from './api/routes/report.routes.js';
 import { webhookRouter } from './api/routes/webhook.routes.js';
+import { adminRouter, notificationRouter } from './api/routes/admin.routes.js';
 import { errorHandler } from './api/middleware/error.middleware.js';
 
 export function createApp(): Application {
@@ -13,7 +14,7 @@ export function createApp(): Application {
 
   // Middleware
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({ limit: '8mb' })); // ID photo uploads arrive as base64
 
   // Health check
   app.get('/health', (_req: Request, res: Response) => {
@@ -32,6 +33,8 @@ export function createApp(): Application {
   app.use('/api/v1/inquiries', inquiryRouter);
   app.use('/api/v1/reports', reportRouter);
   app.use('/api/v1/webhooks', webhookRouter);
+  app.use('/api/v1/admin', adminRouter);
+  app.use('/api/v1/notifications', notificationRouter);
 
   // Centralized Error Handling
   app.use(errorHandler);

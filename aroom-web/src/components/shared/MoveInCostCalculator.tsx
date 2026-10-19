@@ -35,32 +35,30 @@ export function MoveInCostCalculator({
 
   if (mode === 'card') {
     return (
-      // relative + z-10 keeps the floating panel above sibling cards without shifting the grid row
-      <div className="mt-3 relative z-10" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-2.5 relative z-10" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           onClick={handleToggle}
-          className={`w-full flex items-center justify-between text-xs font-semibold px-3 py-2 rounded-lg border transition-colors ${
+          className={`w-full flex items-center justify-between text-xs font-semibold px-3 py-2 rounded-xl border transition-colors cursor-pointer ${
             isLandlord
-              ? 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200'
-              : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+              ? 'bg-amber-50/70 text-amber-900 hover:bg-amber-100 border-amber-200/80'
+              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200/80'
           }`}
         >
-          <span className="flex items-center gap-1.5">
-            <span>{isLandlord ? '👑' : '🏢'}</span>
-            <span>
-              {isOpen
-                ? 'Hide Move-In Breakdown'
-                : isLandlord
-                ? 'See Direct Landlord Package (0% Fee)'
-                : 'See Agent Move-In Breakdown (15% Fee)'}
-            </span>
+          <span className="flex items-center gap-1.5 truncate">
+            <span className="text-slate-500 font-medium">Total Move-In:</span>
+            <strong className={isLandlord ? 'text-amber-800 font-extrabold' : 'text-emerald-700 font-extrabold'}>
+              ₦{breakdown.totalCost.toLocaleString()}
+            </strong>
           </span>
-          {isOpen ? (
-            <ChevronUp className="h-4 w-4 text-slate-600" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-slate-600" />
-          )}
+          <span className="inline-flex items-center gap-0.5 text-[11px] text-slate-500 shrink-0 ml-1">
+            <span>{isOpen ? 'Hide' : 'Breakdown'}</span>
+            {isOpen ? (
+              <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+            )}
+          </span>
         </button>
 
         {/* Floating panel — absolute so it overlays siblings, no layout shift */}
