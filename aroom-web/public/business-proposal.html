@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aroom Technologies — UNIPORT Commercial Business Proposal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 14mm 15mm 14mm 15mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.45;
+      font-size: 9.3pt;
+    }
+
+    .page {
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 268mm;
+      max-height: 268mm;
+      overflow: hidden;
+    }
+
+    .page-last {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Cover Page */
+    .cover-top {
+      border-bottom: 2px solid #059669;
+      padding-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-tag {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid #a7f3d0;
+    }
+
+    .cover-center {
+      margin: auto 0;
+      padding: 20px 0;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #059669;
+      background: #f0fdf4;
+      padding: 5px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border-left: 3px solid #059669;
+    }
+
+    .cover-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32pt;
+      font-weight: 700;
+      line-height: 1.15;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .cover-title span {
+      color: #059669;
+    }
+
+    .cover-subtitle {
+      font-size: 12pt;
+      color: #475569;
+      max-width: 600px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 10px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .meta-value {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .meta-value-sub {
+      font-size: 8.5pt;
+      color: #059669;
+      font-weight: 600;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    /* Headings & Text */
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    h2 .sec-num {
+      color: #059669;
+    }
+
+    h3 {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 9pt;
+      line-height: 1.45;
+    }
+
+    strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* Visual Components */
+    .highlight-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 3.5px solid #059669;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 8.8pt;
+      line-height: 1.42;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .card-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .info-card-header {
+      font-size: 7.2pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #059669;
+      margin-bottom: 2px;
+    }
+
+    .info-card-title {
+      font-size: 9.8pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .info-card-desc {
+      font-size: 8.2pt;
+      color: #475569;
+      line-height: 1.38;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 12px 0;
+      font-size: 8.2pt;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      text-align: left;
+      padding: 7px 9px;
+      border: 1px solid #cbd5e1;
+    }
+
+    td {
+      padding: 6px 9px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .table-total {
+      background: #ecfdf5 !important;
+      font-weight: 700;
+      color: #065f46;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    .team-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #ffffff;
+    }
+
+    .team-role {
+      font-size: 7.2pt;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #059669;
+      margin-bottom: 2px;
+    }
+
+    .team-name {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .team-bio {
+      font-size: 8.2pt;
+      color: #475569;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1: COVER PAGE ==================== -->
+  <div class="page">
+    <div class="cover-top">
+      <div class="brand-logo">
+        <div class="brand-icon">A</div>
+        <div class="brand-name">Aroom Technologies</div>
+      </div>
+      <div class="brand-tag">Commercial Proposal</div>
+    </div>
+
+    <div class="cover-center">
+      <div class="cover-badge">Pilot Market: University of Port Harcourt (UNIPORT)</div>
+      <h1 class="cover-title">Commercial <span>Business Proposal</span></h1>
+      <p class="cover-subtitle">
+        Safe, Transparent Student Accommodation via Local Ground Verification, Transparent Move-In Cost Analytics, and Instant WhatsApp AI Concierge.
+      </p>
+
+      <div class="cover-meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Presented By</span>
+          <span class="meta-value">Don-Amadiwochi Eze</span>
+          <span class="meta-value-sub">Co-Founder & Head of Operations</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Co-Presented By</span>
+          <span class="meta-value">Enyinma Justice Smart</span>
+          <span class="meta-value-sub">Co-Founder & Head of Product</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Target Campus Hubs</span>
+          <span class="meta-value">UNIPORT (Choba, Alakahia, Delta Park)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Document Date &amp; Status</span>
+          <span class="meta-value">October 2026 • Version 1.0 (Commercial)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Aroom Technologies • Port Harcourt, Rivers State, Nigeria</span>
+      <span>Confidential &amp; Proprietary • Page 1 of 4</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2: EXECUTIVE SUMMARY & PROBLEM ==================== -->
+  <div class="page">
+    <div>
+      <h2><span class="sec-num">01.</span> Executive Summary</h2>
+      <p>
+        <strong>Aroom Technologies</strong> is a purpose-built student housing marketplace and trust infrastructure designed to eliminate extortion, scamming, and extreme fee inflation in Nigerian tertiary institution off-campus communities. Anchored at the <strong>University of Port Harcourt (UNIPORT)</strong>, Aroom addresses the acute accommodation challenges faced by over 30,000 students living outside institutional hostels.
+      </p>
+
+      <div class="highlight-box">
+        <strong>Core Value Proposition:</strong> Aroom guarantees <strong>₦0 Free Physical Inspections</strong>, <strong>Team Lead In-Person Verification</strong> of water and electricity infrastructure, <strong>100% Transparent Total Move-In Cost Calculations</strong> (capped 15% agency fee or 0% for Direct Landlords), and a frictionless <strong>WhatsApp AI Concierge</strong> requiring zero app downloads.
+      </div>
+
+      <div class="card-grid-4">
+        <div class="info-card">
+          <div class="info-card-header">Student Body</div>
+          <div class="info-card-title">35,000+</div>
+          <div class="info-card-desc">Total enrollment at UNIPORT</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">Off-Campus Share</div>
+          <div class="info-card-title">85%+</div>
+          <div class="info-card-desc">Forced into private lodges</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">Market Turnover</div>
+          <div class="info-card-title">₦6.5 Billion</div>
+          <div class="info-card-desc">Annual rent turnover in perimeter</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">Year 1 Target</div>
+          <div class="info-card-title">1,200 Leases</div>
+          <div class="info-card-desc">4.8% initial market penetration</div>
+        </div>
+      </div>
+
+      <h2><span class="sec-num">02.</span> The Problem: 4 Painful Realities Every UNIPORT Student Knows</h2>
+      <p>
+        Every semester, students and their parents face systematic exploitation by unregulated street agents stationed around Choba Junction, UPTH Gate, and Delta Park:
+      </p>
+
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="info-card-header" style="color: #dc2626;">Trap #1</div>
+          <div class="info-card-title">The "Inspection Fee" Trap</div>
+          <div class="info-card-desc">
+            Roadside agents demand <strong>₦5,000 to ₦10,000</strong> per trip merely to view a room. After 3 to 4 fruitless excursions under the hot sun or rain, students routinely burn <strong>₦20,000–₦35,000</strong> with no room secured.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header" style="color: #dc2626;">Trap #2</div>
+          <div class="info-card-title">Bait-and-Switch Tactics</div>
+          <div class="info-card-desc">
+            Agents post attractive photos of neat self-contains to lure students to Choba, only to announce upon arrival: <em>"Ah, somebody just paid 20 minutes ago! Let me take you to another one far inside Aluu."</em>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header" style="color: #dc2626;">Trap #3</div>
+          <div class="info-card-title">Shocking Hidden Move-In Fees</div>
+          <div class="info-card-desc">
+            A lodge advertised as <strong>₦220,000/year</strong> suddenly balloons into <strong>₦360,000+</strong> at payment time due to unannounced 20–25% agency fees, arbitrary legal agreement charges, and caution fees.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header" style="color: #dc2626;">Trap #4</div>
+          <div class="info-card-title">Rogue Caretakers &amp; Rental Scams</div>
+          <div class="info-card-desc">
+            Freshers (Year 1 students) and parents transferring rent from distant states frequently pay impostors claiming to be "landlords," only to discover the lodge was rented to someone else or does not exist.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Aroom Technologies • Business Proposal</span>
+      <span>Page 2 of 4</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3: THE SOLUTION & BUSINESS MODEL ==================== -->
+  <div class="page">
+    <div>
+      <h2><span class="sec-num">03.</span> The Aroom Solution: 4 Integrated Pillars</h2>
+
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="info-card-header">Pillar 1</div>
+          <div class="info-card-title">₦0 Free Physical Inspections</div>
+          <div class="info-card-desc">
+            Students book accompanied physical inspections with accredited agents without paying a single kobo. Inspection fees are strictly prohibited across the platform.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">Pillar 2</div>
+          <div class="info-card-title">Team Lead Ground Verification</div>
+          <div class="info-card-desc">
+            Before any lodge or agent is certified, the local Aroom Team Lead physically inspects the compound: verifying treated borehole water, prepaid electricity meters, and security gating.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">Pillar 3</div>
+          <div class="info-card-title">Move-In Cost Calculator</div>
+          <div class="info-card-desc">
+            Every listing displays the exact itemized total upfront: Annual Rent + Caution + Legal + Utility + capped 15% agency commission (or <strong>0% Agency Fee</strong> for Direct Landlords).
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">Pillar 4</div>
+          <div class="info-card-title">WhatsApp AI Concierge</div>
+          <div class="info-card-desc">
+            Students interact directly on WhatsApp to query available rooms by budget, landmark (e.g. <em>"near Choba Gate under ₦280k"</em>), view video walkthroughs, and schedule verified inspections.
+          </div>
+        </div>
+      </div>
+
+      <h3>Competitive Comparison Matrix</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Standard / Feature</th>
+            <th>Street Agents</th>
+            <th>Classifieds (Jiji/FB)</th>
+            <th>Aroom UNIPORT Platform</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Inspection Fee</strong></td>
+            <td>₦5,000 – ₦10,000</td>
+            <td>Demanded via bank transfer</td>
+            <td><span class="badge-pill badge-green">₦0 Free Inspection</span></td>
+          </tr>
+          <tr>
+            <td><strong>Physical Verification</strong></td>
+            <td>None; anonymous</td>
+            <td>Unregulated / fake accounts</td>
+            <td><span class="badge-pill badge-green">In-Person Team Lead Checked</span></td>
+          </tr>
+          <tr>
+            <td><strong>Pricing Transparency</strong></td>
+            <td>Base rent only; huge hidden fees</td>
+            <td>Misleading or missing</td>
+            <td><span class="badge-pill badge-green">100% Upfront Itemized Breakdown</span></td>
+          </tr>
+          <tr>
+            <td><strong>Video Walkthroughs</strong></td>
+            <td>Rarely; static recycled photos</td>
+            <td>Low quality / misleading</td>
+            <td><span class="badge-pill badge-green">Authentic On-Site Video Walkthrough</span></td>
+          </tr>
+          <tr>
+            <td><strong>Direct Landlord Access</strong></td>
+            <td>Blocked by agents</td>
+            <td>Infested by middleman impostors</td>
+            <td><span class="badge-pill badge-green">0% Agency Fee Direct Landlords</span></td>
+          </tr>
+          <tr>
+            <td><strong>WhatsApp Integration</strong></td>
+            <td>Random unorganized chats</td>
+            <td>External broken links</td>
+            <td><span class="badge-pill badge-green">Native AI Agent Booking Bot</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-num">04.</span> Monetization &amp; Business Model</h2>
+      <div class="card-grid-3">
+        <div class="info-card">
+          <div class="info-card-header">Stream 1</div>
+          <div class="info-card-title">Agent Commission Split</div>
+          <div class="info-card-desc">
+            Agents charge a capped 15% agency fee on completed leases. Aroom takes a <strong>25% platform share</strong> (avg ₦9,750 per closed lease on a ₦260,000 room) for qualified lead generation and automated scheduling.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">Stream 2</div>
+          <div class="info-card-title">Landlord Priority Placement</div>
+          <div class="info-card-desc">
+            Multi-unit student lodges (10–30 rooms) pay <strong>₦15,000 – ₦25,000 per semester</strong> for featured badge placement on Web and priority recommendation on the WhatsApp AI Concierge.
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">Stream 3</div>
+          <div class="info-card-title">Standardized Tenancy Packs</div>
+          <div class="info-card-desc">
+            Digital tenancy agreements, formal rent receipt generation, and room inventory condition checklists supplied at a flat fee of <strong>₦3,000 per tenancy pack</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Aroom Technologies • Business Proposal</span>
+      <span>Page 3 of 4</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: PROJECTIONS, GTM, TEAM & THE ASK ==================== -->
+  <div class="page page-last">
+    <div>
+      <h2><span class="sec-num">05.</span> Financial Projections &amp; Unit Economics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Revenue Stream</th>
+            <th>Unit Basis / Year 1 Volume</th>
+            <th>Year 1 (₦)</th>
+            <th>Year 1 ($ USD @ ₦1,500)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Verified Agent Marketplace Split</strong></td>
+            <td>900 closed leases @ ₦9,750 avg</td>
+            <td>₦8,775,000</td>
+            <td>$5,850</td>
+          </tr>
+          <tr>
+            <td><strong>Direct Landlord Priority Boosts</strong></td>
+            <td>45 lodges @ ₦20,000/session</td>
+            <td>₦900,000</td>
+            <td>$600</td>
+          </tr>
+          <tr>
+            <td><strong>Standard Tenancy Agreements</strong></td>
+            <td>1,000 contracts @ ₦3,000</td>
+            <td>₦3,000,000</td>
+            <td>$2,000</td>
+          </tr>
+          <tr>
+            <td><strong>Student Logistics &amp; Moving Referrals</strong></td>
+            <td>350 moves @ ₦2,000 referral cut</td>
+            <td>₦700,000</td>
+            <td>$466</td>
+          </tr>
+          <tr class="table-total">
+            <td><strong>Total Projected Gross Revenue (Year 1)</strong></td>
+            <td><strong>1,200 transactions (4.8% share)</strong></td>
+            <td><strong>₦13,375,000</strong></td>
+            <td><strong>$8,916</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3-Year Financial Scaling Outlook</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Growth Metric</th>
+            <th>Year 1 (UNIPORT Pilot)</th>
+            <th>Year 2 (Rivers State Cluster)</th>
+            <th>Year 3 (South-South Regional)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Campuses Covered</strong></td>
+            <td>1 (UNIPORT)</td>
+            <td>3 (UNIPORT, RSU, IAUE)</td>
+            <td>7 (UNIPORT, RSU, IAUE, DELSU, UNIBEN, UNICAL)</td>
+          </tr>
+          <tr>
+            <td><strong>Annual Student Transactions</strong></td>
+            <td>1,200 leases</td>
+            <td>4,500 leases</td>
+            <td>11,000 leases</td>
+          </tr>
+          <tr>
+            <td><strong>Gross Revenue (₦)</strong></td>
+            <td><strong>₦13,375,000</strong></td>
+            <td><strong>₦48,200,000</strong></td>
+            <td><strong>₦115,600,000</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Operating Profit Margin</strong></td>
+            <td>42%</td>
+            <td>54%</td>
+            <td>61%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-num">06.</span> Leadership &amp; Operational Governance</h2>
+      <div class="card-grid">
+        <div class="team-card">
+          <div class="team-role">Co-Founder &amp; Head of Operations</div>
+          <div class="team-name">Don-Amadiwochi Eze</div>
+          <div class="team-bio">
+            Leads ground verification, landlord partnership negotiations, and agent accreditation across Choba, Alakahia, and Delta Park.
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-role">Co-Founder &amp; Head of Product &amp; Tech</div>
+          <div class="team-name">Enyinma Justice Smart</div>
+          <div class="team-bio">
+            Architect of the Aroom Web platform, WhatsApp AI Concierge integration, and verified listing database.
+          </div>
+        </div>
+      </div>
+
+      <h2><span class="sec-num">07.</span> The Investment &amp; Partnership Ask</h2>
+      <div class="highlight-box" style="margin: 6px 0;">
+        <strong>Seed Capital Requirement: ₦7,500,000 ($5,000 USD)</strong> to establish complete operational dominance at UNIPORT ahead of the upcoming academic session.
+      </div>
+
+      <div class="card-grid-4">
+        <div class="info-card">
+          <div class="info-card-header">40% Allocation</div>
+          <div class="info-card-title">₦3,000,000</div>
+          <div class="info-card-desc">Ground verification kit &amp; field inspection logistics</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">25% Allocation</div>
+          <div class="info-card-title">₦1,875,000</div>
+          <div class="info-card-desc">Student acquisition &amp; campus WhatsApp networks</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">20% Allocation</div>
+          <div class="info-card-title">₦1,500,000</div>
+          <div class="info-card-desc">WhatsApp Twilio gateway &amp; cloud server compute</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">15% Allocation</div>
+          <div class="info-card-title">₦1,125,000</div>
+          <div class="info-card-desc">Legal tenancy contracts &amp; municipal compliance</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Aroom Technologies • Contact: teamleader@aroom.ng • +234 809 999 0001</span>
+      <span>Page 4 of 4</span>
+    </div>
+  </div>
+
+</body>
+</html>
