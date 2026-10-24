@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aroom Technologies — UNIPORT Investor Pitch Deck (₦5M Seed Round)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap');
+
+    @page {
+      size: 1280px 720px;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #090e17;
+      color: #0f172a;
+    }
+
+    .slide {
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 52px 30px 52px;
+    }
+
+    .slide-dark {
+      background: linear-gradient(135deg, #021a13 0%, #091322 55%, #151a30 100%);
+      color: #f8fafc;
+    }
+
+    .slide-light {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 4px;
+      background: #10b981;
+    }
+
+    .deck-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-left: 1.5px solid #cbd5e1;
+      padding-left: 10px;
+    }
+
+    .slide-dark .deck-tag {
+      color: #94a3b8;
+      border-left-color: #334155;
+    }
+
+    .category-pill {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+
+    .pill-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .pill-dark-emerald {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(110, 231, 183, 0.35);
+    }
+
+    .pill-amber {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    /* Headings */
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    .slide-dark .subtitle {
+      color: #cbd5e1;
+    }
+
+    /* Footer */
+    .slide-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      opacity: 0.88;
+    }
+
+    .slide-dark .slide-footer {
+      border-top-color: rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 20px 22px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-dark {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .metric-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .metric-emerald { color: #059669; }
+    .metric-amber { color: #d97706; }
+    .metric-rose { color: #e11d48; }
+    .metric-blue { color: #2563eb; }
+
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: #059669;
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    /* Tables */
+    table.slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    table.slide-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 800;
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    table.slide-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    table.slide-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    table.slide-table tr.highlight-row td {
+      background: #ecfdf5;
+      font-weight: 800;
+      color: #065f46;
+    }
+
+    .slide-badge-num {
+      position: absolute;
+      top: 36px;
+      right: 48px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      color: rgba(148, 163, 184, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       SLIDE 1: COVER SLIDE
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM TECHNOLOGIES</span>
+        </div>
+        <span class="deck-tag">Seed Stage Pitch Deck</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">₦5,000,000 Seed Round</span>
+    </div>
+
+    <div style="margin: auto 0; max-width: 1000px;">
+      <div style="display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #34d399; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); padding: 5px 16px; border-radius: 999px; margin-bottom: 18px;">
+        Anchor Launchpad: University of Port Harcourt (UNIPORT)
+      </div>
+      <h1>Eliminating Extortion &amp; Fraud in Student Housing</h1>
+      <p class="subtitle" style="margin-top: 14px; font-size: 18px; line-height: 1.5; max-width: 840px;">
+        Aroom deploys a <strong>curated cohort of 15 to 20 verified agents and landlords</strong> listing <strong>15 to 20 vetted properties monthly (225–300 rooms/mo)</strong> with <strong>₦0 Free Inspections</strong> and an instant <strong>WhatsApp AI Concierge</strong>.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 680px; margin-top: 26px;">
+        <div class="card card-dark" style="padding: 14px 18px;">
+          <div style="font-size: 10px; font-weight: 700; color: #34d399; text-transform: uppercase;">Co-Founder &amp; Head of Operations</div>
+          <div style="font-size: 17px; font-weight: 800; margin-top: 2px;">Don-Amadiwochi Eze</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Ground Verification &amp; Landlord Onboarding Lead</div>
+        </div>
+        <div class="card card-dark" style="padding: 14px 18px;">
+          <div style="font-size: 10px; font-weight: 700; color: #34d399; text-transform: uppercase;">Co-Founder &amp; Head of Product &amp; Tech</div>
+          <div style="font-size: 17px; font-weight: 800; margin-top: 2px;">Enyinma Justice Smart</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Web Architecture &amp; WhatsApp AI Concierge Lead</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Aroom Technologies • Confidential Investor Presentation</span>
+      <span>Slide 1 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 2: THE UNIPORT PROBLEM
+  ========================================== -->
+  <div class="slide slide-light">
+    <div class="slide-badge-num">02</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Market Realities</span>
+      </div>
+      <span class="category-pill pill-amber">The Problem at UNIPORT</span>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <h2>The Realities of Student House Hunting Around UNIPORT</h2>
+      <p class="subtitle">
+        Over 30,000 students displaced off-campus into unregulated street-agent traps every academic session.
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin: 16px 0;">
+      <div class="card" style="border-top: 4px solid #ef4444; padding: 20px;">
+        <div class="metric-value metric-rose">₦5k – ₦10k</div>
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 6px;">The "Inspection Fee" Hustle</div>
+        <p style="font-size: 12px; color: #64748b; line-height: 1.45;">
+          Roadside agents demand non-refundable fees just to show a student a room. After 3–4 failed trips, a student burns <strong>₦20k–₦35k</strong> of pocket money before finding any shelter.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 4px solid #f59e0b; padding: 20px;">
+        <div class="metric-value metric-amber">₦360k+</div>
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 6px;">Hidden Move-In Price Shocks</div>
+        <p style="font-size: 12px; color: #64748b; line-height: 1.45;">
+          A room advertised at ₦220,000 suddenly escalates to ₦360,000+ at payment time through inflated 20–25% agency fees, unannounced legal fees, and arbitrary caretaker levies.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 4px solid #6366f1; padding: 20px;">
+        <div class="metric-value" style="color: #6366f1;">Zero Trust</div>
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 6px;">Bait-and-Switch &amp; Rental Scams</div>
+        <p style="font-size: 12px; color: #64748b; line-height: 1.45;">
+          Freshers arriving from outside Rivers State have zero ability to verify if a WhatsApp contact is a genuine landlord or a scammer who disappears once deposit is sent.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="background: #fff1f2; border-color: #fecdd3; padding: 12px 18px;">
+      <div style="font-size: 12px; color: #9f1239;">
+        💬 <strong>Common Student Reality:</strong> <em>"I paid three different street agents ₦5,000 each in Choba under the heavy rain, and I still ended up in an uncompleted lodge with no water."</em>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Presented by Don-Amadiwochi Eze &amp; Enyinma Justice Smart</span>
+      <span>Slide 2 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 3: THE INNOVATION
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="slide-badge-num" style="color: rgba(255,255,255,0.1);">03</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Our Solution</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">The Innovation</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>Meet Aroom: Safe, Transparent Student Housing</h2>
+      <p class="subtitle">
+        We engineered a 4-pillar trust infrastructure that removes every trap between a student and a safe room.
+      </p>
+    </div>
+
+    <div class="grid-4" style="margin: 18px 0;">
+      <div class="card card-dark" style="border-top: 4px solid #10b981; padding: 18px;">
+        <div class="step-pill">1</div>
+        <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;">₦0 Free Inspection</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">Students book accompanied physical viewings with vetted partners without paying a single kobo.</p>
+      </div>
+
+      <div class="card card-dark" style="border-top: 4px solid #38bdf8; padding: 18px;">
+        <div class="step-pill">2</div>
+        <div style="font-size: 14px; font-weight: 800; color: #38bdf8; margin-bottom: 6px;">Team Lead Vetting</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">Every lodge is physically inspected: treated borehole water, prepaid meter &amp; Gov ID checked in-person.</p>
+      </div>
+
+      <div class="card card-dark" style="border-top: 4px solid #fbbf24; padding: 18px;">
+        <div class="step-pill">3</div>
+        <div style="font-size: 14px; font-weight: 800; color: #fbbf24; margin-bottom: 6px;">Total Cost Tool</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">Every fee shown upfront: Rent + Caution + Legal + capped 15% agency fee (or 0% for Direct Landlords).</p>
+      </div>
+
+      <div class="card card-dark" style="border-top: 4px solid #a855f7; padding: 18px;">
+        <div class="step-pill">4</div>
+        <div style="font-size: 14px; font-weight: 800; color: #c084fc; margin-bottom: 6px;">WhatsApp AI Concierge</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">Students discover rooms, view video tours, and schedule viewings right inside WhatsApp 24/7.</p>
+      </div>
+    </div>
+
+    <div class="card card-dark" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); padding: 12px 18px;">
+      <div style="font-size: 12px; color: #6ee7b7;">
+        ⚡ <strong>Live Platform Status:</strong> Our MVP is live today with Unified Role Portals, Team Leader Command Center, and active WhatsApp Webhook!
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Zero Inspection Fees • Verified Partner Network</span>
+      <span>Slide 3 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 4: THE CLOSED NETWORK SUPPLY ENGINE
+  ========================================== -->
+  <div class="slide slide-light">
+    <div class="slide-badge-num">04</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Supply Architecture</span>
+      </div>
+      <span class="category-pill pill-emerald">The Curated Cohort</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>The Supply Engine: Why We Are NOT an Open Marketplace</h2>
+      <p class="subtitle">
+        Open platforms get infested by scammers. Aroom establishes an invite-only team of vetted, credible partners.
+      </p>
+    </div>
+
+    <div class="grid-2" style="margin: 16px 0;">
+      <div class="card" style="border-left: 4px solid #059669; padding: 22px;">
+        <div style="font-size: 12px; font-weight: 800; color: #059669; text-transform: uppercase;">The 15–20 Partner Quota Model</div>
+        <div style="font-size: 19px; font-weight: 800; margin: 8px 0; color: #0f172a;">
+          15–20 Partners × 15–20 Listings = 225–300 Verified Rooms/Month
+        </div>
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.5;">
+          • <strong>Manageable Individual Quota:</strong> Each partner lists 15 properties/month (approx. 1 property every 2 days).<br/>
+          • <strong>Concentrated Quality:</strong> Covers 100% of major UNIPORT student clusters: Choba Gate, Alakahia (UPTH), Delta Park, Back of Chem, and Ozuoba.<br/>
+          • <strong>Total Accountability:</strong> If an agent demands an inspection fee, their verified badge is permanently revoked.
+        </p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid #ef4444; padding: 22px; background: #fffaf0;">
+        <div style="font-size: 12px; font-weight: 800; color: #dc2626; text-transform: uppercase;">Why Open Platforms Fail in Nigeria</div>
+        <div style="font-size: 19px; font-weight: 800; margin: 8px 0; color: #991b1b;">
+          Open Marketplaces = Guaranteed Fraud &amp; Decay
+        </div>
+        <p style="font-size: 12.5px; color: #7f1d1d; line-height: 1.5;">
+          • Open classifieds (Jiji, Facebook) have no physical verification—anyone can post stolen photos of someone else's house.<br/>
+          • Students lose money to fake online caretakers demanding booking deposits.<br/>
+          • <strong>Aroom's Moat:</strong> By keeping supply invite-only and physically verified by our Team Lead, we guarantee 100% genuine rooms.
+        </p>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Curated Supply Beats Random Unverified Volume</span>
+      <span>Slide 4 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 5: HOW IT WORKS
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="slide-badge-num" style="color: rgba(255,255,255,0.1);">05</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">User Experience</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">4-Step Journey</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>From Searching to Moving In — 4 Simple Steps</h2>
+      <p class="subtitle">
+        Zero confusing jargon, zero app download barrier, and 100% scam-free physical verification.
+      </p>
+    </div>
+
+    <div class="grid-4" style="margin: 18px 0;">
+      <div class="card card-dark" style="padding: 18px;">
+        <div class="step-pill">1</div>
+        <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;">Query on WhatsApp</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
+          Student messages Aroom in plain English or Pidgin: <em>"I need a self-contain near Choba Gate under 250k."</em>
+        </p>
+      </div>
+
+      <div class="card card-dark" style="padding: 18px;">
+        <div class="step-pill">2</div>
+        <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;">See Exact Total Cost</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
+          AI returns matching verified lodges, on-site video walkthroughs, and exact move-in package breakdown.
+        </p>
+      </div>
+
+      <div class="card card-dark" style="padding: 18px;">
+        <div class="step-pill">3</div>
+        <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;">Book ₦0 Inspection</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
+          Student selects time slot (e.g. <em>"Tomorrow at 2pm"</em>) to meet the accredited agent. Booking is <strong>100% Free</strong>.
+        </p>
+      </div>
+
+      <div class="card card-dark" style="padding: 18px;">
+        <div class="step-pill">4</div>
+        <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;">Inspect &amp; Move In</div>
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
+          Student checks running borehole water, meter, and room condition in person before paying a single kobo for rent.
+        </p>
+      </div>
+    </div>
+
+    <div class="card card-dark" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); padding: 12px 18px;">
+      <div style="font-size: 12px; color: #38bdf8;">
+        🔔 <strong>Room-Taken Protection:</strong> If a lodge is taken before an inspection, Aroom automatically sends an instant WhatsApp alert with matching available alternatives!
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Designed for Students • Mobile-Friendly • Zero Learning Curve</span>
+      <span>Slide 5 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 6: RADICAL PRICE TRANSPARENCY
+  ========================================== -->
+  <div class="slide slide-light">
+    <div class="slide-badge-num">06</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Price Honesty</span>
+      </div>
+      <span class="category-pill pill-emerald">Radical Price Transparency</span>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <h2>No More Price Shock: Total Move-In Cost Calculator</h2>
+      <p class="subtitle">
+        Students and parents see every single fee clearly before stepping out of their rooms.
+      </p>
+    </div>
+
+    <div class="grid-2" style="margin: 14px 0;">
+      <div class="card" style="border-top: 4px solid #2563eb; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 10px; font-weight: 800; background: #dbeafe; color: #1d4ed8; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">Option A: Verified Agent</span>
+          <span style="font-size: 11px; font-weight: 700; color: #059669;">Capped 15% Fee</span>
+        </div>
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 2px;">Tiled Self-Contain at Alakahia</div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 10px;">📍 5 mins walk to UPTH Gate, UNIPORT</div>
+        
+        <div style="font-size: 12px; line-height: 1.8; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 8px;">
+          <div style="display: flex; justify-content: space-between;"><span>Annual Rent (Yearly)</span><strong>₦250,000</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Caution Fee (Refundable)</span><span>₦20,000</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>Legal &amp; Agreement Fee</span><span>₦15,000</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>Utility / Compound Fee</span><span>₦10,000</span></div>
+          <div style="display: flex; justify-content: space-between; color: #2563eb;"><span>Verified Agent Fee (15% Capped)</span><strong>₦37,500</strong></div>
+          <div style="display: flex; justify-content: space-between; color: #059669;"><span>Physical Inspection Fee</span><strong>₦0 (FREE)</strong></div>
+        </div>
+        <div style="border-top: 2px dashed #cbd5e1; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #0f172a;">
+          <span>True Total Move-In Cost:</span><span style="color: #2563eb;">₦332,500</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-top: 4px solid #059669; padding: 18px; background: #f0fdf4;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 10px; font-weight: 800; background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">Option B: Direct Landlord</span>
+          <span style="font-size: 11px; font-weight: 800; color: #059669;">0% Agency Commission</span>
+        </div>
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 2px;">Executive Self-Contain at Choba</div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 10px;">📍 Opposite Choba Gate • Direct Property Owner</div>
+        
+        <div style="font-size: 12px; line-height: 1.8; color: #334155; border-top: 1px solid #dcfce7; padding-top: 8px;">
+          <div style="display: flex; justify-content: space-between;"><span>Annual Rent (Yearly)</span><strong>₦220,000</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Caution Fee (Refundable)</span><span>₦20,000</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>Legal &amp; Agreement Fee</span><span>₦10,000</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>Utility / Compound Fee</span><span>₦10,000</span></div>
+          <div style="display: flex; justify-content: space-between; color: #059669;"><span>Agency Commission Fee</span><strong>₦0 (Save 15%!)</strong></div>
+          <div style="display: flex; justify-content: space-between; color: #059669;"><span>Physical Inspection Fee</span><strong>₦0 (FREE)</strong></div>
+        </div>
+        <div style="border-top: 2px dashed #86efac; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #0f172a;">
+          <span>True Total Move-In Cost:</span><span style="color: #059669;">₦260,000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>No Hidden Charges • Direct Landlord 0% Fee Model</span>
+      <span>Slide 6 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 7: WHATSAPP ASSISTANT
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="slide-badge-num" style="color: rgba(255,255,255,0.1);">07</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Distribution Power</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">WhatsApp AI Concierge</span>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <h2>Why WhatsApp Is Our Primary Acquisition Weapon</h2>
+      <p class="subtitle">
+        100% of UNIPORT students and parents already live inside WhatsApp. We bring the marketplace to them.
+      </p>
+    </div>
+
+    <div class="grid-2" style="margin: 16px 0;">
+      <div class="card card-dark" style="padding: 20px; border-left: 3px solid #25d366; background: #071912;">
+        <div style="font-size: 11px; font-weight: 800; color: #25d366; text-transform: uppercase; margin-bottom: 8px;">Simulated WhatsApp Dialogue</div>
+        <div style="font-size: 12px; line-height: 1.6; color: #e2e8f0; font-family: monospace;">
+          <p style="color: #6ee7b7;"><strong>Student:</strong> <em>"Abeg I need a self-contain near UNIPORT Choba under 250k."</em></p><br/>
+          <p style="color: #cbd5e1;"><strong>Aroom AI:</strong> <em>"Hi Amara! Here is a verified room near Choba Gate:<br/>
+          🏠 Executive Self-Contain (Water &amp; Prepaid Meter)<br/>
+          📍 Opposite Choba Gate, UNIPORT<br/>
+          👤 Landlord: Chief Emeka Nwosu<br/>
+          💰 Total Move-In: ₦260,000 (0% Agency Fee)<br/>
+          Reply 'Book Emeka tomorrow at 2pm' to lock in free inspection!"</em></p>
+        </div>
+      </div>
+
+      <div class="card card-dark" style="padding: 20px;">
+        <div style="font-size: 12px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 8px;">Strategic Advantages at UNIPORT</div>
+        <ul style="font-size: 12.5px; color: #cbd5e1; line-height: 1.6; list-style: none;">
+          <li style="margin-bottom: 10px;">✔ <strong>Zero App Download Friction:</strong> Students don't need to install a 50MB app just to rent a lodge once a year.</li>
+          <li style="margin-bottom: 10px;">✔ <strong>Operates on 2G / Slow Data:</strong> Works seamlessly even when campus WiFi or mobile data is spotty in Aluu or Choba.</li>
+          <li style="margin-bottom: 10px;">✔ <strong>Instant Booking Confirmation:</strong> Auto-generates trackable reference (e.g. #ARM-4821) and delivers direct WhatsApp link to verified partner.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>AI Concierge Powered by Twilio WhatsApp API &amp; Natural Language NLP</span>
+      <span>Slide 7 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 8: UNIT ECONOMICS
+  ========================================== -->
+  <div class="slide slide-light">
+    <div class="slide-badge-num">08</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Monetization Engine</span>
+      </div>
+      <span class="category-pill pill-emerald">Unit Economics</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>High-Margin Marketplace Unit Economics</h2>
+      <p class="subtitle">
+        How every completed lease and landlord placement translates directly into defensible platform cash flow.
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin: 16px 0;">
+      <div class="card" style="border-top: 4px solid #059669; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase;">Per Closed Lease</div>
+        <div class="metric-value metric-emerald">~₦12,500</div>
+        <p style="font-size: 12px; color: #475569; line-height: 1.45;">
+          • <strong>Agent Split (25%):</strong> ₦9,375 on avg ₦250k rent.<br/>
+          • <strong>Tenancy Pack:</strong> ₦3,000 for digital contract.<br/>
+          • <strong>Blended Platform Take:</strong> ~₦12,500/lease.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 4px solid #2563eb; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;">Per Direct Landlord Lodge</div>
+        <div class="metric-value metric-blue">₦15k – ₦25k</div>
+        <p style="font-size: 12px; color: #475569; line-height: 1.45;">
+          • <strong>Featured Placement:</strong> Priority boost on Web &amp; WhatsApp.<br/>
+          • <strong>Zero Fee to Student:</strong> Landlord pays for speed.<br/>
+          • <strong>100% Occupancy:</strong> Lodge filled in 72 hours.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 4px solid #d97706; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #d97706; text-transform: uppercase;">Year 1 Target Output</div>
+        <div class="metric-value metric-amber">₦6.25M+</div>
+        <p style="font-size: 12px; color: #475569; line-height: 1.45;">
+          • <strong>500 Closed Leases:</strong> 500 × ₦12,500 = ₦6.25M.<br/>
+          • <strong>Landlord Boosts:</strong> 30 lodges × ₦20k = ₦600k.<br/>
+          • <strong>Gross Revenue:</strong> <strong>&gt;₦6.85 Million</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="background: #f1f5f9; padding: 12px 18px;">
+      <div style="font-size: 12px; color: #1e293b;">
+        <strong>Capital Efficiency:</strong> Because we don't purchase real estate or hire hundreds of field agents, gross profit margin exceeds <strong>55% in Year 1</strong> and scales beyond <strong>65% in Year 2</strong>.
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Sustainable Economics Grounded in Actual UNIPORT Rental Values</span>
+      <span>Slide 8 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 9: SCALING ROADMAP
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="slide-badge-num" style="color: rgba(255,255,255,0.1);">09</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Growth Milestones</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">Scaling Roadmap</span>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <h2>Milestones: Housing 500+ UNIPORT Students in Year 1</h2>
+      <p class="subtitle">
+        A pragmatic 3-stage execution roadmap anchored at UNIPORT, expanding to Rivers State and South-South.
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin: 18px 0;">
+      <div class="card card-dark" style="border-top: 4px solid #10b981; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase;">Phase 1 (Months 1–3)</div>
+        <div style="font-size: 17px; font-weight: 800; margin: 6px 0;">UNIPORT Ground Seeding</div>
+        <p style="font-size: 12px; color: #94a3b8; line-height: 1.45;">
+          • Onboard core team of 15–20 verified partners.<br/>
+          • Film on-site video walkthroughs for 250 lodges.<br/>
+          • Activate WhatsApp ambassador network in Choba &amp; Alakahia.
+        </p>
+      </div>
+
+      <div class="card card-dark" style="border-top: 4px solid #38bdf8; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Phase 2 (Months 4–9)</div>
+        <div style="font-size: 17px; font-weight: 800; margin: 6px 0;">Resumption Rush &amp; Breakeven</div>
+        <p style="font-size: 12px; color: #94a3b8; line-height: 1.45;">
+          • House 500+ UNIPORT students during clearance.<br/>
+          • Generate <strong>₦6.25M+ in revenue</strong>.<br/>
+          • <strong>Full payback of ₦5M seed capital</strong> achieved within 8–10 months.
+        </p>
+      </div>
+
+      <div class="card card-dark" style="border-top: 4px solid #a855f7; padding: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase;">Phase 3 (Year 2–3)</div>
+        <div style="font-size: 17px; font-weight: 800; margin: 6px 0;">Rivers State &amp; Regional Scale</div>
+        <p style="font-size: 12px; color: #94a3b8; line-height: 1.45;">
+          • Duplicate 20-partner cell in Rivers State University (RSU) and IAUE.<br/>
+          • Scale to 4,500+ leases (~₦54M revenue in Y2).<br/>
+          • Regional expansion to DELSU, UNIBEN, and UNICAL.
+        </p>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>From Anchor Dominance to Multi-Campus Playbook</span>
+      <span>Slide 9 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 10: THE ₦5M ASK & USE OF FUNDS
+  ========================================== -->
+  <div class="slide slide-light">
+    <div class="slide-badge-num">10</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Capital Requirement</span>
+      </div>
+      <span class="category-pill pill-emerald">The Investment Ask</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>The Ask: ₦5,000,000 Seed Capital for UNIPORT Dominance</h2>
+      <p class="subtitle">
+        Disciplined capital deployment tied directly to supply verification, student acquisition, and 8–10 month payback.
+      </p>
+    </div>
+
+    <div class="grid-4" style="margin: 16px 0;">
+      <div class="card" style="border-top: 5px solid #059669; padding: 18px;">
+        <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase;">35% Allotment</div>
+        <div class="metric-value metric-emerald">₦1.75M</div>
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 4px;">Ground Verification</div>
+        <p style="font-size: 11.5px; color: #64748b; line-height: 1.4;">
+          Handheld video stabilizer kits, on-site borehole water and prepaid meter audits, and Team Lead field transport stipends.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 5px solid #2563eb; padding: 18px;">
+        <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;">25% Allotment</div>
+        <div class="metric-value metric-blue">₦1.25M</div>
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 4px;">Campus Acquisition</div>
+        <p style="font-size: 11.5px; color: #64748b; line-height: 1.4;">
+          8 faculty student ambassadors (Medicine/UPTH, Engineering, Mgmt), Choba Gate orientation banner drives &amp; WhatsApp broadcasts.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 5px solid #d97706; padding: 18px;">
+        <div style="font-size: 11px; font-weight: 800; color: #d97706; text-transform: uppercase;">20% Allotment</div>
+        <div class="metric-value metric-amber">₦1.00M</div>
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 4px;">WhatsApp &amp; Cloud</div>
+        <p style="font-size: 11.5px; color: #64748b; line-height: 1.4;">
+          Twilio WhatsApp Business messaging credits, OpenRouter/LLM inference compute tokens, and resilient cloud database.
+        </p>
+      </div>
+
+      <div class="card" style="border-top: 5px solid #6366f1; padding: 18px;">
+        <div style="font-size: 11px; font-weight: 800; color: #6366f1; text-transform: uppercase;">20% Allotment</div>
+        <div class="metric-value" style="color: #6366f1;">₦1.00M</div>
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 4px;">Legal &amp; Reserve</div>
+        <p style="font-size: 11.5px; color: #64748b; line-height: 1.4;">
+          Standardized digital tenancy agreements, local municipal compliance in Rivers State, and operational buffer.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="background: #ecfdf5; border-color: #a7f3d0; padding: 12px 18px;">
+      <div style="font-size: 12.5px; color: #065f46;">
+        💰 <strong>Investor Payback Metric:</strong> With 500 closed leases generating ₦6.25M in Year 1 revenue, the ₦5M investment is fully recovered from operational gross margins in <strong>8 to 10 months</strong>!
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Capital Defense: Every Naira Tied to Concrete Milestones</span>
+      <span>Slide 10 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 11: LEADERSHIP TEAM
+  ========================================== -->
+  <div class="slide slide-dark">
+    <div class="slide-badge-num" style="color: rgba(255,255,255,0.1);">11</div>
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM</span>
+        </div>
+        <span class="deck-tag">Leadership</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">Founding Team</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <h2>Operational Ground Truth &amp; Technical Execution</h2>
+      <p class="subtitle">
+        A complementary leadership team combining continuous physical presence at UNIPORT with software engineering rigor.
+      </p>
+    </div>
+
+    <div class="grid-2" style="margin: 20px 0;">
+      <div class="card card-dark" style="border-left: 4px solid #10b981; padding: 22px;">
+        <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase;">Co-Founder &amp; Head of Operations</div>
+        <div style="font-size: 20px; font-weight: 800; margin: 4px 0;">Don-Amadiwochi Eze</div>
+        <p style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; margin-top: 8px;">
+          • Commands on-the-ground agent accreditation and physical lodge verification across Choba, Alakahia, and Delta Park.<br/>
+          • Manages direct property owner agreements, lodge caretaker compliance, and student dispute mediation.<br/>
+          • Deep rooted network across UNIPORT student bodies and faculty associations.
+        </p>
+      </div>
+
+      <div class="card card-dark" style="border-left: 4px solid #38bdf8; padding: 22px;">
+        <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Co-Founder &amp; Head of Product &amp; Tech</div>
+        <div style="font-size: 20px; font-weight: 800; margin: 4px 0;">Enyinma Justice Smart</div>
+        <p style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; margin-top: 8px;">
+          • Architect of the Aroom Web marketplace, Team Leader Command Portal, and 24/7 WhatsApp AI Concierge.<br/>
+          • Engineering lead on Twilio WhatsApp integration, AI agent workflows, and database security.<br/>
+          • Focused on frictionless, low-bandwidth UI that loads under 1.5 seconds on campus networks.
+        </p>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Built by UNIPORT Operators for UNIPORT Students</span>
+      <span>Slide 11 of 12</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDE 12: CONCLUSION & CALL TO ACTION
+  ========================================== -->
+  <div class="slide slide-dark" style="text-align: center;">
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-logo-pill">
+          <span class="brand-dot"></span>
+          <span>AROOM TECHNOLOGIES</span>
+        </div>
+        <span class="deck-tag">UNIPORT Pilot Operations</span>
+      </div>
+      <span class="category-pill pill-dark-emerald">Ready for Deployment</span>
+    </div>
+
+    <div style="margin: auto auto; max-width: 820px;">
+      <div style="display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #34d399; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); padding: 5px 16px; border-radius: 999px; margin-bottom: 14px;">
+        Seed Round: ₦5,000,000 ($3,333 USD)
+      </div>
+      <h1 style="font-size: 44px; margin-bottom: 10px;">Let's Transform Student Housing Together</h1>
+      <p style="font-size: 16px; color: #cbd5e1; line-height: 1.5; margin-bottom: 22px;">
+        Join us in unlocking a safe, transparent, scam-free housing future for 35,000+ UNIPORT students.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; max-width: 700px; margin: 0 auto;">
+        <div class="card card-dark" style="padding: 16px 20px; border-left: 3px solid #10b981;">
+          <div style="font-size: 10px; font-weight: 700; color: #34d399; text-transform: uppercase;">Co-Founder &amp; Head of Operations</div>
+          <div style="font-size: 16px; font-weight: 800; color: #ffffff;">Don-Amadiwochi Eze</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">operations@aroom.ng • +234 809 999 0001</div>
+        </div>
+
+        <div class="card card-dark" style="padding: 16px 20px; border-left: 3px solid #38bdf8;">
+          <div style="font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Co-Founder &amp; Head of Product</div>
+          <div style="font-size: 16px; font-weight: 800; color: #ffffff;">Enyinma Justice Smart</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">product@aroom.ng • +234 809 999 0002</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; font-size: 12.5px; color: #94a3b8; line-height: 1.5;">
+        Operations Hub: Choba Gate &amp; Abuja Campus Axis, University of Port Harcourt, Rivers State<br/>
+        WhatsApp AI Concierge: <strong>+1 (415) 523-8886</strong> • Web: <strong>aroom.ng</strong>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span>Aroom Technologies • SPEEDLINK Innovation Ecosystem</span>
+      <span>Slide 12 of 12</span>
+    </div>
+  </div>
+
+</body>
+</html>
