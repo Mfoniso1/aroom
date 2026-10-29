@@ -208,3 +208,4 @@ create policy "Public can view active vacancies of verified properties"
       where u.id = vacancies.unit_id and p.verification_status = 'verified'
     )
   );
+
