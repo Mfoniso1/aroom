@@ -12,7 +12,6 @@ interface MoveInCostProps {
     cautionFee?: number
     otherCharges?: number
     utilityFee?: number
-    inspectionFee?: number
   }
   mode?: 'inline' | 'card' | 'modal'
 }
@@ -61,7 +60,7 @@ export function MoveInCostCalculator({
           </span>
         </button>
 
-        {/* Floating panel — absolute so it overlays siblings, no layout shift */}
+        {/* Floating panel */}
         {isOpen && (
           <div className="absolute left-0 right-0 mt-1.5 p-3.5 bg-white border border-slate-200 rounded-xl text-xs space-y-2 shadow-xl z-20 animate-in fade-in slide-in-from-top-1 duration-200">
             {/* Annual Rent */}
@@ -111,25 +110,15 @@ export function MoveInCostCalculator({
                 </span>
               </div>
             ) : (
-              <>
-                <div className="flex justify-between items-center text-slate-600">
-                  <span className="flex items-center gap-1">
-                    Agency Fee{' '}
-                    <span className="text-[10px] text-blue-600 font-bold">(15% of Rent)</span>
-                  </span>
-                  <span className="font-semibold text-slate-800">
-                    ₦{breakdown.agencyFee.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-emerald-700">
-                  <span>Inspection Fee</span>
-                  <span className="font-bold">
-                    {breakdown.inspectionFee === 0
-                      ? '₦0 (Free on Aroom)'
-                      : `₦${breakdown.inspectionFee.toLocaleString()}`}
-                  </span>
-                </div>
-              </>
+              <div className="flex justify-between items-center text-slate-600">
+                <span className="flex items-center gap-1">
+                  Agency Fee{' '}
+                  <span className="text-[10px] text-blue-600 font-bold">(15% of Rent)</span>
+                </span>
+                <span className="font-semibold text-slate-800">
+                  ₦{breakdown.agencyFee.toLocaleString()}
+                </span>
+              </div>
             )}
 
             {/* Total */}
@@ -182,7 +171,7 @@ export function MoveInCostCalculator({
             <p className="text-xs text-slate-500">
               {isLandlord
                 ? 'Only landlord-required fees: Rent, Caution, Legal, and Utilities.'
-                : 'Includes Rent, Caution, Legal, Utilities, Agency Fee, and Inspection Fee.'}
+                : 'Includes Rent, Caution, Legal, Utilities, and capped 15% Agency Commission.'}
             </p>
           </div>
         </div>
@@ -229,30 +218,19 @@ export function MoveInCostCalculator({
             <span className="font-extrabold text-emerald-800">₦0 (0% Agency Fee)</span>
           </div>
         ) : (
-          <>
-            <div className="flex justify-between items-center text-slate-700">
-              <span className="flex items-center gap-1.5">
-                Agency Fee{' '}
-                <span className="text-xs font-bold text-blue-600">(15% of Annual Rent)</span>
-              </span>
-              <span className="font-semibold text-slate-900">
-                ₦{breakdown.agencyFee.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center text-emerald-700">
-              <span>Inspection Fee</span>
-              <span className="font-bold">
-                {breakdown.inspectionFee === 0
-                  ? '₦0 (Aroom Scam-Free Guarantee)'
-                  : `₦${breakdown.inspectionFee.toLocaleString()}`}
-              </span>
-            </div>
-          </>
+          <div className="flex justify-between items-center text-slate-700">
+            <span className="flex items-center gap-1.5">
+              Agency Fee{' '}
+              <span className="text-xs font-bold text-blue-600">(15% of Annual Rent)</span>
+            </span>
+            <span className="font-semibold text-slate-900">
+              ₦{breakdown.agencyFee.toLocaleString()}
+            </span>
+          </div>
         )}
 
         <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
-          <span className="font-bold text-slate-900">Total Move-In Sum Package</span>
+          <span className="font-bold text-slate-900">True Total Move-In Cost</span>
           <span
             className={`font-extrabold text-base ${
               isLandlord ? 'text-amber-700' : 'text-emerald-700'
@@ -267,8 +245,8 @@ export function MoveInCostCalculator({
         <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
         <span>
           {isLandlord
-            ? 'Direct landlord listing verified with property deed/NIN. Free physical walkthrough before payment.'
-            : 'Verified agent listing with standard 15% agency cap. Physical walkthrough inspection before payment.'}
+            ? 'Direct landlord listing verified with property deed/NIN. Free physical viewing before payment.'
+            : 'Verified agent listing with standard 15% agency cap. Physical viewing before payment.'}
         </span>
       </div>
     </div>

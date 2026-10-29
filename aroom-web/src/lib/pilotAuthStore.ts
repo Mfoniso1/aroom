@@ -9,7 +9,7 @@
 import { supabase } from './supabase'
 
 export type PartnerKind = 'agent' | 'landlord'
-export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'suspended'
+export type ApprovalStatus = 'invited' | 'approved' | 'suspended' | 'pending' | 'rejected'
 export type UserRole = 'student' | 'agent' | 'landlord' | 'admin'
 
 export interface PartnerApplication {
@@ -995,6 +995,7 @@ export async function listPartnerApplications(
 }> {
   const all = await syncFromSupabase()
   const counts: Record<ApprovalStatus, number> = {
+    invited: 0,
     pending: 0,
     approved: 0,
     rejected: 0,

@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { CAMPUSES } from '@/lib/campuses'
 import {
   Calculator,
-  ShieldCheck,
   CheckCircle2,
   Video,
   Upload,
@@ -38,7 +37,6 @@ export function NewListingPage() {
   const [cautionFee, setCautionFee] = useState<string>('30000')
   const [legalFee, setLegalFee] = useState<string>('20000')
   const [utilityFee, setUtilityFee] = useState<string>('15000')
-  const [inspectionFee, setInspectionFee] = useState<string>('0')
   const [hasUtilityFee, setHasUtilityFee] = useState(true)
 
   // Media state (Video upload from device storage)
@@ -57,13 +55,12 @@ export function NewListingPage() {
   const cautionNum = Number(cautionFee) || 0
   const legalNum = Number(legalFee) || 0
   const utilityNum = hasUtilityFee ? (Number(utilityFee) || 0) : 0
-  const inspectionNum = Number(inspectionFee) || 0
 
-  // Agency fee: automatically 15% of the annual rent
+  // Agency fee: strictly capped at 15% of annual rent
   const agencyFee = Math.round(rentNum * 0.15)
 
-  // Total move-in package (inspection fee now included when agent sets it)
-  const totalPackage = rentNum + cautionNum + legalNum + agencyFee + utilityNum + inspectionNum
+  // True Total Move-In Package
+  const totalPackage = rentNum + cautionNum + legalNum + agencyFee + utilityNum
 
   const selectedCampus = CAMPUSES.find((c) => c.id === campusId)
 
@@ -137,7 +134,6 @@ export function NewListingPage() {
         legalFee: legalNum,
         utilityFee: utilityNum,
         agencyFee: agencyFee,
-        inspectionFee: inspectionNum,
       },
       description: `Verified ${roomLabel} accommodation with physical walkthrough video uploaded by agent. Scam-free inspection guaranteed. Located near ${landmark || selectedCampus?.name || 'campus'}.`,
     }
@@ -331,37 +327,6 @@ export function NewListingPage() {
                     />
                   )}
                 </div>
-
-                {/* 6. Inspection Fee */}
-                <div className="sm:col-span-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">
-                      Physical Inspection Fee (₦)
-                    </label>
-                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Visible to students
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="0"
-                      value={inspectionFee}
-                      onChange={(e) => setInspectionFee(e.target.value)}
-                      placeholder="0"
-                      className="w-36 border border-slate-200 rounded-xl p-2.5 text-sm font-bold text-slate-900 outline-none focus:border-emerald-500"
-                    />
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      {inspectionNum === 0
-                        ? 'Free on Aroom (Recommended — builds trust)'
-                        : `₦${inspectionNum.toLocaleString()} will appear in student breakdown`}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Set ₦0 for a free inspection — Aroom strongly recommends this as it prevents scams and increases booking rates.
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -388,7 +353,7 @@ export function NewListingPage() {
                   <span className="font-semibold text-white">₦{legalNum.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-emerald-400">
-                  <span>Agency Fee (15%):</span>
+                  <span>Agency Fee (15% Capped):</span>
                   <span className="font-bold">₦{agencyFee.toLocaleString()}</span>
                 </div>
                 {hasUtilityFee && (
@@ -397,12 +362,6 @@ export function NewListingPage() {
                     <span className="font-semibold text-white">₦{utilityNum.toLocaleString()}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-slate-400">
-                  <span>Inspection Fee:</span>
-                  <span className={inspectionNum === 0 ? 'text-emerald-400 font-semibold' : 'text-white font-semibold'}>
-                    {inspectionNum === 0 ? '₦0 (Free — Recommended)' : `₦${inspectionNum.toLocaleString()}`}
-                  </span>
-                </div>
               </div>
 
               <div className="pt-3 border-t border-slate-700 flex items-center justify-between">

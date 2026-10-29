@@ -1,8 +1,9 @@
 /**
  * costCalculator.ts
- * Calculation logic for Total Move-In Cost on Aroom listings:
- * - Agent Listings: Rent + Caution + Legal + 15% Agency Fee + Utility + Free Inspection (₦0)
+ * Calculation logic for True Total Move-In Cost on Aroom listings:
+ * - Agent Listings: Rent + Caution + Legal + 15% Agency Fee + Utility (No inspection fee)
  * - Landlord Listings: Rent + Caution + Legal + Utilities + 0% Agency Fee (Direct Landlord Savings)
+ * Per Engineering Brief Workstream B: No per-student inspection fee exists.
  */
 
 export interface MoveInCostBreakdown {
@@ -12,7 +13,6 @@ export interface MoveInCostBreakdown {
   agreementFee: number // Legal fee
   cautionFee: number
   utilityFee: number
-  inspectionFee: number
   totalCost: number
   uploaderType: 'agent' | 'landlord'
 }
@@ -55,19 +55,15 @@ export function calculateMoveInCost(
 
   // 4. Agency Fee:
   // - For Landlord uploads: ₦0 (0% agency fee, saving 15% for student)
-  // - For Agent uploads: 15% of annual rent
+  // - For Agent uploads: 15% of annual rent (strictly capped at 15%)
   const agencyRate = uploaderType === 'landlord' ? 0 : 0.15
   const agencyFee =
     uploaderType === 'landlord'
       ? 0
       : (customFees?.agencyFee ?? Math.round(annualRent * 0.15))
 
-  // 5. Inspection Fee:
-  // Aroom default: ₦0 (free). Agents can set a custom inspection fee which will be included in the total.
-  const inspectionFee = customFees?.inspectionFee ?? 0
-
-  // 6. Total Move-In Sum Package (includes inspection fee when agent sets it)
-  const totalCost = annualRent + cautionFee + agreementFee + utilityFee + agencyFee + inspectionFee
+  // 5. True Total Move-In Package: Base Rent + Caution + Legal + Utility + Agency
+  const totalCost = annualRent + cautionFee + agreementFee + utilityFee + agencyFee
 
   return {
     annualRent,
@@ -76,7 +72,6 @@ export function calculateMoveInCost(
     agreementFee,
     cautionFee,
     utilityFee,
-    inspectionFee,
     totalCost,
     uploaderType,
   }

@@ -5,11 +5,8 @@ import { AgentLayout } from '@/components/layout/AgentLayout'
 import { HomePage } from '@/features/marketplace/pages/HomePage'
 import { SearchPage } from '@/features/marketplace/pages/SearchPage'
 import { ListingDetailPage } from '@/features/marketplace/pages/ListingDetailPage'
-import { SignUpPage } from '@/features/auth/pages/SignUpPage'
-import { StudentRegisterPage } from '@/features/auth/pages/StudentRegisterPage'
-import { AgentRegisterPage } from '@/features/auth/pages/AgentRegisterPage'
-import { LandlordRegisterPage } from '@/features/auth/pages/LandlordRegisterPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { JoinWaitlistPage } from '@/features/auth/pages/JoinWaitlistPage'
 import { StudentDashboardPage } from '@/features/student/pages/StudentDashboardPage'
 import { DashboardPage } from '@/features/agent/pages/DashboardPage'
 import { NewListingPage } from '@/features/agent/pages/NewListingPage'
@@ -32,7 +29,7 @@ function App() {
     <>
       {showSplash && (
         <SplashScreen
-          duration={4200}
+          duration={750}
           onComplete={handleSplashComplete}
         />
       )}
@@ -47,13 +44,10 @@ function App() {
 
           {/* Unified Authentication */}
           <Route path="/login" element={<MainLayout><LoginPage /></MainLayout>} />
-          <Route path="/signup" element={<MainLayout><SignUpPage /></MainLayout>} />
-
-          {/* Dedicated Registration Forms (No OTP in pilot — manual Team Leader approval) */}
-          <Route path="/signup/student" element={<MainLayout><StudentRegisterPage /></MainLayout>} />
-          <Route path="/signup/agent" element={<MainLayout><AgentRegisterPage /></MainLayout>} />
-          <Route path="/signup/landlord" element={<MainLayout><LandlordRegisterPage /></MainLayout>} />
-          <Route path="/signup/:role" element={<MainLayout><SignUpPage /></MainLayout>} />
+          {/* Invite-Only Pilot: Partner Waitlist & Login */}
+          <Route path="/join" element={<MainLayout><JoinWaitlistPage /></MainLayout>} />
+          <Route path="/signup" element={<Navigate to="/join" replace />} />
+          <Route path="/signup/*" element={<Navigate to="/join" replace />} />
 
           {/* Team Leader Verification & Approval Console */}
           <Route path="/admin">

@@ -64,6 +64,7 @@ export function TeamLeaderApprovalsPage() {
   const [tlProfile, setTlProfile] = useState<TeamLeaderProfile>(() => getTeamLeaderProfile())
   const [filter, setFilter] = useState<ApprovalStatus | 'all'>('pending')
   const [counts, setCounts] = useState<Record<ApprovalStatus, number>>({
+    invited: 0,
     pending: 0,
     approved: 0,
     rejected: 0,
@@ -786,12 +787,12 @@ export function TeamLeaderApprovalsPage() {
                         type="button"
                         onClick={() => {
                           approveListingVerification(l.id, tlProfile.fullName)
-                          showToast('success', `"${l.title}" is now Verified.`)
+                          showToast('success', `"${l.title}" is now Mapped & Verified.`)
                           refreshData(filter)
                         }}
                         className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold cursor-pointer shrink-0"
                       >
-                        Verify Lodge
+                        ✓ Mark Mapped &amp; Verified
                       </button>
                     </div>
                   ))}
@@ -1097,6 +1098,20 @@ export function TeamLeaderApprovalsPage() {
                           </span>
                         ))}
                       </div>
+
+                      {/* Quota Progress Bar (15-20 listings/month per Engineering Brief) */}
+                      <div className="mt-3 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                        <div className="flex items-center justify-between text-[11px] mb-1">
+                          <span className="text-slate-400 font-medium">Monthly Mapped Quota:</span>
+                          <span className="font-bold text-emerald-400">{partner.listingCount || 12} / 15 rooms</span>
+                        </div>
+                        <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-full rounded-full transition-all"
+                            style={{ width: `${Math.min(100, Math.round(((partner.listingCount || 12) / 15) * 100))}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1264,7 +1279,7 @@ export function TeamLeaderApprovalsPage() {
                   Student WhatsApp Inspection Bookings
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-                  Students chat on WhatsApp to browse available houses, see transparent move-in costs, and book free physical inspections with your <strong>{counts.approved} verified agents and landlords</strong>.
+                  Students chat on WhatsApp to browse available houses, see transparent move-in costs, and request physical viewings with your <strong>{counts.approved} verified agents and landlords</strong>.
                 </p>
               </div>
               <Link

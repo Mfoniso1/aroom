@@ -18,9 +18,6 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldCheck,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
 } from 'lucide-react'
 import { PageBackground } from '@/components/shared/PageBackground'
 import { HeroSection } from '@/components/shared/HeroSection'
@@ -65,7 +62,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [showDemoDrawer, setShowDemoDrawer] = useState(false)
   const [errors, setErrors] = useState<{
     identifier?: string
     password?: string
@@ -99,33 +95,6 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fillDemo = (
-    demoRole:
-      | 'admin'
-      | 'approved_agent'
-      | 'approved_landlord'
-      | 'pending_landlord'
-      | 'student'
-  ) => {
-    if (demoRole === 'admin') {
-      setIdentifier('teamleader@aroom.ng')
-      setPassword('TeamLead@12345')
-    } else if (demoRole === 'approved_agent') {
-      setIdentifier('david.opubo@aroomagents.ng')
-      setPassword('Agent@12345')
-    } else if (demoRole === 'approved_landlord') {
-      setIdentifier('emeka.nwosu@directlodge.ng')
-      setPassword('Agent@12345')
-    } else if (demoRole === 'pending_landlord') {
-      setIdentifier('tariye.briggs@uniportagents.ng')
-      setPassword('Agent@12345')
-    } else {
-      setIdentifier('amara.nwosu@uniport.edu.ng')
-      setPassword('Student@12345')
-    }
-    setErrors({})
   }
 
   return (
@@ -221,107 +190,21 @@ export function LoginPage() {
             </button>
           </form>
 
-          {/* Create Account CTA */}
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+          {/* Closed Cohort / Join Waitlist CTA */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2">
             <p className="text-xs text-slate-500">
-              New to Aroom?{' '}
+              Not yet onboarded?{' '}
               <button
                 type="button"
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/join')}
                 className="text-emerald-700 font-extrabold hover:underline cursor-pointer"
               >
-                Create an Account
+                Join the UNIPORT Pilot Waitlist
               </button>
             </p>
-            <div className="mt-2.5 flex items-center justify-center gap-3 text-[11px] text-slate-400">
-              <button
-                type="button"
-                onClick={() => navigate('/signup/student')}
-                className="hover:text-emerald-700 hover:underline cursor-pointer"
-              >
-                Student Signup
-              </button>
-              <span>•</span>
-              <button
-                type="button"
-                onClick={() => navigate('/signup/agent')}
-                className="hover:text-emerald-700 hover:underline cursor-pointer"
-              >
-                Agent Application
-              </button>
-              <span>•</span>
-              <button
-                type="button"
-                onClick={() => navigate('/signup/landlord')}
-                className="hover:text-emerald-700 hover:underline cursor-pointer"
-              >
-                Landlord Application
-              </button>
-            </div>
-          </div>
-
-          {/* Collapsible Pilot Quick-Fill Switcher */}
-          <div className="mt-5 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setShowDemoDrawer((v) => !v)}
-              className="w-full px-3.5 py-2.5 flex items-center justify-between text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Quick Demo Accounts</span>
-              </span>
-              {showDemoDrawer ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5" />
-              )}
-            </button>
-
-            {showDemoDrawer && (
-              <div className="px-3.5 pb-3 pt-1 border-t border-slate-200/70 space-y-2">
-                <p className="text-[11px] text-slate-500">
-                  Click any role below to auto-fill credentials, then press <strong>Sign In</strong>:
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => fillDemo('admin')}
-                    className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-950 text-indigo-100 hover:bg-indigo-900 cursor-pointer shadow-2xs"
-                  >
-                    Team Leader (Unique UI)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemo('student')}
-                    className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 cursor-pointer"
-                  >
-                    Student (Amara)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemo('approved_agent')}
-                    className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-teal-100 text-teal-800 hover:bg-teal-200 cursor-pointer"
-                  >
-                    Verified Agent (David)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemo('approved_landlord')}
-                    className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200 cursor-pointer"
-                  >
-                    Verified Landlord (Emeka)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemo('pending_landlord')}
-                    className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-rose-100 text-rose-800 hover:bg-rose-200 cursor-pointer"
-                  >
-                    Pending Agent (Tariye)
-                  </button>
-                </div>
-              </div>
-            )}
+            <p className="text-[11px] text-slate-400">
+              Aroom is currently operating with an invite-only cohort of 15–20 curated partners at UNIPORT.
+            </p>
           </div>
         </div>
       </div>

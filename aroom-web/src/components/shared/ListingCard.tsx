@@ -25,12 +25,15 @@ export type Listing = {
   verificationRequestedAt?: string
   verificationRequestNote?: string
   verifiedBy?: string
+  propertyPublicId?: string
+  unitPublicId?: string
+  conditionStatus?: 'good' | 'minor_issues' | 'under_repair'
+  verifiedAt?: string
   customFees?: {
     cautionFee?: number
     legalFee?: number
     utilityFee?: number
     agencyFee?: number
-    inspectionFee?: number
   }
 }
 

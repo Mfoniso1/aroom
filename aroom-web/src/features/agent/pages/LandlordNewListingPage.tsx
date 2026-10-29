@@ -126,7 +126,6 @@ export function LandlordNewListingPage() {
         legalFee: legalNum,
         utilityFee: utilityNum,
         agencyFee: 0,
-        inspectionFee: 0,
       },
       description: `Direct landlord listing with walkthrough video. Zero agent commission. Listed by verified property owner near ${landmark || selectedCampus?.name || 'campus'}.`,
     }

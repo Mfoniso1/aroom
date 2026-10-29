@@ -754,8 +754,8 @@ export async function processWhatsAppStudentMessage(input: {
       `🏠 *Property:* ${booking.listingTitle}`,
       `📍 *Meeting Point:* ${booking.landmark}`,
       booking.totalMoveInCost > 0
-        ? `💵 *Total Move-In Cost:* ₦${booking.totalMoveInCost.toLocaleString()} (Physical inspection is *₦0 FREE*)`
-        : `💵 *Physical Inspection Fee:* *₦0 (100% FREE)*`,
+        ? `💵 *Total Move-In Cost:* ₦${booking.totalMoveInCost.toLocaleString()} (All move-in fees included)`
+        : `💵 *Move-In Pricing:* Verified with zero hidden fees`,
       `🗓️ *Scheduled Time:* ${booking.preferredSlot}`,
       ``,
       `You can tap the WhatsApp link above to message *${matchedAgent.fullName}* directly and mention your reference *#${booking.bookingRef}*. Would you like to check another room as a backup?`,

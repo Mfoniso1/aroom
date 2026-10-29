@@ -11,6 +11,8 @@ import type { Listing } from '@/components/shared/ListingCard'
 export const SEED_LISTINGS: Listing[] = [
   {
     id: 'uniport-1',
+    propertyPublicId: 'ARM-CHB-0141',
+    unitPublicId: 'ARM-CHB-0141-U1',
     title: 'Executive Self-Contain in Choba',
     price: 280000,
     period: 'yr',
@@ -18,6 +20,8 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Tiled self-contain with treated borehole water, prepaid meter, and gated compound with night security. Quiet street, close to Choba Gate.',
     roomType: 'Self-Contain',
     verificationStatus: 'verified',
+    conditionStatus: 'good',
+    verifiedAt: '10 Oct 2026',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'landlord',
@@ -25,10 +29,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 25000, legalFee: 20000, utilityFee: 15000, agencyFee: 0, inspectionFee: 0 },
+    customFees: { cautionFee: 25000, legalFee: 20000, utilityFee: 15000, agencyFee: 0 },
   },
   {
     id: 'uniport-2',
+    propertyPublicId: 'ARM-ALK-0082',
+    unitPublicId: 'ARM-ALK-0082-U2',
     title: 'Modern Studio at Alakahia (UPTH Road)',
     price: 320000,
     period: 'yr',
@@ -36,6 +42,8 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Studio apartment with borehole water, prepaid meter, and standby generator for the compound. Tarred access road.',
     roomType: 'Studio',
     verificationStatus: 'verified',
+    conditionStatus: 'good',
+    verifiedAt: '12 Oct 2026',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'agent',
@@ -43,10 +51,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 48000, inspectionFee: 0 },
+    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 48000 },
   },
   {
     id: 'uniport-3',
+    propertyPublicId: 'ARM-BOC-0033',
+    unitPublicId: 'ARM-BOC-0033-U1',
     title: 'Newly Built Self-Contain at Back of Chem',
     price: 240000,
     period: 'yr',
@@ -54,6 +64,7 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Newly built self-contain, treated borehole water, prepaid meter. Awaiting Aroom Team Lead physical verification.',
     roomType: 'Self-Contain',
     verificationStatus: 'unverified_new',
+    conditionStatus: 'good',
     verificationRequested: true,
     verificationRequestedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
     verificationRequestNote: 'Please inspect before we open to students.',
@@ -64,10 +75,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 36000, inspectionFee: 0 },
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 36000 },
   },
   {
     id: 'uniport-4',
+    propertyPublicId: 'ARM-OZU-0019',
+    unitPublicId: 'ARM-OZU-0019-U1',
     title: '2-Bedroom Shared Flat in Ozuoba',
     price: 220000,
     period: 'yr',
@@ -75,6 +88,7 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Shared 2-bedroom flat for two students. Borehole water and prepaid meter. Landlord lives on the compound.',
     roomType: 'Shared Flat',
     verificationStatus: 'unverified_new',
+    conditionStatus: 'good',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'landlord',
@@ -82,10 +96,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 0, inspectionFee: 0 },
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 0 },
   },
   {
     id: 'uniport-5',
+    propertyPublicId: 'ARM-DTA-0051',
+    unitPublicId: 'ARM-DTA-0051-U3',
     title: 'Standard Single Room at Delta Park',
     price: 160000,
     period: 'yr',
@@ -93,6 +109,8 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Affordable single room, shared bathroom, borehole water. Ideal for budget-conscious UNIPORT students.',
     roomType: 'Single Room',
     verificationStatus: 'verified',
+    conditionStatus: 'good',
+    verifiedAt: '14 Oct 2026',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'agent',
@@ -100,10 +118,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 15000, legalFee: 10000, utilityFee: 8000, agencyFee: 24000, inspectionFee: 0 },
+    customFees: { cautionFee: 15000, legalFee: 10000, utilityFee: 8000, agencyFee: 24000 },
   },
   {
     id: 'uniport-6',
+    propertyPublicId: 'ARM-ALU-0014',
+    unitPublicId: 'ARM-ALU-0014-U2',
     title: 'Spacious 2-Bedroom Flat in Aluu',
     price: 350000,
     period: 'yr',
@@ -111,6 +131,8 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Large flat for two or three students sharing. Tiled floors, borehole water, prepaid meter, secure fence.',
     roomType: '2-Bedroom Flat',
     verificationStatus: 'verified',
+    conditionStatus: 'good',
+    verifiedAt: '15 Oct 2026',
     availabilityStatus: 'held',
     campusId: 'uniport',
     uploaderType: 'landlord',
@@ -118,10 +140,12 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 0, inspectionFee: 0 },
+    customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 0 },
   },
   {
     id: 'uniport-7',
+    propertyPublicId: 'ARM-RMU-0008',
+    unitPublicId: 'ARM-RMU-0008-U1',
     title: 'Neat Self-Contain at Rumuosi',
     price: 200000,
     period: 'yr',
@@ -129,6 +153,7 @@ export const SEED_LISTINGS: Listing[] = [
     description: 'Self-contain with tiled floor, borehole water and prepaid meter. Short bike ride to campus.',
     roomType: 'Self-Contain',
     verificationStatus: 'unverified_new',
+    conditionStatus: 'good',
     availabilityStatus: 'available',
     campusId: 'uniport',
     uploaderType: 'agent',
@@ -136,7 +161,7 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
-    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 30000, inspectionFee: 0 },
+    customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 30000 },
   },
 ]
 
@@ -410,3 +435,55 @@ export function extractThumbnailFromVideo(videoFile: File): Promise<string> {
     }
   })
 }
+
+// ── Duplicate Prevention Model (Engineering Brief Section 6) ──────────────────
+export interface DuplicateCandidate {
+  id: string
+  publicId?: string
+  name: string
+  landmark: string
+  imageUrl: string
+  uploaderName?: string
+  confidenceReason: string
+}
+
+/**
+ * Checks for already-mapped lodges near the given landmark / name / phone
+ */
+export function checkPropertyDuplicates(
+  name: string,
+  landmark: string,
+  _ownerPhone?: string
+): DuplicateCandidate[] {
+  const all = getAllListings()
+  const candidates: DuplicateCandidate[] = []
+  const cleanName = name.toLowerCase().trim()
+  const cleanLandmark = landmark.toLowerCase().trim()
+
+  for (const item of all) {
+    const itemTitle = item.title.toLowerCase()
+    const itemLandmark = item.landmark.toLowerCase()
+
+    let matchReason = ''
+    if (cleanName && itemTitle.includes(cleanName)) {
+      matchReason = 'Similar lodge title in same area'
+    } else if (cleanLandmark && itemLandmark.includes(cleanLandmark)) {
+      matchReason = 'Identical campus landmark / proximity'
+    }
+
+    if (matchReason) {
+      candidates.push({
+        id: item.id,
+        publicId: item.propertyPublicId || `ARM-CHB-${item.id.replace(/\D/g, '') || '0140'}`,
+        name: item.title,
+        landmark: item.landmark,
+        imageUrl: item.imageUrl,
+        uploaderName: item.uploaderName,
+        confidenceReason: matchReason,
+      })
+    }
+  }
+
+  return candidates.slice(0, 3)
+}
+

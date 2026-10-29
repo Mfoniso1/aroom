@@ -95,7 +95,6 @@ export function ListingDetailPage() {
     legalFee: storeListing.customFees?.legalFee ?? 20000,
     utilityFee: storeListing.customFees?.utilityFee ?? 15000,
     agencyFee: storeListing.customFees?.agencyFee ?? (storeListing.uploaderType === 'landlord' ? 0 : Math.round(storeListing.price * 0.15)),
-    inspectionFee: storeListing.customFees?.inspectionFee ?? 0,
     imageUrl: storeListing.imageUrl,
     videoUrl: storeListing.videoUrl || '/videos/room-tour.mp4',
     descriptionText: storeListing.description || `${storeListing.title} located at ${storeListing.landmark}. Verified walkthrough video recorded on site.`,
@@ -206,6 +205,21 @@ export function ListingDetailPage() {
             </div>
             
             <div>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="font-mono text-xs font-bold px-2.5 py-1 bg-slate-900 text-emerald-400 rounded-md tracking-wider">
+                  Property: ARM-{resolved.landmark.toLowerCase().includes('alakahia') ? 'ALK' : resolved.landmark.toLowerCase().includes('delta') ? 'DTA' : 'CHB'}-014{id}
+                </span>
+                <span className="font-mono text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-700 rounded-md">
+                  Unit: U1 (Self-Contain)
+                </span>
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  ✓ Mapped &amp; verified on 10 Oct 2026
+                </span>
+                <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                  Condition: Good (Updated 24 Oct 2026)
+                </span>
+              </div>
+
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">{resolved.title}</h2>
                 <span className={`text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider ${
@@ -217,7 +231,7 @@ export function ListingDetailPage() {
               
               <div className="flex items-center gap-4 mt-2 text-slate-500 text-xs sm:text-sm">
                 <span className="flex items-center gap-1"><MapPin className="h-4 w-4 text-emerald-600" /> {resolved.landmark}</span>
-                <span className="flex items-center gap-1"><Calendar className="h-4 w-4 text-emerald-600" /> Available for Immediate Move-in</span>
+                <span className="flex items-center gap-1"><Calendar className="h-4 w-4 text-emerald-600" /> Vacancy Open for 2026/2027 Session</span>
               </div>
             </div>
 
@@ -264,16 +278,10 @@ export function ListingDetailPage() {
                       <p className="text-sm font-extrabold text-emerald-700 mt-0.5">₦0 (0% Fee)</p>
                     </div>
                   ) : (
-                    <>
-                      <div className="bg-blue-50 p-2.5 rounded-lg border border-blue-200">
-                        <p className="text-blue-700 font-bold">Agency Fee (15%)</p>
-                        <p className="text-sm font-extrabold text-blue-900 mt-0.5">₦{(resolved.price * 0.15).toLocaleString()}</p>
-                      </div>
-                      <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
-                        <p className="text-emerald-700 font-bold">Inspection Fee</p>
-                        <p className="text-sm font-extrabold text-emerald-900 mt-0.5">₦0 (Free on Aroom)</p>
-                      </div>
-                    </>
+                    <div className="bg-blue-50 p-2.5 rounded-lg border border-blue-200">
+                      <p className="text-blue-700 font-bold">Agency Fee (15%)</p>
+                      <p className="text-sm font-extrabold text-blue-900 mt-0.5">₦{(resolved.price * 0.15).toLocaleString()}</p>
+                    </div>
                   )}
                 </div>
 
@@ -329,11 +337,11 @@ export function ListingDetailPage() {
               {scheduledSlot ? (
                 <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-left space-y-2">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Inspection Scheduled
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Viewing Scheduled
                   </div>
                   <p className="text-sm font-bold text-slate-900">{scheduledSlot}</p>
                   <p className="text-xs text-slate-500">
-                    {isLandlord ? 'The property owner' : 'The agent'} has been notified via WhatsApp.
+                    {isLandlord ? 'The property owner' : 'The accredited partner'} has been notified via WhatsApp.
                   </p>
                   <div className="pt-2 flex items-center justify-between">
                     <button
@@ -356,13 +364,13 @@ export function ListingDetailPage() {
                   className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-5 h-5" />
-                  <span>Customize &amp; Book Inspection</span>
+                  <span>Request a viewing</span>
                 </button>
               )}
 
               <p className="text-xs text-center text-slate-500 mt-3 flex items-center justify-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Zero inspection fees guaranteed.</span>
+                <span>Mapped and verified by Team Leader</span>
               </p>
 
               <hr className="my-6 border-slate-100" />

@@ -48,7 +48,7 @@ export function HomePage() {
       <HeroSection className="py-12 sm:py-20 px-4 min-h-0 sm:min-h-125">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-600/80 border border-emerald-400/30 text-emerald-50 text-xs font-semibold mb-4 backdrop-blur-xs">
           <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
-          <span>Team-Leader Verified • ₦0 Inspection Fee</span>
+          <span>Mapped &amp; Verified Lodges • Transparent Move-In Costs</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-3xl mx-auto">

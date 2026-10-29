@@ -403,8 +403,8 @@ export function StudentDashboardPage() {
             <ShieldCheck className="w-4 h-4 text-emerald-600" /> Aroom Student Protection Policy
           </h3>
           <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
-            <li>Never pay any form of inspection fee or upfront cash before seeing the apartment physically.</li>
-            <li>All agents on Aroom are required to conduct free physical walkthroughs for verified students.</li>
+            <li>Never pay any agent fee before seeing the apartment physically and verifying running water and prepaid light.</li>
+            <li>All partners on Aroom conduct accompanied viewings with zero upfront charges.</li>
             <li>If a house is taken, we message you directly on WhatsApp with matching available rooms so you never make a wasted trip.</li>
           </ul>
         </div>

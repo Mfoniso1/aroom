@@ -161,16 +161,21 @@ export function WhatsAppConciergePage() {
                 Aroom WhatsApp Housing Assistant
               </h1>
               <p className="text-xs text-slate-400 truncate">
-                {approvedAgents.length} Verified Campus Agents • {availableHouses.length} Available Rooms • Free Physical Inspections
+                {approvedAgents.length} Verified Campus Partners • {availableHouses.length} Available Rooms • Free Accompanied Viewings
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>₦0 Inspection Fee Guarantee</span>
-            </span>
+            <a
+              href="https://wa.me/2348099990001?text=Hello%20Aroom%2C%20I%20need%20a%20verified%20student%20room%20near%20UNIPORT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all shadow-md active:scale-95"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span>Open in WhatsApp (+234 809 999 0001) →</span>
+            </a>
           </div>
         </div>
 

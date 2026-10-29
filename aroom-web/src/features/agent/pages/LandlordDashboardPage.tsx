@@ -388,7 +388,7 @@ export function LandlordDashboardPage() {
             <div>
               <h3 className="text-base font-extrabold text-amber-950 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-amber-700" />
-                <span>Upcoming Physical Walkthroughs (Zero Inspection Fees)</span>
+                <span>Upcoming Scheduled Viewings</span>
               </h3>
               <p className="text-xs text-amber-900/80 mt-0.5">
                 Students who scheduled to inspect your lodge physically before making payment.

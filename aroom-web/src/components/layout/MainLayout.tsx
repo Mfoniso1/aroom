@@ -193,7 +193,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             <Logo variant="dark" size="sm" showTagline />
           </Link>
           <p className="text-xs text-slate-500">
-            &copy; {CURRENT_YEAR} Aroom. Verified campus housing &amp; zero inspection fees.
+            &copy; {CURRENT_YEAR} Aroom. Verified campus accommodation &amp; transparent move-in pricing.
           </p>
         </div>
       </footer>

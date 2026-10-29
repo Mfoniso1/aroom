@@ -23,7 +23,7 @@ const ROLES: RoleOption[] = [
     icon: <GraduationCap className="w-6 h-6" />,
     title: 'Student',
     subtitle: 'Find verified campus rooms & book free physical inspections.',
-    badge: '₦0 Inspection Fee',
+    badge: 'Verified Rooms',
     badgeColor: 'bg-emerald-100 text-emerald-800',
     iconBg: 'bg-emerald-100',
     iconColor: 'text-emerald-600',
