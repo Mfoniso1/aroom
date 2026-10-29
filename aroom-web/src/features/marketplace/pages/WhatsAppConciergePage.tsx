@@ -147,6 +147,33 @@ export function WhatsAppConciergePage() {
 
   const latestBotMessage = [...messages].reverse().find((m) => m.sender === 'bot')
 
+  const buildWhatsAppHandoffUrl = () => {
+    const baseWa = 'https://wa.me/2348099990001'
+    // Case A: Student has an active booking #ARM-XXXX
+    if (bookings.length > 0) {
+      const latest = bookings[0]
+      const text = `Hello Aroom, my free inspection pass is #${latest.bookingRef} for ${latest.listingTitle} with ${latest.agentName} at ${latest.preferredSlot}. Please confirm my slot.`
+      return `${baseWa}?text=${encodeURIComponent(text)}`
+    }
+
+    // Case B: Student was viewing specific listings/filters
+    const lastStudentMsg = [...messages].reverse().find((m) => m.sender === 'student')?.text || ''
+    if (
+      lastStudentMsg &&
+      (lastStudentMsg.includes('Choba') ||
+        lastStudentMsg.includes('Alakahia') ||
+        lastStudentMsg.includes('budget') ||
+        lastStudentMsg.includes('250k') ||
+        lastStudentMsg.includes('#'))
+    ) {
+      const text = `Hello Aroom, I was checking rooms on the web simulator (${lastStudentMsg.slice(0, 80)}). Please send the details to my WhatsApp.`
+      return `${baseWa}?text=${encodeURIComponent(text)}`
+    }
+
+    // Case C: Default initial state
+    return `${baseWa}?text=${encodeURIComponent('Hello Aroom, I need a verified student room near UNIPORT')}`
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-4">
@@ -168,7 +195,7 @@ export function WhatsAppConciergePage() {
 
           <div className="flex items-center gap-2 shrink-0">
             <a
-              href="https://wa.me/2348099990001?text=Hello%20Aroom%2C%20I%20need%20a%20verified%20student%20room%20near%20UNIPORT"
+              href={buildWhatsAppHandoffUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all shadow-md active:scale-95"
@@ -262,11 +289,23 @@ export function WhatsAppConciergePage() {
                     >
                       {msg.mediaUrl && (
                         <div className="mb-2.5 rounded-xl overflow-hidden border border-slate-200">
-                          <img
-                            src={msg.mediaUrl}
-                            alt={msg.mediaCaption || 'Room photo'}
-                            className="w-full h-36 object-cover"
-                          />
+                          <div className="relative">
+                            <img
+                              src={msg.mediaUrl}
+                              alt={msg.mediaCaption || 'Room photo'}
+                              className="w-full h-36 object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                sendMessage(`Show me the 15-second video walkthrough and survival details for ${msg.mediaCaption || 'this room'}`)
+                              }
+                              className="absolute bottom-2 right-2 inline-flex items-center gap-1 bg-black/80 hover:bg-black text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md backdrop-blur-xs cursor-pointer border border-white/20 transition-all shadow-md"
+                              title="Watch 15s verified video walkthrough"
+                            >
+                              <span>🎥 Watch 15s Room Video</span>
+                            </button>
+                          </div>
                           {msg.mediaCaption && (
                             <div className="bg-slate-900 text-white px-2.5 py-1 text-[11px] font-bold truncate">
                               {msg.mediaCaption}
@@ -439,30 +478,70 @@ export function WhatsAppConciergePage() {
                 </h3>
               </div>
 
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="space-y-2.5 max-h-72 overflow-y-auto">
                 {bookings.map((b) => (
                   <div
                     key={b.id}
-                    className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5"
+                    className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-extrabold text-emerald-400">Booking #{b.bookingRef}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 truncate">
-                        {b.preferredSlot}
-                      </span>
+                      {b.status === 'pending_agent' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 truncate">
+                          ⏳ Awaiting Agent Confirm
+                        </span>
+                      )}
+                      {b.status === 'confirmed' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 truncate">
+                          ✅ Confirmed
+                        </span>
+                      )}
+                      {b.status === 'reported_issue' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 truncate">
+                          🚨 Reported Issue
+                        </span>
+                      )}
+                      {b.status === 'reschedule_needed' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 truncate">
+                          🔄 Reschedule Needed
+                        </span>
+                      )}
+                      {b.status === 'completed' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30 truncate">
+                          Completed
+                        </span>
+                      )}
+                      {b.status === 'cancelled' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 truncate">
+                          Cancelled
+                        </span>
+                      )}
                     </div>
+
                     <p className="font-bold text-white truncate">{b.listingTitle}</p>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+
+                    <div className="text-[11px] text-slate-400 space-y-1">
+                      <p className="flex items-center gap-1.5 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="truncate">Meetup: <strong className="text-slate-200">{b.meetupLandmark || b.landmark}</strong></span>
+                      </p>
+                      <p className="flex items-center gap-1.5 truncate">
+                        <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="truncate">Slot: <strong className="text-slate-200">{b.preferredSlot}</strong></span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
                       <span className="truncate">
                         With: <strong className="text-slate-200">{b.agentName}</strong>
                       </span>
                       <a
-                        href={`https://wa.me/${b.agentPhone.replace(/\D/g, '')}`}
+                        href={`https://wa.me/${b.agentPhone.replace(/\D/g, '')}?text=Hello%20${encodeURIComponent(b.agentName)}%2C%20I%20have%20an%20inspection%20pass%20%23${b.bookingRef}%20for%20${encodeURIComponent(b.listingTitle)}`}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 font-bold text-emerald-400 hover:underline shrink-0"
                       >
-                        <Phone className="w-3 h-3" /> Message on WhatsApp
+                        <Phone className="w-3 h-3" /> Send Pass on WhatsApp
                       </a>
                     </div>
                   </div>

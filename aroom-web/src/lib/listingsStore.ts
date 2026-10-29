@@ -6,7 +6,8 @@
  * - Emits reactive change events so Explore page and Detail pages update immediately.
  */
 import { useState, useEffect } from 'react'
-import type { Listing } from '@/components/shared/ListingCard'
+import type { Listing, CampusSurvivalMetrics } from '@/components/shared/ListingCard'
+export type { CampusSurvivalMetrics }
 
 export const SEED_LISTINGS: Listing[] = [
   {
@@ -29,6 +30,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Borehole (Running)',
+      powerStatus: 'Federal Light (Band A/B)',
+      walkMinutesToGate: 5,
+      nearestLandmark: 'Choba Junction (by Crunchies)',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Fenced & Gated', 'Night Security Guard', 'Uniformed Caretaker'],
+    },
     customFees: { cautionFee: 25000, legalFee: 20000, utilityFee: 15000, agencyFee: 0 },
   },
   {
@@ -51,6 +60,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Borehole (Running)',
+      powerStatus: 'Federal Light (Band A/B)',
+      walkMinutesToGate: 8,
+      nearestLandmark: 'UPTH First Gate, East-West Road',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Caretaker On-Site', 'Compound Generator Allowed', 'Gated Perimeter'],
+    },
     customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 48000 },
   },
   {
@@ -75,6 +92,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Pumped Daily',
+      powerStatus: 'Federal Light (Band A/B)',
+      walkMinutesToGate: 6,
+      nearestLandmark: 'Back of Chem Junction, Abuja Campus',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Fenced & Gated', 'Borehole Treated'],
+    },
     customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 36000 },
   },
   {
@@ -96,6 +121,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Borehole (Running)',
+      powerStatus: 'Generator Allowed',
+      walkMinutesToGate: 12,
+      nearestLandmark: 'Ozuoba Market Junction',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Landlord On-Site', 'Gated Perimeter'],
+    },
     customFees: { cautionFee: 20000, legalFee: 15000, utilityFee: 10000, agencyFee: 0 },
   },
   {
@@ -118,6 +151,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Well Water',
+      powerStatus: 'Federal Light (Band A/B)',
+      walkMinutesToGate: 10,
+      nearestLandmark: 'Delta Park Security Gate',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Fenced Compound', 'Day Security'],
+    },
     customFees: { cautionFee: 15000, legalFee: 10000, utilityFee: 8000, agencyFee: 24000 },
   },
   {
@@ -140,6 +181,14 @@ export const SEED_LISTINGS: Listing[] = [
     hasVideoTour: true,
     videoUrl: '/videos/room-tour.mp4',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop',
+    survivalMetrics: {
+      waterSource: 'Borehole (Running)',
+      powerStatus: 'Generator Allowed',
+      walkMinutesToGate: 15,
+      nearestLandmark: 'Aluu Roundabout, near Police Station',
+      walkthroughVideoUrl: '/videos/room-tour.mp4',
+      securityFeatures: ['Fenced & Gated', 'Caretaker On-Site'],
+    },
     customFees: { cautionFee: 30000, legalFee: 20000, utilityFee: 15000, agencyFee: 0 },
   },
   {

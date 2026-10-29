@@ -5,6 +5,15 @@ import { MoveInCostCalculator } from './MoveInCostCalculator'
 import { VideoModal } from './VideoModal'
 import { Play, Building2, UserCheck, MapPin } from 'lucide-react'
 
+export interface CampusSurvivalMetrics {
+  waterSource: 'Borehole (Running)' | 'Well Water' | 'Pumped Daily'
+  powerStatus: 'Federal Light (Band A/B)' | 'Solar Backup' | 'Generator Allowed'
+  walkMinutesToGate: number // e.g., 6
+  nearestLandmark: string   // e.g., "Choba Junction (by Crunchies)"
+  walkthroughVideoUrl?: string // 15-sec compressed MP4 or YouTube Shorts/Cloudinary link
+  securityFeatures: string[] // e.g., ['Fenced & Gated', 'Caretaker On-Site']
+}
+
 export type Listing = {
   id: string
   title: string
@@ -29,6 +38,7 @@ export type Listing = {
   unitPublicId?: string
   conditionStatus?: 'good' | 'minor_issues' | 'under_repair'
   verifiedAt?: string
+  survivalMetrics?: CampusSurvivalMetrics
   customFees?: {
     cautionFee?: number
     legalFee?: number

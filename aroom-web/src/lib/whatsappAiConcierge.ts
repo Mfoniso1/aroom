@@ -45,24 +45,39 @@ export interface EnrichedWhatsAppListing {
   agentCode: string // e.g. "A1"
 }
 
+export type InspectionBookingStatus =
+  | 'pending_agent'      // Default when student creates booking
+  | 'confirmed'          // Agent or Team Leader confirmed slot
+  | 'reschedule_needed'  // Agent proposed a different time
+  | 'completed'          // Walkthrough happened
+  | 'reported_issue'     // Student reported no-show or fee extortion
+  | 'cancelled'
+
 export interface WhatsAppAgentBooking {
   id: string
   bookingRef: string
+  referenceCode?: string // alias for bookingRef
   studentPhone: string
   studentName: string
   agentProfileId: string
+  agentId?: string // alias for agentProfileId
   agentName: string
   agentPhone: string
   agentKind: 'agent' | 'landlord'
   agencyName?: string
   listingId?: string
+  houseId?: string // alias for listingId
   listingTitle: string
+  houseTitle?: string // alias for listingTitle
   landmark: string
+  meetupLandmark: string // REQUIRED: Public landmark, never private alley
   totalMoveInCost: number
   preferredSlot: string
-  status: 'confirmed' | 'completed' | 'cancelled'
+  status: InspectionBookingStatus
   createdAt: string
 }
+
+export type WhatsAppInspectionBooking = WhatsAppAgentBooking
 
 export interface TwilioAiConfig {
   twilioAccountSid: string
@@ -107,19 +122,24 @@ const INITIAL_BOOKINGS: WhatsAppAgentBooking[] = [
   {
     id: 'wb-1001',
     bookingRef: 'ARM-4821',
+    referenceCode: 'ARM-4821',
     studentPhone: '+2348055556666',
     studentName: 'Amara Nwosu',
     agentProfileId: 'a1111111-1111-1111-1111-111111111111',
+    agentId: 'a1111111-1111-1111-1111-111111111111',
     agentName: 'David Opubo',
     agentPhone: '+2348011112222',
     agentKind: 'agent',
     agencyName: 'Choba & Alakahia Campus Homes',
     listingId: 'uniport-2',
+    houseId: 'uniport-2',
     listingTitle: 'Modern Studio at Alakahia (UPTH Road)',
+    houseTitle: 'Modern Studio at Alakahia (UPTH Road)',
     landmark: '8 mins to UPTH Gate & Delta Park',
+    meetupLandmark: 'UPTH First Gate, East-West Road',
     totalMoveInCost: 433000,
     preferredSlot: 'Tomorrow at 2:00 PM',
-    status: 'confirmed',
+    status: 'pending_agent',
     createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
   },
 ]
@@ -235,7 +255,20 @@ export async function getVerifiedWhatsAppCatalog(): Promise<{
   return { approvedAgents, availableHouses }
 }
 
-/** Create a confirmed WhatsApp Agent Inspection Booking and sync to Supabase */
+/** Nigerian phone number validator */
+export function isValidNigerianPhone(phone: string): boolean {
+  const cleaned = phone.replace(/[\s\-+]/g, '')
+  return /^(?:0|234)(?:70|80|81|90|91)\d{8}$/.test(cleaned)
+}
+
+/** Extract first Nigerian phone number token from free text */
+export function extractNigerianPhone(text: string): string | null {
+  const cleaned = text.replace(/[\s\-()]/g, '')
+  const match = cleaned.match(/(?:\+?234|0)(?:70|80|81|90|91)\d{8}\b/)
+  return match ? match[0] : null
+}
+
+/** Create a WhatsApp Agent Inspection Booking (defaults to 'pending_agent') and sync to Supabase */
 export async function createWhatsAppAgentBooking(input: {
   studentPhone: string
   studentName: string
@@ -243,32 +276,45 @@ export async function createWhatsAppAgentBooking(input: {
   house?: EnrichedWhatsAppListing
   preferredSlot: string
   customBookingRef?: string
+  status?: InspectionBookingStatus
+  meetupLandmark?: string
 }): Promise<WhatsAppAgentBooking> {
   const bookingRef = input.customBookingRef || `ARM-${Math.floor(1000 + Math.random() * 9000)}`
   const now = new Date().toISOString()
+  const publicMeetup =
+    input.meetupLandmark ||
+    input.house?.listing.survivalMetrics?.nearestLandmark ||
+    input.house?.listing.landmark ||
+    input.partner.coverageAreas
+      .map((id) => AGENT_LOCATIONS.find((l) => l.id === id)?.label || id)
+      .join(', ') ||
+    'UNIPORT Choba Gate Main Security Post'
 
   const newBooking: WhatsAppAgentBooking = {
     id: crypto.randomUUID(),
     bookingRef,
+    referenceCode: bookingRef,
     studentPhone: input.studentPhone,
     studentName: input.studentName || 'WhatsApp Student',
     agentProfileId: input.partner.id,
+    agentId: input.partner.id,
     agentName: input.partner.fullName,
     agentPhone: input.partner.phoneNumber,
     agentKind: input.partner.agentKind,
     agencyName: input.partner.agencyName,
     listingId: input.house?.listing.id,
+    houseId: input.house?.listing.id,
     listingTitle:
       input.house?.listing.title ||
       `Campus Walkthrough with ${input.partner.fullName}`,
-    landmark:
-      input.house?.listing.landmark ||
-      input.partner.coverageAreas
-        .map((id) => AGENT_LOCATIONS.find((l) => l.id === id)?.label || id)
-        .join(', '),
+    houseTitle:
+      input.house?.listing.title ||
+      `Campus Walkthrough with ${input.partner.fullName}`,
+    landmark: input.house?.listing.landmark || publicMeetup,
+    meetupLandmark: publicMeetup,
     totalMoveInCost: input.house?.costs.totalMoveInCost || 0,
     preferredSlot: input.preferredSlot,
-    status: 'confirmed',
+    status: input.status || 'pending_agent',
     createdAt: now,
   }
 
@@ -288,7 +334,7 @@ export async function createWhatsAppAgentBooking(input: {
         listing_title: newBooking.listingTitle,
         preferred_slot: newBooking.preferredSlot,
         total_move_in_kobo: newBooking.totalMoveInCost * 100,
-        status: 'confirmed',
+        status: newBooking.status,
       })
     } catch {
       // Table may not be created yet; localStorage keeps working
@@ -310,11 +356,29 @@ export function buildTwimlXml(body: string, mediaUrl?: string): string {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Message>\n    <Body>${escapeXml(body)}</Body>${mediaTag}\n  </Message>\n</Response>`
 }
 
-function parseMaxBudget(text: string): number | null {
-  const kMatch = text.match(/(\d{2,3})\s*k\b/i)
-  if (kMatch) return parseInt(kMatch[1], 10) * 1000
-  const fullMatch = text.match(/\b(\d{3}),?(\d{3})\b/)
-  if (fullMatch) return parseInt(`${fullMatch[1]}${fullMatch[2]}`, 10)
+export function parseMaxBudget(rawMessage: string): number | null {
+  // 1. Strip house codes (#1), agent codes (A1), times (2pm), and durations (1 year)
+  const sanitized = rawMessage
+    .toLowerCase()
+    .replace(/#\d+/g, '')
+    .replace(/\ba\d+\b/g, '')
+    .replace(/\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/g, '')
+    .replace(/\b\d+\s*(?:year|yr|month|day|week)s?\b/g, '')
+
+  // 2. Match explicit 'k' notation first (e.g., "250k", "₦180k", "250.5k")
+  const kMatch = sanitized.match(/(?:₦|ngn|\b)\s*(\d{2,4}(?:\.\d+)?)\s*k\b/i)
+  if (kMatch) {
+    const val = Math.round(parseFloat(kMatch[1]) * 1000)
+    return val >= 50000 ? val : null
+  }
+
+  // 3. Match full numbers >= 50,000 (e.g., "250,000", "250000")
+  const fullMatch = sanitized.match(/(?:₦|ngn|\b)\s*(\d{2,3}(?:,\d{3})+|\d{5,7})\b/i)
+  if (fullMatch) {
+    const val = parseInt(fullMatch[1].replace(/,/g, ''), 10)
+    return val >= 50000 ? val : null
+  }
+
   return null
 }
 
@@ -449,22 +513,27 @@ export async function processWhatsAppStudentMessage(input: {
           localBooking = {
             id: b.id || crypto.randomUUID(),
             bookingRef: b.bookingRef,
+            referenceCode: b.bookingRef,
             studentPhone: b.studentPhone || studentPhone,
             studentName: b.studentName || studentName,
             agentProfileId: b.agentProfileId,
+            agentId: b.agentProfileId,
             agentName: b.agentName,
             agentPhone: b.agentPhone,
             agentKind: b.agentKind || 'agent',
             agencyName: b.agencyName,
             listingId: b.listingId,
+            houseId: b.listingId,
             listingTitle: b.listingTitle,
+            houseTitle: b.listingTitle,
             landmark: b.landmark || '',
+            meetupLandmark: b.meetupLandmark || b.landmark || 'UNIPORT Choba Gate',
             totalMoveInCost: b.totalMoveInCost || 0,
             preferredSlot: b.preferredSlot,
-            status: 'confirmed',
+            status: b.status || 'pending_agent',
             createdAt: b.createdAt || new Date().toISOString(),
           }
-          if (!existing.some((x) => x.bookingRef === localBooking!.bookingRef)) {
+          if (localBooking && !existing.some((x) => x.bookingRef === localBooking!.bookingRef)) {
             saveWhatsAppBookings([localBooking, ...existing])
           }
         }
@@ -590,6 +659,116 @@ export async function processWhatsAppStudentMessage(input: {
 
   // ── PATH C: Natural 4-Stage Human Conversational Flow ──
   const firstName = studentName.split(' ')[0]
+
+  // Stage 0: Anti-Extortion & Reported Issue Handler (Task 4.1)
+  const isReportIntent =
+    /\b(report|extort|asked for money|inspection fee|no show|agent didn't come|dem demand money|money for fuel|mobilization)\b/i.test(rawMsg)
+  if (isReportIntent) {
+    const currentBookings = listWhatsAppBookings()
+    if (currentBookings.length > 0) {
+      const updated = currentBookings.map((b, i) =>
+        i === 0 ? { ...b, status: 'reported_issue' as const } : b
+      )
+      saveWhatsAppBookings(updated)
+      const flagged = updated[0]
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('aroom:agent-reported', {
+            detail: { booking: flagged, reason: rawMsg },
+          })
+        )
+      }
+
+      const reportReply = [
+        `🚨 *Report Logged with Team Leader!*`,
+        ``,
+        `Reference: *#${flagged.bookingRef}* with *${flagged.agentName}* has been flagged as *Reported Issue* for immediate investigation.`,
+        `Our Team Leader (*${tl.fullName}*, ${tl.whatsappSupport}) has been alerted to review this partner's standing.`,
+        ``,
+        `🛡️ *Aroom Zero-Tolerance Policy:*`,
+        `You must NEVER pay any mobilization, fuel, transport, or inspection fee to anyone on campus. Physical walkthroughs are 100% free.`,
+        ``,
+        `We will follow up with you directly on WhatsApp at *${flagged.studentPhone}*. Would you like to view other verified houses with a different accredited partner?`,
+      ].join('\n')
+
+      return {
+        id: crypto.randomUUID(),
+        sender: 'bot',
+        text: reportReply,
+        twimlXml: buildTwimlXml(reportReply),
+        suggestedReplies: [
+          'Show me other available rooms',
+          'Who are the verified agents I can book?',
+        ],
+        timestamp: new Date().toISOString(),
+      }
+    }
+  }
+
+  // Stage 0b: Check if student is answering the Phone Number Gate (Task 2.3)
+  const detectedPhone = extractNigerianPhone(rawMsg)
+  const draftRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_pending_booking_draft') : null
+  if (detectedPhone && draftRaw) {
+    try {
+      localStorage.setItem('aroom_student_phone', detectedPhone)
+      localStorage.removeItem('aroom_pending_booking_draft')
+      const draft = JSON.parse(draftRaw)
+      const draftHouse = availableHouses[draft.houseIdx] || availableHouses[0]
+      const draftAgentEntry =
+        approvedAgents.find((a) => a.partner.id === draft.agentId) || approvedAgents[0]
+
+      const booking = await createWhatsAppAgentBooking({
+        studentPhone: detectedPhone,
+        studentName,
+        partner: draftAgentEntry.partner,
+        house: draftHouse,
+        preferredSlot: draft.slot || 'Tomorrow at 2:00 PM',
+        status: 'pending_agent',
+      })
+
+      const cleanWaDigits = draftAgentEntry.partner.phoneNumber.replace(/\D/g, '')
+      const replyText = [
+        `Thank you, ${firstName}! Phone number *${detectedPhone}* saved. 🎉`,
+        ``,
+        `⏳ *Inspection Request #${booking.bookingRef} Logged*`,
+        `🔖 Booking Reference: *#${booking.bookingRef}* (Awaiting Partner Confirm)`,
+        `👤 *Verified Partner:* ${draftAgentEntry.partner.fullName} (${draftAgentEntry.partner.agentKind === 'landlord' ? 'Direct Landlord — 0% Fee' : 'Campus Agent'})`,
+        draftAgentEntry.partner.agencyName ? `🏢 *Lodge / Agency:* ${draftAgentEntry.partner.agencyName}` : '',
+        `📞 *Direct WhatsApp / Call:* https://wa.me/${cleanWaDigits} (${draftAgentEntry.partner.phoneNumber})`,
+        `🏠 *Property:* ${booking.listingTitle}`,
+        `📍 *Public Meetup Point:* ${booking.meetupLandmark}`,
+        `🗓️ *Requested Time:* ${booking.preferredSlot}`,
+        booking.totalMoveInCost > 0
+          ? `💵 *Total Move-In Cost:* ₦${booking.totalMoveInCost.toLocaleString()} (All move-in fees included)`
+          : `💵 *Move-In Pricing:* Verified with zero hidden fees`,
+        ``,
+        `We have pinged *${draftAgentEntry.partner.fullName}* to lock in this time. Click the WhatsApp link above to message them your pass *#${booking.bookingRef}*.`,
+        ``,
+        `🛡️ *Aroom Safety Rule:* Show pass *#${booking.bookingRef}* when meeting *${draftAgentEntry.partner.fullName}* at *${booking.meetupLandmark}*. NEVER pay any inspection, form, or transport fee. If asked for ₦1, reply *REPORT #${booking.bookingRef}* here immediately.`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+
+      return {
+        id: crypto.randomUUID(),
+        sender: 'bot',
+        text: replyText,
+        mediaUrl: draftHouse?.listing.imageUrl,
+        mediaCaption: draftHouse?.listing.title,
+        twimlXml: buildTwimlXml(replyText, draftHouse?.listing.imageUrl),
+        bookingCreated: booking,
+        suggestedReplies: [
+          'Show me other available rooms',
+          'Is the caution fee refundable?',
+          'Who are your verified agents?',
+        ],
+        timestamp: new Date().toISOString(),
+      }
+    } catch {
+      // Continue normal processing
+    }
+  }
 
   // Stage 1: Warm Human Greeting
   const isGreetingOnly =
@@ -734,31 +913,67 @@ export async function processWhatsAppStudentMessage(input: {
     )
     const preferredSlot = slotMatch ? slotMatch[0].trim() : 'Tomorrow at 2:00 PM'
 
+    // Mandatory Student WhatsApp Phone Gate (Task 2.3)
+    const storedPhone = typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_student_phone') || '' : ''
+    const effectivePhone =
+      isValidNigerianPhone(studentPhone)
+        ? studentPhone
+        : isValidNigerianPhone(storedPhone)
+        ? storedPhone
+        : ''
+
+    if (!isValidNigerianPhone(effectivePhone)) {
+      const houseIdx = matchedHouse ? availableHouses.indexOf(matchedHouse) : 0
+      const draftPayload = {
+        houseIdx,
+        agentId: matchedAgent.id,
+        slot: preferredSlot,
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('aroom_pending_booking_draft', JSON.stringify(draftPayload))
+      }
+
+      const promptPhoneText = [
+        `Almost done! Drop your active WhatsApp phone number (e.g., 0803XXXXXXX) so we can generate your free *#ARM-XXXX* inspection pass and send it to your phone.`,
+      ].join('\n')
+
+      return {
+        id: crypto.randomUUID(),
+        sender: 'bot',
+        text: promptPhoneText,
+        twimlXml: buildTwimlXml(promptPhoneText),
+        suggestedReplies: [
+          '08031234567',
+          '08123456789',
+          'Cancel booking',
+        ],
+        timestamp: new Date().toISOString(),
+      }
+    }
+
     const booking = await createWhatsAppAgentBooking({
-      studentPhone,
+      studentPhone: effectivePhone,
       studentName,
       partner: matchedAgent,
       house: matchedHouse,
       preferredSlot,
+      status: 'pending_agent',
     })
 
     const cleanWaDigits = matchedAgent.phoneNumber.replace(/\D/g, '')
     const replyText = [
-      `All set, ${firstName}! 🎉 I've booked your free physical inspection with *${matchedAgent.fullName}*.`,
+      `⏳ *Inspection Request #${booking.bookingRef}* logged for *${booking.preferredSlot}* at *${booking.meetupLandmark}*. We have pinged *${matchedAgent.fullName}* to lock in this time. Click below to send your pass to *${matchedAgent.fullName}* on WhatsApp:`,
+      `👉 https://wa.me/${cleanWaDigits}?text=Hello%20${encodeURIComponent(matchedAgent.fullName)}%2C%20my%20free%20inspection%20pass%20is%20%23${booking.bookingRef}%20for%20${encodeURIComponent(booking.listingTitle)}%20at%20${encodeURIComponent(booking.preferredSlot)}`,
       ``,
-      `✅ *Free Inspection Confirmed*`,
-      `🔖 Booking Reference: *#${booking.bookingRef}*`,
       `👤 *Verified ${matchedAgent.agentKind === 'landlord' ? 'Direct Landlord' : 'Agent'}:* ${matchedAgent.fullName}`,
       matchedAgent.agencyName ? `🏢 *Lodge / Agency:* ${matchedAgent.agencyName}` : '',
-      `📞 *Direct WhatsApp / Call:* https://wa.me/${cleanWaDigits} (${matchedAgent.phoneNumber})`,
       `🏠 *Property:* ${booking.listingTitle}`,
-      `📍 *Meeting Point:* ${booking.landmark}`,
+      `📍 *Public Meetup Point:* ${booking.meetupLandmark}`,
       booking.totalMoveInCost > 0
-        ? `💵 *Total Move-In Cost:* ₦${booking.totalMoveInCost.toLocaleString()} (All move-in fees included)`
+        ? `💵 *Total Year-1 Move-In:* ₦${booking.totalMoveInCost.toLocaleString()} (All move-in fees included)`
         : `💵 *Move-In Pricing:* Verified with zero hidden fees`,
-      `🗓️ *Scheduled Time:* ${booking.preferredSlot}`,
       ``,
-      `You can tap the WhatsApp link above to message *${matchedAgent.fullName}* directly and mention your reference *#${booking.bookingRef}*. Would you like to check another room as a backup?`,
+      `🛡️ *Aroom Safety Rule:* Show pass *#${booking.bookingRef}* when meeting *${matchedAgent.fullName}* at *${booking.meetupLandmark}*. NEVER pay any inspection, form, or transport fee. If asked for ₦1, reply *REPORT #${booking.bookingRef}* here immediately.`,
     ]
       .filter(Boolean)
       .join('\n')
@@ -884,7 +1099,7 @@ export async function processWhatsAppStudentMessage(input: {
     }
   }
 
-  // Stage 2: Plain-English House & Total Cost Discovery
+  // Stage 2: Plain-English House & Total Cost Discovery with Survival Metrics & Budget Bucketing (Task 3.1 & 3.2)
   const campusFilter = detectCampusFilter(rawMsg)
   const maxBudget = parseMaxBudget(rawMsg)
   const directLandlordOnly =
@@ -894,54 +1109,112 @@ export async function processWhatsAppStudentMessage(input: {
     lower.includes('no agent fee') ||
     lower.includes('landlord only')
 
-  let matches = availableHouses.filter((h) => {
-    if (campusFilter && h.listing.campusId !== campusFilter) return false
-    if (maxBudget && h.costs.annualRent > maxBudget) return false
-    if (directLandlordOnly && !h.costs.isDirectLandlord) return false
-    return true
-  })
-
-  let introLine = `Here are the best verified student rooms${campusFilter ? ` near *${campusFilter.toUpperCase()}*` : ''}${maxBudget ? ` within *₦${maxBudget.toLocaleString()}/yr*` : ''} with their complete move-in costs, ${firstName}:`
-  if (matches.length === 0) {
-    matches = availableHouses
-    introLine = `Here are all *${availableHouses.length} verified campus rooms* currently available for physical inspection, ${firstName}:`
-  }
-
-  const houseBlocks = matches.slice(0, 4).map((h) => {
+  function renderListingBlock(h: EnrichedWhatsAppListing) {
     const c = h.costs
+    const m = h.listing.survivalMetrics
     const agentName = h.verifiedAgent
       ? `${h.verifiedAgent.fullName} (✅ Verified ${h.verifiedAgent.agentKind === 'landlord' ? 'Landlord' : 'Agent'})`
       : h.listing.uploaderName
+    const realityLine = m
+      ? `📍 ${m.walkMinutesToGate} mins walk to ${m.nearestLandmark} • 💧 ${m.waterSource} • ⚡ ${m.powerStatus}`
+      : `📍 ${h.listing.landmark}`
+
     return [
-      `🏠 *${h.indexCode}. ${h.listing.title}* (${h.campusShort})`,
-      `📍 ${h.listing.landmark}`,
+      `🏠 *${h.indexCode} ${h.listing.title}* (${h.campusShort})`,
+      realityLine,
       `👤 Handled by: *${agentName}*`,
-      `💰 Rent: *₦${c.annualRent.toLocaleString()}/yr* + Other Fees: ₦${(c.cautionFee + c.legalFee + c.utilityFee).toLocaleString()} + Agency: *${c.isDirectLandlord ? '₦0 (Direct Landlord)' : `₦${c.agencyFee.toLocaleString()}`}*`,
-      `👉 *Total Move-In Cost: ₦${c.totalMoveInCost.toLocaleString()}* _(Free Inspection)_`,
+      `💰 Base Rent: ₦${c.annualRent.toLocaleString()}/yr | *Total Year-1 Move-In: ₦${c.totalMoveInCost.toLocaleString()}*`,
+      `🛡️ Inspection Fee: *₦0 (FREE)*`,
     ].join('\n')
-  })
+  }
 
-  const topAgentFirstName = matches[0]?.verifiedAgent?.fullName.split(' ')[0] || 'David'
+  let replyText = ''
+  let topHouse: EnrichedWhatsAppListing | undefined
 
-  const replyText = [
-    introLine,
-    ``,
-    ...houseBlocks.flatMap((b) => [b, '']),
-    `Which of these rooms would you like to inspect in person? You can ask me for the full fee breakdown of *${matches[0]?.indexCode || '#1'}*, or say *"Book ${topAgentFirstName} tomorrow at 2pm"* to schedule your free walkthrough!`,
-  ].join('\n')
+  if (maxBudget !== null) {
+    // Task 3.2: Disambiguation between Total Move-In vs Base Rent
+    const underTotalBudget = availableHouses.filter((h) => {
+      if (campusFilter && h.listing.campusId !== campusFilter) return false
+      if (directLandlordOnly && !h.costs.isDirectLandlord) return false
+      return h.costs.totalMoveInCost <= maxBudget
+    })
+
+    const baseRentFits = availableHouses.filter((h) => {
+      if (campusFilter && h.listing.campusId !== campusFilter) return false
+      if (directLandlordOnly && !h.costs.isDirectLandlord) return false
+      return (
+        h.costs.annualRent <= maxBudget &&
+        h.costs.totalMoveInCost > maxBudget &&
+        h.costs.totalMoveInCost <= maxBudget * 1.25
+      )
+    })
+
+    topHouse = underTotalBudget[0] || baseRentFits[0] || availableHouses[0]
+    const sections: string[] = []
+
+    if (underTotalBudget.length > 0) {
+      sections.push(
+        `✅ *Total Move-In Under Your Budget (≤ ₦${maxBudget.toLocaleString()} All-In):*`,
+        '',
+        ...underTotalBudget.slice(0, 3).flatMap((h) => [renderListingBlock(h), ''])
+      )
+    }
+
+    if (baseRentFits.length > 0) {
+      sections.push(
+        `💡 *Base Rent Fits, Total Move-In Slightly Above:*`,
+        `_(Base rent fits your ₦${maxBudget.toLocaleString()} budget, and Year 2 drops back to base rent.)_`,
+        '',
+        ...baseRentFits.slice(0, 3).flatMap((h) => [renderListingBlock(h), ''])
+      )
+    }
+
+    if (sections.length === 0) {
+      sections.push(
+        `Here are verified rooms closest to your ₦${maxBudget.toLocaleString()} budget around ${campusFilter ? campusFilter.toUpperCase() : 'UNIPORT'}, ${firstName}:`,
+        '',
+        ...availableHouses.slice(0, 3).flatMap((h) => [renderListingBlock(h), ''])
+      )
+    }
+
+    const topAgentFirstName = topHouse?.verifiedAgent?.fullName.split(' ')[0] || 'David'
+    sections.push(
+      `Which of these would you like to inspect? You can say *"Book ${topAgentFirstName} tomorrow at 2pm"* for a free walkthrough, or ask for details on *${topHouse?.indexCode || '#1'}*!`
+    )
+
+    replyText = sections.join('\n')
+  } else {
+    let matches = availableHouses.filter((h) => {
+      if (campusFilter && h.listing.campusId !== campusFilter) return false
+      if (directLandlordOnly && !h.costs.isDirectLandlord) return false
+      return true
+    })
+    if (matches.length === 0) matches = availableHouses
+    topHouse = matches[0]
+    const topAgentFirstName = topHouse?.verifiedAgent?.fullName.split(' ')[0] || 'David'
+
+    replyText = [
+      `Here are verified campus rooms${campusFilter ? ` near *${campusFilter.toUpperCase()}*` : ''} ready for free physical walkthroughs, ${firstName}:`,
+      '',
+      ...matches.slice(0, 4).flatMap((h) => [renderListingBlock(h), '']),
+      `Which of these rooms would you like to inspect in person? You can ask me for the full fee breakdown of *${topHouse.indexCode}*, or say *"Book ${topAgentFirstName} tomorrow at 2pm"* to schedule your free walkthrough!`,
+    ].join('\n')
+  }
+
+  const agentPromptName = topHouse?.verifiedAgent?.fullName.split(' ')[0] || 'David'
 
   return {
     id: crypto.randomUUID(),
     sender: 'bot',
     text: replyText,
-    mediaUrl: matches[0]?.listing.imageUrl,
-    mediaCaption: matches[0]
-      ? `${matches[0].listing.title} — Total Move-In: ₦${matches[0].costs.totalMoveInCost.toLocaleString()}`
+    mediaUrl: topHouse?.listing.imageUrl,
+    mediaCaption: topHouse
+      ? `${topHouse.listing.title} — Total Move-In: ₦${topHouse.costs.totalMoveInCost.toLocaleString()}`
       : undefined,
-    twimlXml: buildTwimlXml(replyText, matches[0]?.listing.imageUrl),
+    twimlXml: buildTwimlXml(replyText, topHouse?.listing.imageUrl),
     suggestedReplies: [
-      `Show full cost breakdown for ${matches[0]?.indexCode || '#1'}`,
-      `Book ${topAgentFirstName} tomorrow at 2pm`,
+      `Show full cost breakdown for ${topHouse?.indexCode || '#1'}`,
+      `Book ${agentPromptName} tomorrow at 2pm`,
       'Who are the verified agents I can book?',
       'How do I know this is safe?',
     ],

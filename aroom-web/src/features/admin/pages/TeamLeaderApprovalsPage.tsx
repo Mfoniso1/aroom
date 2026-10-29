@@ -1309,9 +1309,26 @@ export function TeamLeaderApprovalsPage() {
                   {waBookings.map((b) => (
                     <div key={b.id} className="p-5 space-y-2 hover:bg-slate-800/40">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-xs font-extrabold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded border border-emerald-700">
-                          Ref #{b.bookingRef}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-extrabold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded border border-emerald-700">
+                            Ref #{b.bookingRef}
+                          </span>
+                          {b.status === 'pending_agent' && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              ⏳ Awaiting Agent Confirm
+                            </span>
+                          )}
+                          {b.status === 'confirmed' && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              ✅ Confirmed
+                            </span>
+                          )}
+                          {b.status === 'reported_issue' && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse">
+                              🚨 Extortion / Issue Reported
+                            </span>
+                          )}
+                        </div>
                         <span className="text-xs font-bold text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full">
                           Slot: {b.preferredSlot}
                         </span>

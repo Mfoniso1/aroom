@@ -285,7 +285,78 @@ Deno.serve(async (req: Request) => {
       profileName = String(params.get('ProfileName') ?? 'Campus Student').trim()
     }
 
-  // 1. Load Approved Agents from Supabase (strictly users.account_status = 'active')
+    // 0. Agent Confirmation Webhook Handler (Task 2.2)
+    const agentConfirmMatch = body.match(/(?:confirm|yes|accept|lock in)\s*#?(ARM-\d{4})/i)
+    if (agentConfirmMatch) {
+      const targetRef = agentConfirmMatch[1].toUpperCase()
+      if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+        try {
+          const patchUrl = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/whatsapp_bookings?booking_ref=eq.${targetRef}`
+          await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal',
+            },
+            body: JSON.stringify({ status: 'confirmed' }),
+          })
+        } catch {
+          // ignore if table not created
+        }
+      }
+
+      const agentReplyText = `✅ Inspection Pass #${targetRef} has been confirmed. The student has been notified and we have logged this for the Team Leader accompaniment.`
+      if (isJsonRequest) {
+        return new Response(
+          JSON.stringify({
+            replyText: agentReplyText,
+            twimlXml: `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Message>\n    <Body>${escapeXml(agentReplyText)}</Body>\n  </Message>\n</Response>`,
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      return twimlResponse(agentReplyText)
+    }
+
+    // 0b. Student Report Extortion Handler (Task 4.1)
+    const reportMatch = body.match(/\b(report|extort|asked for money|inspection fee|no show)\b/i)
+    if (reportMatch) {
+      const refMatch = body.match(/#?(ARM-\d{4})/i)
+      const targetRef = refMatch ? refMatch[1].toUpperCase() : ''
+      if (targetRef && SUPABASE_URL && SUPABASE_ANON_KEY) {
+        try {
+          const patchUrl = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/whatsapp_bookings?booking_ref=eq.${targetRef}`
+          await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal',
+            },
+            body: JSON.stringify({ status: 'reported_issue' }),
+          })
+        } catch {
+          // ignore
+        }
+      }
+
+      const reportReplyText = `🚨 Report Logged! Reference #${targetRef || 'Pass'} has been flagged for investigation by our Team Leader. Remember: Aroom inspections are 100% FREE (₦0). NEVER pay any inspection or transport fee.`
+      if (isJsonRequest) {
+        return new Response(
+          JSON.stringify({
+            replyText: reportReplyText,
+            twimlXml: `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Message>\n    <Body>${escapeXml(reportReplyText)}</Body>\n  </Message>\n</Response>`,
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      return twimlResponse(reportReplyText)
+    }
+
+    // 1. Load Approved Agents from Supabase (strictly users.account_status = 'active')
   let agentsCatalog = FALLBACK_AGENTS
   if (clientAgents && clientAgents.length > 0) {
     agentsCatalog = clientAgents
@@ -522,7 +593,7 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
       landmark: chosenHouse?.landmark || chosenAgent.coverageAreas,
       totalMoveInCost: chosenHouse?.totalMoveIn || 0,
       preferredSlot: requestedSlot,
-      status: 'confirmed',
+      status: 'pending_agent',
       createdAt: new Date().toISOString(),
     }
 
@@ -535,7 +606,7 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
       listing_title: listingTitle,
       preferred_slot: requestedSlot,
       total_move_in_kobo: (chosenHouse?.totalMoveIn || 0) * 100,
-      status: 'confirmed',
+      status: 'pending_agent',
     })
 
     // Remove the raw tag from the student-facing message and append the official booking receipt
@@ -543,13 +614,16 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
     const cleanPhone = String(chosenAgent.phoneNumber).replace(/\D/g, '')
     const receiptBlock = [
       ``,
-      `✅ *Official Inspection Booking Confirmed!*`,
-      `🔖 *Booking Ref:* #${bookingRef}`,
+      `⏳ *Inspection Request #${bookingRef} Logged*`,
+      `🔖 *Pass Reference:* #${bookingRef} (Awaiting Agent Confirm)`,
       `👤 *Verified Partner:* ${chosenAgent.fullName} (${chosenAgent.code})`,
       `📞 *Direct WhatsApp:* https://wa.me/${cleanPhone} (${chosenAgent.phoneNumber})`,
       `🏠 *Property:* ${listingTitle}`,
+      `📍 *Meetup Point:* ${chosenHouse?.landmark || 'Campus Gate'}`,
       `🗓️ *Time Slot:* ${requestedSlot}`,
       `💵 *Inspection Fee:* ₦0 (100% FREE)`,
+      ``,
+      `🛡️ *Aroom Safety Rule:* Show pass *#${bookingRef}* when meeting ${chosenAgent.fullName}. NEVER pay any inspection, form, or transport fee. If asked for ₦1, reply *REPORT #${bookingRef}* here immediately.`,
     ].join('\n')
 
     if (!aiReplyText.includes(bookingRef)) {

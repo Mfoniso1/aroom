@@ -238,3 +238,4 @@ stateDiagram-v2
 | **Tablet / Foldable (iPad Mini, Surface Duo)** | 768px – 1023px | Elevated 640px chat canvas; spacious typography (`text-sm`); quick switching between chat and agent directory. |
 | **Desktop / Laptop (MacBook, 1080p Monitor)** | 1024px – 1440px | Full dual-pane workspace; WhatsApp stream on left; live cohort inventory and scheduled inspections visible on right. |
 | **Ultra-Wide Screens (4K, 1440p+ Monitors)** | 1440px+ | Centered max-w-7xl canvas preventing excessive stretching; balanced proportions with rich dark-mode aesthetics. |
+
