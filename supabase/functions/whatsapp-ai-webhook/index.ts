@@ -242,9 +242,9 @@ Deno.serve(async (req: Request) => {
       )
     }
 
-    let from = '+2348055556666'
+    let from = ''
     let body = ''
-    let profileName = 'Campus Student'
+    let profileName = ''
     let clientHistory: ChatTurn[] = []
     let clientAgents: typeof FALLBACK_AGENTS | null = null
     let clientHouses: typeof FALLBACK_HOUSES | null = null
@@ -252,14 +252,14 @@ Deno.serve(async (req: Request) => {
     let preferredModel = ''
 
     if (req.method === 'GET') {
-      from = String(urlObj.searchParams.get('From') ?? '').replace('whatsapp:', '').trim() || '+2348055556666'
+      from = String(urlObj.searchParams.get('From') ?? '').replace('whatsapp:', '').trim()
       body = String(urlObj.searchParams.get('Body') ?? '').trim()
-      profileName = String(urlObj.searchParams.get('ProfileName') ?? 'Campus Student').trim()
+      profileName = String(urlObj.searchParams.get('ProfileName') ?? '').trim()
     } else if (isJsonRequest) {
       const payload = await req.json()
-      from = String(payload.from || payload.studentPhone || '+2348055556666').replace('whatsapp:', '').trim()
+      from = String(payload.from || payload.studentPhone || '').replace('whatsapp:', '').trim()
       body = String(payload.body || payload.studentMessage || '').trim()
-      profileName = String(payload.profileName || payload.studentName || 'Campus Student')
+      profileName = String(payload.profileName || payload.studentName || '').trim()
       if (Array.isArray(payload.history)) {
         clientHistory = payload.history
       }
@@ -273,16 +273,16 @@ Deno.serve(async (req: Request) => {
       preferredModel = String(payload.model || '')
     } else if (contentType.includes('multipart/form-data')) {
       const formData = await req.formData()
-      from = String(formData.get('From') ?? '').replace('whatsapp:', '').trim() || '+2348055556666'
+      from = String(formData.get('From') ?? '').replace('whatsapp:', '').trim()
       body = String(formData.get('Body') ?? '').trim()
-      profileName = String(formData.get('ProfileName') ?? 'Campus Student').trim()
+      profileName = String(formData.get('ProfileName') ?? '').trim()
     } else {
       // Standard Twilio POST: application/x-www-form-urlencoded
       const rawText = await req.text()
       const params = new URLSearchParams(rawText)
-      from = String(params.get('From') ?? '').replace('whatsapp:', '').trim() || '+2348055556666'
+      from = String(params.get('From') ?? '').replace('whatsapp:', '').trim()
       body = String(params.get('Body') ?? '').trim()
-      profileName = String(params.get('ProfileName') ?? 'Campus Student').trim()
+      profileName = String(params.get('ProfileName') ?? '').trim()
     }
 
     // 0. Agent Confirmation Webhook Handler (Task 2.2)
@@ -469,8 +469,16 @@ Deno.serve(async (req: Request) => {
     )
     .join('\n')
 
+  const cleanFirstName =
+    profileName && !['campus', 'student', 'guest', 'there'].includes(profileName.split(' ')[0].toLowerCase())
+      ? profileName.split(' ')[0]
+      : ''
+  const studentIdentityLine = cleanFirstName
+    ? `You are chatting with a student named "${profileName}" (WhatsApp: ${from || 'not yet provided'}).`
+    : `You are chatting with a prospective university student (Name: not yet provided, WhatsApp: ${from || 'not yet provided'}). Address them warmly without inventing or assuming a name.`
+
   const systemPrompt = `You are "Aroom AI", a warm, smart, conversational WhatsApp Student Housing & Trusted Agent Concierge for Nigerian university students (UNILAG, UNIPORT, UNIBEN, DELSU, etc.).
-You are chatting with a student named "${profileName}" (WhatsApp: ${from}).
+${studentIdentityLine}
 
 YOUR CORE MISSION:
 Help students naturally on WhatsApp without ever needing them to visit the website:
@@ -558,7 +566,8 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
     lowerBody.includes('book femi') ||
     lowerBody.includes('book emeka')
 
-  if (tagMatch || explicitBookIntent) {
+  const hasValidPhone = /^(?:\+?234|0)[789][01]\d{8}$/.test(from.replace(/[\s-]/g, ''))
+  if ((tagMatch || explicitBookIntent) && hasValidPhone) {
     const requestedAgentCode = tagMatch?.[1] || (body.match(/\b(A\d)\b/i)?.[1] ?? 'A1')
     const requestedHouseCode = tagMatch?.[2] || (body.match(/(#[1-9])/i)?.[1] ?? '#1')
     const requestedSlot =
@@ -577,12 +586,13 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
     const bookingRef = `ARM-${Math.floor(1000 + Math.random() * 9000)}`
     const bookingId = crypto.randomUUID()
     const listingTitle = chosenHouse?.title || `Campus Walkthrough with ${chosenAgent.fullName}`
+    const finalStudentName = profileName || 'Campus Student'
 
     bookingCreated = {
       id: bookingId,
       bookingRef,
       studentPhone: from,
-      studentName: profileName,
+      studentName: finalStudentName,
       agentProfileId: chosenAgent.id,
       agentName: chosenAgent.fullName,
       agentPhone: chosenAgent.phoneNumber,
@@ -601,7 +611,7 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
       id: bookingId,
       booking_ref: bookingRef,
       student_phone: from,
-      student_name: profileName,
+      student_name: finalStudentName,
       agent_profile_id: chosenAgent.id,
       listing_title: listingTitle,
       preferred_slot: requestedSlot,
@@ -633,13 +643,14 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
 
   // 6. Conversational Fallback if OpenRouter key was not yet set
   if (!aiReplyText) {
+    const greetName = cleanFirstName ? ` ${cleanFirstName}` : ' there'
     if (lowerBody.includes('agent') || lowerBody.includes('trusted') || lowerBody.includes('who')) {
       const agentLines = agentsCatalog.map(
         (a) =>
           `*${a.code}. ${a.fullName}* — ✅ Team Leader Verified\n🏢 ${a.agencyName}\n📍 ${a.coverageAreas}\n📞 WhatsApp: ${a.phoneNumber}`
       )
       aiReplyText = [
-        `Hey ${profileName.split(' ')[0]}! 👋 Here are our *Team-Leader-Verified Agents & Landlords* you can book right now on WhatsApp:`,
+        `Hey${greetName}! 👋 Here are our *Team-Leader-Verified Agents & Landlords* you can book right now on WhatsApp:`,
         ``,
         ...agentLines,
         ``,
@@ -651,7 +662,7 @@ HOW TO FORMAT YOUR WHATSAPP REPLIES:
           `*${h.code}. ${h.title}* (${h.campus})\n📍 ${h.landmark}\n👤 Verified Partner: ${h.agentName} (${h.agentCode})\n💰 Rent: ₦${h.annualRent.toLocaleString()}/yr | Caution/Legal/Util: ₦${(h.cautionFee + h.legalFee + h.utilityFee).toLocaleString()} | Agency: ₦${h.agencyFee.toLocaleString()}\n👉 *Total Move-In Cost: ₦${h.totalMoveIn.toLocaleString()}*`
       )
       aiReplyText = [
-        `Hi ${profileName.split(' ')[0]}! 😊 I can help you compare verified student houses, check the full move-in costs, and book a trusted agent right here on WhatsApp.`,
+        `Hi${greetName}! 😊 I can help you compare verified student houses, check the full move-in costs, and book a trusted agent right here on WhatsApp.`,
         ``,
         `Here are our top verified options right now:`,
         ...houseLines,

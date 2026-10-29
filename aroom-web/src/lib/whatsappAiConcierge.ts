@@ -118,31 +118,52 @@ const DEFAULT_TWILIO_CONFIG: TwilioAiConfig = {
   aiApiKey: openRouterKeyFromEnv,
 }
 
-const INITIAL_BOOKINGS: WhatsAppAgentBooking[] = [
-  {
-    id: 'wb-1001',
-    bookingRef: 'ARM-4821',
-    referenceCode: 'ARM-4821',
-    studentPhone: '+2348055556666',
-    studentName: 'Amara Nwosu',
-    agentProfileId: 'a1111111-1111-1111-1111-111111111111',
-    agentId: 'a1111111-1111-1111-1111-111111111111',
-    agentName: 'David Opubo',
-    agentPhone: '+2348011112222',
-    agentKind: 'agent',
-    agencyName: 'Choba & Alakahia Campus Homes',
-    listingId: 'uniport-2',
-    houseId: 'uniport-2',
-    listingTitle: 'Modern Studio at Alakahia (UPTH Road)',
-    houseTitle: 'Modern Studio at Alakahia (UPTH Road)',
-    landmark: '8 mins to UPTH Gate & Delta Park',
-    meetupLandmark: 'UPTH First Gate, East-West Road',
-    totalMoveInCost: 433000,
-    preferredSlot: 'Tomorrow at 2:00 PM',
-    status: 'pending_agent',
-    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-  },
-]
+const INITIAL_BOOKINGS: WhatsAppAgentBooking[] = []
+
+export const STUDENT_IDENTITY_EVENT = 'aroom:student-identity-changed'
+
+export interface StudentChatIdentity {
+  name: string
+  phone: string
+}
+
+export function getStudentChatIdentity(
+  session?: { fullName?: string; phoneNumber?: string } | null
+): StudentChatIdentity {
+  const storedName =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_student_name') || '' : ''
+  const storedPhone =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_student_phone') || '' : ''
+  return {
+    name: (session?.fullName || storedName).trim(),
+    phone: (session?.phoneNumber || storedPhone).trim(),
+  }
+}
+
+export function saveStudentChatIdentity(patch: Partial<StudentChatIdentity>): StudentChatIdentity {
+  if (typeof localStorage !== 'undefined') {
+    if (patch.name !== undefined) {
+      const cleanName = patch.name.trim()
+      if (cleanName) {
+        localStorage.setItem('aroom_student_name', cleanName)
+      } else {
+        localStorage.removeItem('aroom_student_name')
+      }
+    }
+    if (patch.phone !== undefined) {
+      const cleanPhone = patch.phone.trim()
+      if (cleanPhone) {
+        localStorage.setItem('aroom_student_phone', cleanPhone)
+      } else {
+        localStorage.removeItem('aroom_student_phone')
+      }
+    }
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(STUDENT_IDENTITY_EVENT))
+  }
+  return getStudentChatIdentity()
+}
 
 export function getTwilioAiConfig(): TwilioAiConfig {
   try {
@@ -171,7 +192,13 @@ export function listWhatsAppBookings(): WhatsAppAgentBooking[] {
       localStorage.setItem(BOOKINGS_KEY, JSON.stringify(INITIAL_BOOKINGS))
       return INITIAL_BOOKINGS
     }
-    return JSON.parse(raw)
+    const parsed: WhatsAppAgentBooking[] = JSON.parse(raw)
+    // Purge legacy hardcoded 'Amara Nwosu' demo seed booking if present
+    const cleaned = parsed.filter((b) => b.id !== 'wb-1001' && b.studentName !== 'Amara Nwosu')
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(cleaned))
+    }
+    return cleaned
   } catch {
     return INITIAL_BOOKINGS
   }
@@ -266,6 +293,78 @@ export function extractNigerianPhone(text: string): string | null {
   const cleaned = text.replace(/[\s\-()]/g, '')
   const match = cleaned.match(/(?:\+?234|0)(?:70|80|81|90|91)\d{8}\b/)
   return match ? match[0] : null
+}
+
+/** Extract student's real name from natural self-introduction or "Name 0803XXXXXXX" reply */
+export function extractStudentNameFromText(text: string): string | null {
+  // 1. Explicit self-introduction ("My name is Chidi", "I'm Tobi", "I am Kemi", "Call me Nnamdi")
+  const introMatch = text.match(
+    /(?:my name is|i am|i'm|call me|name\s*[:=-])\s*([A-Za-z]{2,20}(?:\s+[A-Za-z]{2,20})?)/i
+  )
+  if (introMatch) {
+    const candidate = introMatch[1].trim()
+    if (
+      !/^(looking|searching|schooling|in|at|from|interested|ready|here|a|an|student|booking|new|under|around|near)\b/i.test(
+        candidate
+      )
+    ) {
+      return candidate
+        .split(/\s+/)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ')
+    }
+  }
+
+  // 2. Name paired alongside a Nigerian phone number (e.g., "Chidi 08031234567" or "08031234567 Chidi")
+  if (extractNigerianPhone(text)) {
+    const withoutPhone = text
+      .replace(/(?:\+?234|0)(?:70|80|81|90|91)\d{8}/g, '')
+      .replace(/[^A-Za-z\s]/g, ' ')
+      .trim()
+    const stopWords = new Set([
+      'my',
+      'number',
+      'phone',
+      'whatsapp',
+      'is',
+      'its',
+      'it',
+      'here',
+      'abeg',
+      'please',
+      'book',
+      'for',
+      'me',
+      'yes',
+      'hi',
+      'hello',
+      'name',
+      'and',
+      'call',
+    ])
+    const nameTokens = withoutPhone
+      .split(/\s+/)
+      .filter((w) => w.length >= 2 && !stopWords.has(w.toLowerCase()))
+    if (nameTokens.length >= 1 && nameTokens.length <= 3) {
+      return nameTokens
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ')
+    }
+  }
+
+  return null
+}
+
+/** Returns clean first name, or empty string if unknown/generic */
+export function getCleanFirstName(fullName?: string): string {
+  const clean = (fullName || '').trim()
+  if (
+    !clean ||
+    /^(guest|student|campus student|whatsapp student|there|anonymous|user)$/i.test(clean)
+  ) {
+    return ''
+  }
+  return clean.split(/\s+/)[0]
 }
 
 /** Create a WhatsApp Agent Inspection Booking (defaults to 'pending_agent') and sync to Supabase */
@@ -418,8 +517,12 @@ function buildOpenRouterSystemPrompt(params: {
     })
     .join('\n')
 
+  const studentContextLine = params.studentName
+    ? `You are chatting on WhatsApp with "${params.studentName}" (${params.studentPhone || 'WhatsApp Student'}).`
+    : `You are chatting on WhatsApp with a student (${params.studentPhone || 'Guest Student'} — do not assume a name unless the student shares their name).`
+
   return `You are "Aroom Housing Assistant", a warm, friendly, conversational WhatsApp Student Housing & Trusted Agent Concierge for Nigerian university students.
-You are chatting on WhatsApp with "${params.studentName}" (${params.studentPhone}).
+${studentContextLine}
 All agents and landlords in your roster have been manually vetted and approved by our Team Leader (${params.teamLeaderName}).
 
 YOUR ROLE IN CONVERSATION:
@@ -451,8 +554,20 @@ export async function processWhatsAppStudentMessage(input: {
 }): Promise<WhatsAppBotReply> {
   const rawMsg = input.studentMessage.trim()
   const lower = rawMsg.toLowerCase()
-  const studentPhone = input.studentPhone || '+2348055556666'
-  const studentName = input.studentName || 'Amara Chukwuemeka'
+
+  // Passively capture name or phone if the student mentions them in chat
+  const passiveName = extractStudentNameFromText(rawMsg)
+  if (passiveName) {
+    saveStudentChatIdentity({ name: passiveName })
+  }
+  const passivePhone = extractNigerianPhone(rawMsg)
+  if (passivePhone) {
+    saveStudentChatIdentity({ phone: passivePhone })
+  }
+
+  const savedIdentity = getStudentChatIdentity()
+  const studentPhone = (input.studentPhone || savedIdentity.phone || '').trim()
+  const studentName = (input.studentName || savedIdentity.name || '').trim()
   const history = input.history || []
   const tl = getTeamLeaderProfile()
   const config = getTwilioAiConfig()
@@ -658,7 +773,9 @@ export async function processWhatsAppStudentMessage(input: {
   }
 
   // ── PATH C: Natural 4-Stage Human Conversational Flow ──
-  const firstName = studentName.split(' ')[0]
+  const firstName = getCleanFirstName(studentName)
+  const nameComma = firstName ? `, ${firstName}` : ''
+  const greetName = firstName ? ` ${firstName}` : ' there'
 
   // Stage 0: Anti-Extortion & Reported Issue Handler (Task 4.1)
   const isReportIntent =
@@ -706,21 +823,28 @@ export async function processWhatsAppStudentMessage(input: {
     }
   }
 
-  // Stage 0b: Check if student is answering the Phone Number Gate (Task 2.3)
+  // Stage 0b: Check if student is answering the Name + Phone Number Gate (Task 2.3)
   const detectedPhone = extractNigerianPhone(rawMsg)
   const draftRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_pending_booking_draft') : null
   if (detectedPhone && draftRaw) {
     try {
-      localStorage.setItem('aroom_student_phone', detectedPhone)
+      saveStudentChatIdentity({
+        phone: detectedPhone,
+        ...(passiveName ? { name: passiveName } : {}),
+      })
       localStorage.removeItem('aroom_pending_booking_draft')
       const draft = JSON.parse(draftRaw)
       const draftHouse = availableHouses[draft.houseIdx] || availableHouses[0]
       const draftAgentEntry =
         approvedAgents.find((a) => a.partner.id === draft.agentId) || approvedAgents[0]
 
+      const resolvedName = passiveName || studentName || 'Campus Student'
+      const resolvedFirst = getCleanFirstName(resolvedName)
+      const resolvedComma = resolvedFirst ? `, ${resolvedFirst}` : ''
+
       const booking = await createWhatsAppAgentBooking({
         studentPhone: detectedPhone,
-        studentName,
+        studentName: resolvedName,
         partner: draftAgentEntry.partner,
         house: draftHouse,
         preferredSlot: draft.slot || 'Tomorrow at 2:00 PM',
@@ -729,7 +853,7 @@ export async function processWhatsAppStudentMessage(input: {
 
       const cleanWaDigits = draftAgentEntry.partner.phoneNumber.replace(/\D/g, '')
       const replyText = [
-        `Thank you, ${firstName}! Phone number *${detectedPhone}* saved. 🎉`,
+        `Thank you${resolvedComma}! Your WhatsApp number *${detectedPhone}* is saved. 🎉`,
         ``,
         `⏳ *Inspection Request #${booking.bookingRef} Logged*`,
         `🔖 Booking Reference: *#${booking.bookingRef}* (Awaiting Partner Confirm)`,
@@ -781,7 +905,7 @@ export async function processWhatsAppStudentMessage(input: {
 
   if (isGreetingOnly) {
     const replyText = [
-      `Hi ${firstName}! 👋 Welcome to *Aroom Housing*.`,
+      `Hi${greetName}! 👋 Welcome to *Aroom Housing*.`,
       ``,
       `I can help you check available student rooms, see the exact total move-in cost (with zero hidden charges), and book a free physical walkthrough with one of our *${approvedAgents.length} verified agents and landlords*.`,
       ``,
@@ -818,7 +942,7 @@ export async function processWhatsAppStudentMessage(input: {
     lower.includes('refundable')
   ) {
     const replyText = [
-      `Great question, ${firstName}! 🛡️ Here is how we keep you 100% safe on Aroom:`,
+      `Great question${nameComma}! 🛡️ Here is how we keep you 100% safe on Aroom:`,
       ``,
       `1️⃣ *Free Physical Inspections (₦0):* You NEVER pay any agent to inspect a room. Walking through the house in person is completely free.`,
       `2️⃣ *Personally Vetted Agents:* Every agent and landlord here (like *${approvedAgents[0]?.partner.fullName || 'David Opubo'}*) has had their ID card and phone number verified by our Team Leader (*${tl.fullName}*).`,
@@ -913,7 +1037,7 @@ export async function processWhatsAppStudentMessage(input: {
     )
     const preferredSlot = slotMatch ? slotMatch[0].trim() : 'Tomorrow at 2:00 PM'
 
-    // Mandatory Student WhatsApp Phone Gate (Task 2.3)
+    // Mandatory Student WhatsApp Phone + Name Gate (Task 2.3)
     const storedPhone = typeof localStorage !== 'undefined' ? localStorage.getItem('aroom_student_phone') || '' : ''
     const effectivePhone =
       isValidNigerianPhone(studentPhone)
@@ -933,27 +1057,25 @@ export async function processWhatsAppStudentMessage(input: {
         localStorage.setItem('aroom_pending_booking_draft', JSON.stringify(draftPayload))
       }
 
-      const promptPhoneText = [
-        `Almost done! Drop your active WhatsApp phone number (e.g., 0803XXXXXXX) so we can generate your free *#ARM-XXXX* inspection pass and send it to your phone.`,
-      ].join('\n')
+      const promptPhoneText = firstName
+        ? `Almost done, ${firstName}! 👋 Drop your active *WhatsApp phone number* (e.g., 0803XXXXXXX) so we can generate your free *#ARM-XXXX* inspection pass and send it to your phone.`
+        : `Almost done! 👋 Please reply with your *First Name and active WhatsApp number* (e.g., Chidi 08031234567) so we can generate your free *#ARM-XXXX* inspection pass and send it to your phone.`
 
       return {
         id: crypto.randomUUID(),
         sender: 'bot',
         text: promptPhoneText,
         twimlXml: buildTwimlXml(promptPhoneText),
-        suggestedReplies: [
-          '08031234567',
-          '08123456789',
-          'Cancel booking',
-        ],
+        suggestedReplies: firstName
+          ? ['08031234567', '08123456789', 'Cancel booking']
+          : ['Chidi 08031234567', 'Kemi 08123456789', 'Cancel booking'],
         timestamp: new Date().toISOString(),
       }
     }
 
     const booking = await createWhatsAppAgentBooking({
       studentPhone: effectivePhone,
-      studentName,
+      studentName: studentName || 'Campus Student',
       partner: matchedAgent,
       house: matchedHouse,
       preferredSlot,
@@ -1009,7 +1131,7 @@ export async function processWhatsAppStudentMessage(input: {
       const agent = house.verifiedAgent
       const agentFirstName = agent?.fullName.split(' ')[0] || 'David'
       const replyText = [
-        `Sure thing, ${firstName}! Here is the complete, transparent cost breakdown for *${house.listing.title}* (${house.campusShort}):`,
+        `Sure thing${nameComma}! Here is the complete, transparent cost breakdown for *${house.listing.title}* (${house.campusShort}):`,
         ``,
         `📍 *Location:* ${house.listing.landmark}`,
         `👤 *Verified Partner:* ${agent ? `${agent.fullName} (${agent.phoneNumber})` : house.listing.uploaderName}`,
@@ -1079,7 +1201,7 @@ export async function processWhatsAppStudentMessage(input: {
     const firstAgentName = finalAgents[0]?.partner.fullName.split(' ')[0] || 'David'
 
     const replyText = [
-      `Here are our *Verified Agents & Landlords*${campusFilter ? ` covering *${campusFilter.toUpperCase()}*` : ''} ready to take you on a free physical walkthrough, ${firstName}:`,
+      `Here are our *Verified Agents & Landlords*${campusFilter ? ` covering *${campusFilter.toUpperCase()}*` : ''} ready to take you on a free physical walkthrough${nameComma}:`,
       ``,
       ...agentCards.flatMap((c) => [c, '']),
       `Every partner above has been personally vetted by our Team Leader (*${tl.fullName}*). Just tell me who you'd like to book (for example, *"Book ${firstAgentName} tomorrow at 2pm"*), or ask to see the rooms they have available!`,
@@ -1171,7 +1293,7 @@ export async function processWhatsAppStudentMessage(input: {
 
     if (sections.length === 0) {
       sections.push(
-        `Here are verified rooms closest to your ₦${maxBudget.toLocaleString()} budget around ${campusFilter ? campusFilter.toUpperCase() : 'UNIPORT'}, ${firstName}:`,
+        `Here are verified rooms closest to your ₦${maxBudget.toLocaleString()} budget around ${campusFilter ? campusFilter.toUpperCase() : 'UNIPORT'}${nameComma}:`,
         '',
         ...availableHouses.slice(0, 3).flatMap((h) => [renderListingBlock(h), ''])
       )
@@ -1194,7 +1316,7 @@ export async function processWhatsAppStudentMessage(input: {
     const topAgentFirstName = topHouse?.verifiedAgent?.fullName.split(' ')[0] || 'David'
 
     replyText = [
-      `Here are verified campus rooms${campusFilter ? ` near *${campusFilter.toUpperCase()}*` : ''} ready for free physical walkthroughs, ${firstName}:`,
+      `Here are verified campus rooms${campusFilter ? ` near *${campusFilter.toUpperCase()}*` : ''} ready for free physical walkthroughs${nameComma}:`,
       '',
       ...matches.slice(0, 4).flatMap((h) => [renderListingBlock(h), '']),
       `Which of these rooms would you like to inspect in person? You can ask me for the full fee breakdown of *${topHouse.indexCode}*, or say *"Book ${topAgentFirstName} tomorrow at 2pm"* to schedule your free walkthrough!`,

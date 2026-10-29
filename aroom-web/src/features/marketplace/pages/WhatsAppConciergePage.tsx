@@ -10,12 +10,18 @@ import {
   Calendar,
   MessageSquare,
   MapPin,
+  User,
 } from 'lucide-react'
 import {
   processWhatsAppStudentMessage,
   getVerifiedWhatsAppCatalog,
   listWhatsAppBookings,
   WHATSAPP_BOOKING_EVENT,
+  STUDENT_IDENTITY_EVENT,
+  getStudentChatIdentity,
+  saveStudentChatIdentity,
+  getCleanFirstName,
+  type StudentChatIdentity,
   type WhatsAppBotReply,
   type EnrichedWhatsAppListing,
   type WhatsAppAgentBooking,
@@ -58,15 +64,22 @@ export function WhatsAppConciergePage() {
   >([])
   const [availableHouses, setAvailableHouses] = useState<EnrichedWhatsAppListing[]>([])
   const [bookings, setBookings] = useState<WhatsAppAgentBooking[]>(() => listWhatsAppBookings())
-  const session = getCurrentSession()
-  const studentFirstName = session?.fullName ? session.fullName.split(' ')[0] : 'there'
+  const [studentIdentity, setStudentIdentity] = useState<StudentChatIdentity>(() =>
+    getStudentChatIdentity(getCurrentSession())
+  )
+  const [editingIdentity, setEditingIdentity] = useState(false)
+  const [draftName, setDraftName] = useState('')
+  const [draftPhone, setDraftPhone] = useState('')
+
+  const cleanFirstName = getCleanFirstName(studentIdentity.name)
+  const welcomeGreeting = cleanFirstName ? `Hi ${cleanFirstName}! 👋` : `Hi there! 👋`
 
   const [messages, setMessages] = useState<WhatsAppBotReply[]>(() => [
     {
       id: 'welcome-msg',
       sender: 'bot',
       text: [
-        `Hi ${studentFirstName}! 👋 Welcome to *Aroom Housing Assistant*.`,
+        `${welcomeGreeting} Welcome to *Aroom Housing Assistant*.`,
         ``,
         `You can chat with me in English or Pidgin just like a friend on WhatsApp:`,
         `• *Tell me your school & budget* to see available rooms and the exact total amount you'll need to move in.`,
@@ -91,17 +104,37 @@ export function WhatsAppConciergePage() {
     setApprovedAgents(cat.approvedAgents)
     setAvailableHouses(cat.availableHouses)
     setBookings(listWhatsAppBookings())
+    setStudentIdentity(getStudentChatIdentity(getCurrentSession()))
   }
 
   useEffect(() => {
+    const syncIdentity = () => {
+      setStudentIdentity(getStudentChatIdentity(getCurrentSession()))
+    }
     loadCatalog()
     window.addEventListener(AUTH_CHANGE_EVENT, loadCatalog)
     window.addEventListener(WHATSAPP_BOOKING_EVENT, loadCatalog)
+    window.addEventListener(STUDENT_IDENTITY_EVENT, syncIdentity)
     return () => {
       window.removeEventListener(AUTH_CHANGE_EVENT, loadCatalog)
       window.removeEventListener(WHATSAPP_BOOKING_EVENT, loadCatalog)
+      window.removeEventListener(STUDENT_IDENTITY_EVENT, syncIdentity)
     }
   }, [])
+
+  useEffect(() => {
+    const nextFirstName = getCleanFirstName(studentIdentity.name)
+    const nextGreeting = nextFirstName ? `Hi ${nextFirstName}! 👋` : `Hi there! 👋`
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === 'welcome-msg') {
+        const updatedText = prev[0].text.replace(/^Hi [^!]+! 👋/, nextGreeting)
+        if (updatedText !== prev[0].text) {
+          return [{ ...prev[0], text: updatedText }]
+        }
+      }
+      return prev
+    })
+  }, [studentIdentity.name])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -132,14 +165,16 @@ export function WhatsAppConciergePage() {
     setSending(true)
 
     try {
+      const latestIdentity = getStudentChatIdentity(getCurrentSession())
       const botReply = await processWhatsAppStudentMessage({
         studentMessage: clean,
-        studentName: session?.fullName || 'Amara Chukwuemeka',
-        studentPhone: session?.phoneNumber || '+2348055556666',
+        studentName: latestIdentity.name,
+        studentPhone: latestIdentity.phone,
         history,
       })
       setMessages((prev) => [...prev, botReply])
       setBookings(listWhatsAppBookings())
+      setStudentIdentity(getStudentChatIdentity(getCurrentSession()))
     } finally {
       setSending(false)
     }
@@ -193,7 +228,28 @@ export function WhatsAppConciergePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setDraftName(studentIdentity.name)
+                setDraftPhone(studentIdentity.phone)
+                setEditingIdentity((prev) => !prev)
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+              title="Set or update your name and WhatsApp number for inspection passes"
+            >
+              <User className="w-3.5 h-3.5 text-emerald-400" />
+              {cleanFirstName ? (
+                <span>
+                  {cleanFirstName}
+                  {studentIdentity.phone ? ` (${studentIdentity.phone})` : ' • Add WhatsApp'} ✎
+                </span>
+              ) : (
+                <span>Guest Student • Set Name &amp; WhatsApp ✎</span>
+              )}
+            </button>
+
             <a
               href={buildWhatsAppHandoffUrl()}
               target="_blank"
@@ -205,6 +261,60 @@ export function WhatsAppConciergePage() {
             </a>
           </div>
         </div>
+
+        {/* Inline Student Identity Editor */}
+        {editingIdentity && (
+          <div className="rounded-2xl bg-slate-900 border border-emerald-500/30 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="text-xs text-slate-300">
+              <span className="font-extrabold text-emerald-400">Your Chat Identity:</span> Used to personalize your inspection passes (or simply tell the AI in chat).
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                placeholder="First Name (e.g. Chidi)"
+                className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+              <input
+                type="tel"
+                value={draftPhone}
+                onChange={(e) => setDraftPhone(e.target.value)}
+                placeholder="WhatsApp (e.g. 08031234567)"
+                className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const updated = saveStudentChatIdentity({
+                    name: draftName.trim(),
+                    phone: draftPhone.trim(),
+                  })
+                  setStudentIdentity(updated)
+                  setEditingIdentity(false)
+                }}
+                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold cursor-pointer"
+              >
+                Save
+              </button>
+              {(studentIdentity.name || studentIdentity.phone) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem('aroom_whatsapp_student_identity_v1')
+                    setStudentIdentity({ name: '', phone: '' })
+                    setDraftName('')
+                    setDraftPhone('')
+                    setEditingIdentity(false)
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold cursor-pointer"
+                >
+                  Reset to Guest
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ── Mobile Segmented Switcher (< lg) ── */}
         <div className="lg:hidden grid grid-cols-3 gap-1.5 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
@@ -479,73 +589,83 @@ export function WhatsAppConciergePage() {
               </div>
 
               <div className="space-y-2.5 max-h-72 overflow-y-auto">
-                {bookings.map((b) => (
-                  <div
-                    key={b.id}
-                    className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-extrabold text-emerald-400">Booking #{b.bookingRef}</span>
-                      {b.status === 'pending_agent' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 truncate">
-                          ⏳ Awaiting Agent Confirm
-                        </span>
-                      )}
-                      {b.status === 'confirmed' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 truncate">
-                          ✅ Confirmed
-                        </span>
-                      )}
-                      {b.status === 'reported_issue' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 truncate">
-                          🚨 Reported Issue
-                        </span>
-                      )}
-                      {b.status === 'reschedule_needed' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 truncate">
-                          🔄 Reschedule Needed
-                        </span>
-                      )}
-                      {b.status === 'completed' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30 truncate">
-                          Completed
-                        </span>
-                      )}
-                      {b.status === 'cancelled' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 truncate">
-                          Cancelled
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="font-bold text-white truncate">{b.listingTitle}</p>
-
-                    <div className="text-[11px] text-slate-400 space-y-1">
-                      <p className="flex items-center gap-1.5 truncate">
-                        <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span className="truncate">Meetup: <strong className="text-slate-200">{b.meetupLandmark || b.landmark}</strong></span>
-                      </p>
-                      <p className="flex items-center gap-1.5 truncate">
-                        <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span className="truncate">Slot: <strong className="text-slate-200">{b.preferredSlot}</strong></span>
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
-                      <span className="truncate">
-                        With: <strong className="text-slate-200">{b.agentName}</strong>
-                      </span>
-                      <a
-                        href={`https://wa.me/${b.agentPhone.replace(/\D/g, '')}?text=Hello%20${encodeURIComponent(b.agentName)}%2C%20I%20have%20an%20inspection%20pass%20%23${b.bookingRef}%20for%20${encodeURIComponent(b.listingTitle)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-bold text-emerald-400 hover:underline shrink-0"
-                      >
-                        <Phone className="w-3 h-3" /> Send Pass on WhatsApp
-                      </a>
-                    </div>
+                {bookings.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-center space-y-1.5">
+                    <p className="text-xs font-bold text-slate-300">No inspection passes booked yet</p>
+                    <p className="text-[11px] text-slate-400">
+                      Ask the assistant in chat to book a free physical viewing (e.g.{' '}
+                      <span className="text-emerald-400 font-semibold">"Book #1 tomorrow at 2pm"</span>) and your pass will appear here.
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  bookings.map((b) => (
+                    <div
+                      key={b.id}
+                      className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-extrabold text-emerald-400">Booking #{b.bookingRef}</span>
+                        {b.status === 'pending_agent' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 truncate">
+                            ⏳ Awaiting Agent Confirm
+                          </span>
+                        )}
+                        {b.status === 'confirmed' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 truncate">
+                            ✅ Confirmed
+                          </span>
+                        )}
+                        {b.status === 'reported_issue' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 truncate">
+                            🚨 Reported Issue
+                          </span>
+                        )}
+                        {b.status === 'reschedule_needed' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 truncate">
+                            🔄 Reschedule Needed
+                          </span>
+                        )}
+                        {b.status === 'completed' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30 truncate">
+                            Completed
+                          </span>
+                        )}
+                        {b.status === 'cancelled' && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 truncate">
+                            Cancelled
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="font-bold text-white truncate">{b.listingTitle}</p>
+
+                      <div className="text-[11px] text-slate-400 space-y-1">
+                        <p className="flex items-center gap-1.5 truncate">
+                          <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span className="truncate">Meetup: <strong className="text-slate-200">{b.meetupLandmark || b.landmark}</strong></span>
+                        </p>
+                        <p className="flex items-center gap-1.5 truncate">
+                          <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="truncate">Slot: <strong className="text-slate-200">{b.preferredSlot}</strong></span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
+                        <span className="truncate">
+                          With: <strong className="text-slate-200">{b.agentName}</strong>
+                        </span>
+                        <a
+                          href={`https://wa.me/${b.agentPhone.replace(/\D/g, '')}?text=Hello%20${encodeURIComponent(b.agentName)}%2C%20I%20have%20an%20inspection%20pass%20%23${b.bookingRef}%20for%20${encodeURIComponent(b.listingTitle)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 font-bold text-emerald-400 hover:underline shrink-0"
+                        >
+                          <Phone className="w-3 h-3" /> Send Pass on WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
