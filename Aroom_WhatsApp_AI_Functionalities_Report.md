@@ -226,3 +226,4 @@ The WhatsApp AI is strictly synchronized with the closed pilot cohort model:
 1. **Twilio Production Deployment:** Link live WhatsApp Business Number (`+234 809 999 0001`) with Meta Verified Business Manager.
 2. **Automated SMS Reminders:** Trigger automated SMS 2 hours before the scheduled inspection time to both student and agent.
 3. **Location Pin Sharing:** Attach Google Maps coordinates to the booking confirmation message for exact lodge navigation at UNIPORT.
+
